@@ -7,6 +7,9 @@ import java.util.Properties;
 
 import btwmods.ModLoader;
 import btwmods.ModProperties;
+import btwmods.api.player.events.ContainerEvent;
+import btwmods.api.player.events.DropEvent;
+import btwmods.api.player.events.SlotEvent;
 import btwmods.api.player.listeners.IContainerListener;
 import btwmods.api.player.listeners.IDropListener;
 import btwmods.api.player.listeners.ISlotListener;
@@ -116,15 +119,21 @@ public class PlayerAPI {
 	}
 	
 	public void containerOpened(Block block, Container container, World world, int x, int y, int z) {
-		if (!containerListeners.isEmpty())
+		if (!containerListeners.isEmpty()) {
+			ContainerEvent event = ContainerEvent.Open(this, block, container, world, x, y, z);
+			
 			for (IContainerListener listener : containerListeners)
-				listener.containerOpened(block, container, world, x, y, z);
+				listener.containerAction(event);
+		}
 	}
 	
 	public void containerClosed(Container container) {
-		if (!containerListeners.isEmpty())
+		if (!containerListeners.isEmpty()) {
+			ContainerEvent event = ContainerEvent.Close(this, container);
+			
 			for (IContainerListener listener : containerListeners)
-				listener.containerClosed(container);
+				listener.containerAction(event);
+		}
 	}
 	
 	public void containerDestroyed(Container container, int x, int y, int z) {
@@ -138,81 +147,76 @@ public class PlayerAPI {
 	 */
 	public void itemDropped(ItemStack itemStack, int mouseButton) {
 		if (!dropListeners.isEmpty()) {
-        	ItemStack eventStack = itemStack.copy();
-        	if (mouseButton == 1) eventStack.stackSize = 1;
-        	
-        	itemDropped(eventStack);
+			DropEvent event;
+			
+			if (mouseButton == 1)
+				event = DropEvent.One(this, itemStack);
+			else
+				event = DropEvent.Stack(this, itemStack);
+			
+			for (IDropListener listener : dropListeners)
+				listener.dropAction(event);
 		}
 	}
 	
 	/**
-	 * An item is dropped from a player's inventory for any reason (e.g. closed a crafting window).
+	 * An item is dropped from a player's inventory for any reason (purposefully drops an item or closed a crafting window).
 	 * @param items
 	 */
-	public void itemDropped(ItemStack items) {
-		if (!dropListeners.isEmpty())
+	public void itemEjected(ItemStack items) {
+		if (!dropListeners.isEmpty()) {
+			DropEvent event = DropEvent.Eject(this, items);
+		
 			for (IDropListener listener : dropListeners)
-				listener.itemDropped(items);
+				listener.dropAction(event);
+		}
 	}
 	
 	/**
 	 * All player items are dropped.
 	 */
 	public void itemsDroppedAll() {
-		if (!dropListeners.isEmpty())
+		if (!dropListeners.isEmpty()) {
+			DropEvent event = DropEvent.All(this);
+			
 			for (IDropListener listener : dropListeners)
-				listener.itemsDroppedAll();
+				listener.dropAction(event);
+		}
 	}
-	
-	/*public void itemWithdrawn(Container container, int slotId, ItemStack itemStack) {
-		if (!listeners.isEmpty())
-			for (IItemListener listener : listeners)
-				listener.itemWithdrawn(container, slotId, itemStack);
-	}
-	
-	public void itemDeposited(Container container, int slotId, ItemStack itemStack) {if (!listeners.isEmpty())
-		if (!listeners.isEmpty())
-			for (IItemListener listener : listeners)
-				listener.itemDeposited(container, slotId, itemStack);
-	}*/
 	
 	public void itemTransfered(Container container, int slotId, ItemStack original) {
 		if (!slotListeners.isEmpty()) {
-			Slot clickedSlot = (Slot)container.inventorySlots.get(slotId);
-			ItemStack remaining = clickedSlot.getStack();
-
+        	SlotEvent event = SlotEvent.Transfer(this, container, slotId, original);
+        	
 			for (ISlotListener listener : slotListeners)
-				listener.itemTransfered(container, clickedSlot, original, remaining);
+				listener.slotAction(event);
 		}
 	}
 	
 	public void itemAddedToSlot(Container container, Slot clickedSlot, int quantity) {
 		if (!slotListeners.isEmpty()) {
-			ItemStack slotItems = clickedSlot.getStack();
-			ItemStack heldItems = this.player.inventory.getItemStack();
-
+        	SlotEvent event = SlotEvent.Add(this, container, clickedSlot, quantity);
+        	
 			for (ISlotListener listener : slotListeners)
-				listener.itemAddedToSlot(container, clickedSlot, slotItems, heldItems, quantity);
+				listener.slotAction(event);
 		}
 	}
 	
 	public void itemRemovedFromSlot(Container container, Slot clickedSlot, int quantity) {
 		if (!slotListeners.isEmpty()) {
-			ItemStack slotItems = clickedSlot.getStack();
-			ItemStack heldItems = this.player.inventory.getItemStack();
-
+        	SlotEvent event = SlotEvent.Add(this, container, clickedSlot, quantity);
+        	
 			for (ISlotListener listener : slotListeners)
-				listener.itemRemovedFromSlot(container, clickedSlot, slotItems, heldItems, quantity);
+				listener.slotAction(event);
 		}
 	}
 	
 	public void itemSwitchedWithSlot(Container container, Slot clickedSlot) {
 		if (!slotListeners.isEmpty()) {
-			ItemStack slotItems = clickedSlot.getStack();
-			ItemStack heldItems = this.player.inventory.getItemStack();
-
+        	SlotEvent event = SlotEvent.Switch(this, container, clickedSlot);
+        	
 			for (ISlotListener listener : slotListeners)
-				listener.itemSwitchedWithSlot(container, clickedSlot, slotItems, heldItems);
+				listener.slotAction(event);
 		}
 	}
 }

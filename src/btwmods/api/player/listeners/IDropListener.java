@@ -1,9 +1,8 @@
 package btwmods.api.player.listeners;
 
 import java.util.EventListener;
-import net.minecraft.src.ItemStack;
+import btwmods.api.player.events.DropEvent;
 
 public interface IDropListener extends EventListener {
-	void itemDropped(ItemStack items);
-	void itemsDroppedAll();
+	void dropAction(DropEvent event);
 }
