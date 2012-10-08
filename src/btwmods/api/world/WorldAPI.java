@@ -9,6 +9,7 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import btwmods.ModLoader;
 import btwmods.ModProperties;
+import btwmods.api.world.events.BlockEvent;
 import btwmods.api.world.listeners.IBlockListener;
 
 public class WorldAPI {
@@ -47,10 +48,10 @@ public class WorldAPI {
 	
 	public void blockContainerBroken(Block block, int x, int y, int z, int blockID, int blockMetadata) {
 		if (!blockListeners.isEmpty()) {
-            TileEntity tileEntity = this.world.getBlockTileEntity(x, y, z);
+			BlockEvent event = BlockEvent.RemovedContainer(this, block, blockMetadata, x, y, z);
 
 			for (IBlockListener listener : blockListeners)
-				listener.blockContainerBroken(block, blockMetadata, tileEntity, x, y, z);
+				listener.blockAction(event);
 		}
 	}
 }
