@@ -48,18 +48,18 @@ public class PlayerAPI {
 	public void addListener(EventListener listener) {
 		if (listener instanceof ISlotListener)
 			slotListeners.add((ISlotListener)listener);
-		else if (listener instanceof IContainerListener)
+		if (listener instanceof IContainerListener)
 			containerListeners.add((IContainerListener)listener);
-		else if (listener instanceof IDropListener)
+		if (listener instanceof IDropListener)
 			dropListeners.add((IDropListener)listener);
 	}
 
 	public void removeListener(EventListener listener) {
 		if (listener instanceof ISlotListener)
 			slotListeners.remove((ISlotListener)listener);
-		else if (listener instanceof IContainerListener)
+		if (listener instanceof IContainerListener)
 			containerListeners.remove((IContainerListener)listener);
-		else if (listener instanceof IDropListener)
+		if (listener instanceof IDropListener)
 			dropListeners.remove((IDropListener)listener);
 	}
 	
@@ -200,7 +200,7 @@ public class PlayerAPI {
 	
 	public void itemRemovedFromSlot(Container container, Slot clickedSlot, int quantity) {
 		if (!slotListeners.isEmpty()) {
-        	SlotEvent event = SlotEvent.Add(this, container, clickedSlot, quantity);
+        	SlotEvent event = SlotEvent.Remove(this, container, clickedSlot, quantity);
         	
 			for (ISlotListener listener : slotListeners)
 				listener.slotAction(event);
