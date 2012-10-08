@@ -9,5 +9,5 @@ public interface IMod<T> {
 	/**
 	 * Cleanup and remove listeners.
 	 */
-	public void unload();
+	public void unload(T parent);
 }

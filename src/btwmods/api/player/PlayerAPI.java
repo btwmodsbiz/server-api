@@ -42,7 +42,7 @@ public class PlayerAPI {
 	}
 	
 	public void unload() {
-		mods.unloadMods();
+		mods.unloadMods(this);
 	}
 	
 	public void addListener(EventListener listener) {

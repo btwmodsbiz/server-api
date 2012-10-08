@@ -79,9 +79,9 @@ public class ModLoader<P, T extends IMod> {
 			}
 		}
 
-		public void unloadMods() {
+		public void unloadMods(P parentMod) {
 			for (T mod : mods) {
-				mod.unload();
+				mod.unload(parentMod);
 			}
 			mods.clear();
 		}
