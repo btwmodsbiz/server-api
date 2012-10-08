@@ -107,7 +107,10 @@ public class PlayerAPI {
 		}
 	}
 	
-
+	public void blockRemoved(Block block, int metadata, int x, int y, int z) {
+		
+	}
+	
 	public void containerPlaced(Container container, World world, int x, int y, int z) {
 		//this.items.containerPlaced(player, container, world, x, y, z);
 	}
