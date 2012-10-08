@@ -22,13 +22,9 @@ public class WorldAPI {
 	
 	public final static String MOD_LIST_KEY = "WorldAPI.Mods";
 	
-	public static void SetDefaultProperties(Properties properties) {
-		ModLoader.setDefaultProperties(properties, ModProperties.Get(MOD_LIST_KEY));
-	}
-	
 	public WorldAPI(World world) {
 		this.world = world;
-		mods = ModLoader.createMods(ModProperties.Get(MOD_LIST_KEY));
+		mods = ModLoader.createMods(ModProperties.Get(MOD_LIST_KEY, ""));
 		mods.initMods(this);
 	}
 	

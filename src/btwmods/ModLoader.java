@@ -25,19 +25,21 @@ public class ModLoader<P, T extends IMod> {
 		if ((classes = ModClassCache.get(this.parentClass)) == null) {
 			classes = new HashSet<Class>();
 			
-			String[] modNames = modList.split("[:,;]+");
-			for (int i = 0; i < modNames.length; i++) {
-				if (!modNames[i].isEmpty()) {
-					try {
-						Class modClass = Class.forName(modNames[i]);
-						if (modClass.isAssignableFrom(modClass)) {
-							classes.add(modClass);
+			if (modList != null && !modList.isEmpty()) {
+				String[] modNames = modList.split("[:,;]+");
+				for (int i = 0; i < modNames.length; i++) {
+					if (!modNames[i].isEmpty()) {
+						try {
+							Class modClass = Class.forName(modNames[i]);
+							if (modClass.isAssignableFrom(modClass)) {
+								classes.add(modClass);
+							}
+							else {
+								MinecraftServer.logger.warning("BTWMod's " + this.parentClass.getSimpleName() + " failed to load the '" + modNames[i] + "' mod class, as it does not extend " + modClass.getName() + ".");
+							}
+						} catch (ClassNotFoundException e) {
+							MinecraftServer.logger.warning("BTWMod's " + this.parentClass.getSimpleName() + " failed to find the class for the '" + modNames[i] + "' mod.");
 						}
-						else {
-							MinecraftServer.logger.warning("BTWMod's " + this.parentClass.getSimpleName() + " failed to load the '" + modNames[i] + "' mod class, as it does not extend " + modClass.getName() + ".");
-						}
-					} catch (ClassNotFoundException e) {
-						MinecraftServer.logger.warning("BTWMod's " + this.parentClass.getSimpleName() + " failed to find the class for the '" + modNames[i] + "' mod.");
 					}
 				}
 			}
@@ -46,10 +48,6 @@ public class ModLoader<P, T extends IMod> {
 		}
 		
 		return classes;
-	}
-	
-	public void setDefaultProperties(Properties properties, String modList) {
-		createMods(modList).setDefaultProperties(properties);
 	}
 	
 	public Mods createMods(String modList) {
@@ -86,12 +84,6 @@ public class ModLoader<P, T extends IMod> {
 				mod.unload();
 			}
 			mods.clear();
-		}
-		
-		public void setDefaultProperties(Properties properties) {
-			for (T mod : mods) {
-				mod.setDefaultProperties(properties);
-			}
 		}
 	}
 }
