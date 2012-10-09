@@ -40,7 +40,19 @@ public class PlayerListener implements IPlayerAPIMod, ISlotListener, IDropListen
 
 	@Override
 	public void containerAction(ContainerEvent event) {
+		EntityPlayer player = api.player;
 		
+		if (event.getType() == ContainerEvent.TYPE.OPENED) {
+			logger.log(Level.INFO, player.username + " at " + (int)player.posX + "/" + (int)player.posY + "/" + (int)player.posZ + " opened " + event.getBlock().getBlockName() + " at " + event.getX() + "/" + event.getY() + "/" + event.getZ(),
+					new Object[] { "opened container", event });
+		}
+		else if (event.getType() == ContainerEvent.TYPE.REMOVED) {
+			logger.log(Level.INFO, player.username + " at " + (int)player.posX + "/" + (int)player.posY + "/" + (int)player.posZ + " removed " + event.getBlock().getBlockName() + " at " + event.getX() + "/" + event.getY() + "/" + event.getZ(),
+					new Object[] { "removed container", event });
+		}
+		else if (event.getType() == ContainerEvent.TYPE.PLACED) {
+			
+		}
 	}
 
 	@Override
