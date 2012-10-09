@@ -124,15 +124,6 @@ public class PlayerAPI {
 		}
 	}
 	
-	public void containerClosed(Container container) {
-		if (!containerListeners.isEmpty()) {
-			ContainerEvent event = ContainerEvent.Closed(this, container);
-			
-			for (IContainerListener listener : containerListeners)
-				listener.containerAction(event);
-		}
-	}
-	
 	/**
 	 * Player purposefully drops an item.
 	 * @param itemStack

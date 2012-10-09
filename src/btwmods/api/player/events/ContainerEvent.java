@@ -13,7 +13,7 @@ import btwmods.api.player.PlayerAPI;
 
 public class ContainerEvent extends EventObject {
 	
-	public enum TYPE { OPENED, CLOSED, PLACED, REMOVED };
+	public enum TYPE { OPENED, PLACED, REMOVED };
 
 	private TYPE type;
 	private PlayerAPI api;
@@ -87,12 +87,6 @@ public class ContainerEvent extends EventObject {
 		event.x = x;
 		event.y = y;
 		event.z = z;
-		return event;
-	}
-	
-	public static ContainerEvent Closed(PlayerAPI api, Container container) {
-		ContainerEvent event = new ContainerEvent(TYPE.CLOSED, api);
-		event.container = container;
 		return event;
 	}
 	
