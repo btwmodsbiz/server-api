@@ -11,19 +11,12 @@ import net.minecraft.src.World;
 
 import btwmods.api.player.PlayerAPI;
 
-public class ContainerEvent extends EventObject {
+public class ContainerEvent extends AbstractBlockEvent {
 	
 	public enum TYPE { OPENED, PLACED, REMOVED };
 
 	private TYPE type;
-	private PlayerAPI api;
 	private Container container = null;
-	private Block block = null;
-	private int metadata = -1;
-	private World world = null;
-	private int x = -1;
-	private int y = -1;
-	private int z = -1;
 	
 	private boolean checkedTileEntity = false;
 	private TileEntity tileEntity = null;
@@ -32,52 +25,8 @@ public class ContainerEvent extends EventObject {
 		return type;
 	}
 	
-	public PlayerAPI getApi() {
-		return api;
-	}
-	
 	public Container getContainer() {
 		return container;
-	}
-	
-	public Block getBlock() {
-		return block;
-	}
-	
-	public int getMetadata() {
-		return metadata;
-	}
-	
-	public World getWorld() {
-		if (world == null)
-			world = api.player.worldObj;
-		
-		return world;
-	}
-	
-	public int getX() {
-		return x;
-	}
-	
-	public int getY() {
-		return y;
-	}
-	
-	public int getZ() {
-		return z;
-	}
-	
-	public TileEntity getTileEntity() {
-		if (!checkedTileEntity) {
-			tileEntity = getWorld().getBlockTileEntity(x, y, z);
-			checkedTileEntity = true;
-		}
-		
-		return tileEntity;
-	}
-	
-	public boolean hasInventory() {
-		return getTileEntity() instanceof IInventory;
 	}
 	
 	public static ContainerEvent Open(PlayerAPI api, Block block, Container container, int x, int y, int z) {
@@ -111,6 +60,5 @@ public class ContainerEvent extends EventObject {
 	private ContainerEvent(TYPE type, PlayerAPI api) {
 		super(api);
 		this.type = type;
-		this.api = api;
 	}
 }
