@@ -10,7 +10,7 @@ import btwmods.api.world.WorldAPI;
 
 public class BlockEvent extends EventObject {
 	
-	public enum TYPE { REMOVED_CONTAINER };
+	public enum TYPE { DESTROYED_CONTAINER };
 
 	private TYPE type;
 	private WorldAPI api;
@@ -79,7 +79,7 @@ public class BlockEvent extends EventObject {
 	}
 	
 	public static BlockEvent RemovedContainer(WorldAPI api, Block block, int metadata, int x, int y, int z) {
-		BlockEvent event = new BlockEvent(TYPE.REMOVED_CONTAINER, api);
+		BlockEvent event = new BlockEvent(TYPE.DESTROYED_CONTAINER, api);
 		event.block = block;
 		event.metadata = metadata;
 		event.x = x;
