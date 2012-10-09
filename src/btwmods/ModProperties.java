@@ -17,6 +17,8 @@ public class ModProperties {
 	private static Properties properties = null;
 	private static File propertiesFile = null;
 	
+	public static final boolean Default_EnableHardcoreBeds = true;
+	
 	private static void Load() {
 		if (properties == null) {
 			properties = new Properties();
@@ -65,5 +67,10 @@ public class ModProperties {
 			}
 		}
 		return value;
+	}
+	
+	public static boolean GetBoolean(String key, boolean defaultValue) {
+		String value = Get(key, "1");
+		return value == "1";
 	}
 }
