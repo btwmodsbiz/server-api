@@ -7,9 +7,11 @@ import java.util.Properties;
 
 import btwmods.ModLoader;
 import btwmods.ModProperties;
+import btwmods.api.player.events.BlockEvent;
 import btwmods.api.player.events.ContainerEvent;
 import btwmods.api.player.events.DropEvent;
 import btwmods.api.player.events.SlotEvent;
+import btwmods.api.player.listeners.IBlockListener;
 import btwmods.api.player.listeners.IContainerListener;
 import btwmods.api.player.listeners.IDropListener;
 import btwmods.api.player.listeners.ISlotListener;
@@ -28,7 +30,8 @@ public class PlayerAPI {
 	
 	private static ModLoader<PlayerAPI,IPlayerAPIMod> ModLoader = new ModLoader<PlayerAPI,IPlayerAPIMod>(PlayerAPI.class, IPlayerAPIMod.class);
 	private ModLoader.Mods mods;
-	
+
+	private HashSet<IBlockListener> blockListeners = new HashSet<IBlockListener>();
 	private HashSet<ISlotListener> slotListeners = new HashSet<ISlotListener>();
 	private HashSet<IContainerListener> containerListeners = new HashSet<IContainerListener>();
 	private HashSet<IDropListener> dropListeners = new HashSet<IDropListener>();
@@ -46,6 +49,8 @@ public class PlayerAPI {
 	}
 	
 	public void addListener(EventListener listener) {
+		if (listener instanceof IBlockListener)
+			blockListeners.add((IBlockListener)listener);
 		if (listener instanceof ISlotListener)
 			slotListeners.add((ISlotListener)listener);
 		if (listener instanceof IContainerListener)
@@ -55,6 +60,8 @@ public class PlayerAPI {
 	}
 
 	public void removeListener(EventListener listener) {
+		if (listener instanceof IBlockListener)
+			blockListeners.remove((IBlockListener)listener);
 		if (listener instanceof ISlotListener)
 			slotListeners.remove((ISlotListener)listener);
 		if (listener instanceof IContainerListener)
@@ -96,6 +103,13 @@ public class PlayerAPI {
 		 * - O C Turntable (opens as ContainerPlayer. does not close)
 		 * - O C Vase (opens as ContainerPlayer only on deposit. does not close)
 		 */
+
+		if (!blockListeners.isEmpty()) {
+			BlockEvent event = BlockEvent.Activated(this, block, x, y, z);
+			
+			for (IBlockListener listener : blockListeners)
+				listener.blockActivated(event);
+		}
 
 		if (block instanceof BlockContainer) {
 			containerOpened(block, this.player.craftingInventory, x, y, z);
