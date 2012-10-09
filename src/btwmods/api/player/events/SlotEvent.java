@@ -5,8 +5,12 @@ import java.util.EventObject;
 import btwmods.api.player.PlayerAPI;
 import btwmods.api.player.events.DropEvent.TYPE;
 import net.minecraft.src.Container;
+import net.minecraft.src.Entity;
+import net.minecraft.src.IInventory;
+import net.minecraft.src.InventoryLargeChest;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
+import net.minecraft.src.TileEntity;
 
 public class SlotEvent extends EventObject {
 	
@@ -33,6 +37,10 @@ public class SlotEvent extends EventObject {
 	
 	public Container getContainer() {
 		return container;
+	}
+	
+	public boolean slotIsContainer() {
+		return getSlot().inventory instanceof TileEntity || getSlot().inventory instanceof Entity || getSlot().inventory instanceof InventoryLargeChest;
 	}
 	
 	public int getSlotId() {
