@@ -5,9 +5,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minecraft.src.Container;
+import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.TileEntity;
 
 import btwmods.api.player.IPlayerAPIMod;
 import btwmods.api.player.PlayerAPI;
@@ -51,57 +53,57 @@ public class PlayerListener implements IPlayerAPIMod, ISlotListener, IDropListen
 		EntityPlayer player = api.player;
 		
 		ItemStack withdrawn = null;
-		int withdrawnQuantity = 0;
+		int withdrawnQuantity = -1;
 		
 		ItemStack deposited = null;
-		int depositedQuantity = 0;
+		int depositedQuantity = -1;
 		
 		if (event.getType() == SlotEvent.TYPE.ADD) {
-			if (event.getSlot().inventory instanceof InventoryPlayer) {
+			if (event.slotIsContainer()) {
 				deposited = event.getSlotItems();
 				depositedQuantity = event.getQuantity();
-			}
-			else {
-				withdrawn = event.getSlotItems();
-				withdrawnQuantity = event.getQuantity();
 			}
 		}
 		else if (event.getType() == SlotEvent.TYPE.REMOVE) {
-			if (event.getSlot().inventory instanceof InventoryPlayer) {
-				withdrawn = event.getSlotItems();
+			if (event.slotIsContainer()) {
+				withdrawn = event.getHeldItems();
 				withdrawnQuantity = event.getQuantity();
-			}
-			else {
-				deposited = event.getSlotItems();
-				depositedQuantity = event.getQuantity();
 			}
 		}
 		else if (event.getType() == SlotEvent.TYPE.SWITCH) {
-			if (event.getSlot().inventory instanceof InventoryPlayer) {
-				withdrawn = event.getSlotItems();
-				deposited = event.getHeldItems();
-			}
-			else {
+			if (event.slotIsContainer()) {
 				withdrawn = event.getHeldItems();
 				deposited = event.getSlotItems();
+			}
+			else {
+				withdrawn = event.getSlotItems();
+				deposited = event.getHeldItems();
 			}
 			
 			withdrawnQuantity = withdrawn.stackSize;
 			depositedQuantity = deposited.stackSize;
 		}
 		else if (event.getType() == SlotEvent.TYPE.TRANSFER) {
-			// TODO: determine the direction of transfer.
+			if (event.getSlot().inventory instanceof InventoryPlayer) {
+				deposited = event.getOriginalItems();
+				depositedQuantity = event.getQuantity();
+			}
+			else {
+				withdrawn = event.getOriginalItems();
+				withdrawnQuantity = event.getQuantity();
+			}
 		}
 		else {
+			// TODO: use proper logging.
 			ItemLogger.GetLogger().log(Level.SEVERE, "Unknown slotAction: " + event.getType().toString());
 		}
 		
 		if (withdrawn != null)
-			logger.log(Level.INFO, player.username + " at x" + player.posX + " y" + player.posY + " z" + player.posZ + " withdrew " + withdrawnQuantity + " " + withdrawn.getItemName() + " from " + event.getContainer().getClass().getSimpleName() + " (" + event.getSlot().inventory.getInvName() + ")",
+			logger.log(Level.INFO, player.username + " at " + (int)player.posX + "/" + (int)player.posY + "/" + (int)player.posZ + " withdrew " + withdrawnQuantity + " " + withdrawn.getItemName() + " from " + event.getContainer().getClass().getSimpleName() + " (" + event.getSlot().inventory.getInvName() + ")",
 					new Object[] { "withdrawn", event, withdrawn, withdrawnQuantity });
 		
 		if (deposited != null)
-			logger.log(Level.INFO, player.username + " at x" + player.posX + " y" + player.posY + " z" + player.posZ + " deposited " + withdrawnQuantity + " " + withdrawn.getItemName() + " into " + event.getContainer().getClass().getSimpleName() + " (" + event.getSlot().inventory.getInvName() + ")",
+			logger.log(Level.INFO, player.username + " at " + (int)player.posX + "/" + (int)player.posY + "/" + (int)player.posZ + " deposited " + depositedQuantity + " " + deposited.getItemName() + " into " + event.getContainer().getClass().getSimpleName() + " (" + event.getSlot().inventory.getInvName() + ")",
 					new Object[] { "deposited", event, deposited, depositedQuantity });
 	}
 }
