@@ -12,11 +12,11 @@ public class ModLoader<P, T extends IMod> {
 	private Map<Class, HashSet<Class>> ModClassCache = new HashMap<Class, HashSet<Class>>();
 	
 	private Class parentClass;
-	private Class<T> modClass;
+	private Class<T> requiredClass;
 	
-	public ModLoader(Class parentClass, Class<T> modClass) {
+	public ModLoader(Class parentClass, Class<T> requiredClass) {
 		this.parentClass = parentClass;
-		this.modClass = modClass;
+		this.requiredClass = requiredClass;
 	}
 	
 	public HashSet<Class> loadModClasses(String modList) {
@@ -28,14 +28,16 @@ public class ModLoader<P, T extends IMod> {
 			if (modList != null && !modList.isEmpty()) {
 				String[] modNames = modList.split("[:,;]+");
 				for (int i = 0; i < modNames.length; i++) {
+					modNames[i] = modNames[i].trim();
+					
 					if (!modNames[i].isEmpty()) {
 						try {
 							Class modClass = Class.forName(modNames[i]);
-							if (modClass.isAssignableFrom(modClass)) {
+							if (requiredClass.isAssignableFrom(modClass)) {
 								classes.add(modClass);
 							}
 							else {
-								MinecraftServer.logger.warning("BTWMod's " + this.parentClass.getSimpleName() + " failed to load the '" + modNames[i] + "' mod class, as it does not extend " + modClass.getName() + ".");
+								MinecraftServer.logger.warning("BTWMod's " + this.parentClass.getSimpleName() + " failed to load the '" + modNames[i] + "' mod class, as it does not extend " + requiredClass.getName() + ".");
 							}
 						} catch (ClassNotFoundException e) {
 							MinecraftServer.logger.warning("BTWMod's " + this.parentClass.getSimpleName() + " failed to find the class for the '" + modNames[i] + "' mod.");
