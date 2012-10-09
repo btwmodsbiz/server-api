@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Properties;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.BlockContainer;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import btwmods.ModLoader;
@@ -42,10 +43,10 @@ public class WorldAPI {
 			blockListeners.remove((IBlockListener)listener);
 	}
 	
-	public void blockContainerBroken(Block block, int x, int y, int z, int blockID, int blockMetadata) {
+	public void blockBroken(Block block, int x, int y, int z, int blockID, int blockMetadata) {
 		if (!blockListeners.isEmpty()) {
-			BlockEvent event = BlockEvent.RemovedContainer(this, block, blockMetadata, x, y, z);
-
+			BlockEvent event = BlockEvent.Broken(this, block, blockMetadata, x, y, z);
+			
 			for (IBlockListener listener : blockListeners)
 				listener.blockAction(event);
 		}

@@ -74,7 +74,7 @@ public class PlayerAPI {
 	 * @param y coordinate of the block
 	 * @param z coordinate of the block
 	 */
-	public void activatedBlock(World world, ItemStack heldItemStack, Block block, int x, int y, int z) {
+	public void activatedBlock(Block block, int x, int y, int z) {
 		/*
 		 * BlockContainers checked:
 		 * - O C BrewingStand
@@ -98,25 +98,26 @@ public class PlayerAPI {
 		 */
 
 		if (block instanceof BlockContainer) {
-			containerOpened(block, this.player.craftingInventory, world, x, y, z);
-		}
-		else {
-			// TODO: remove after testing.
-			MinecraftServer.logger.info("Activated non-container block " + block.getBlockName() + "(" + block.blockID + ")");
+			containerOpened(block, this.player.craftingInventory, x, y, z);
 		}
 	}
 	
 	public void blockRemoved(Block block, int metadata, int x, int y, int z) {
-		
+		if (block instanceof BlockContainer && !containerListeners.isEmpty()) {
+			ContainerEvent event = ContainerEvent.Removed(this, block, metadata, x, y, z);
+			
+			for (IContainerListener listener : containerListeners)
+				listener.containerAction(event);
+		}
 	}
 	
 	public void containerPlaced(Container container, World world, int x, int y, int z) {
-		//this.items.containerPlaced(player, container, world, x, y, z);
+		//TODO: this.items.containerPlaced(player, container, world, x, y, z);
 	}
 	
-	public void containerOpened(Block block, Container container, World world, int x, int y, int z) {
+	public void containerOpened(Block block, Container container, int x, int y, int z) {
 		if (!containerListeners.isEmpty()) {
-			ContainerEvent event = ContainerEvent.Open(this, block, container, world, x, y, z);
+			ContainerEvent event = ContainerEvent.Open(this, block, container, x, y, z);
 			
 			for (IContainerListener listener : containerListeners)
 				listener.containerAction(event);
@@ -125,15 +126,11 @@ public class PlayerAPI {
 	
 	public void containerClosed(Container container) {
 		if (!containerListeners.isEmpty()) {
-			ContainerEvent event = ContainerEvent.Close(this, container);
+			ContainerEvent event = ContainerEvent.Closed(this, container);
 			
 			for (IContainerListener listener : containerListeners)
 				listener.containerAction(event);
 		}
-	}
-	
-	public void containerDestroyed(Container container, int x, int y, int z) {
-		//this.items.containerDestroyed(player, container, x, y, z);
 	}
 	
 	/**
