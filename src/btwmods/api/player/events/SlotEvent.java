@@ -76,7 +76,7 @@ public class SlotEvent extends EventObject {
 	
 	public int getQuantity() {
 		if (quantity == -1 && type == TYPE.TRANSFER)
-			quantity = getOriginalItems().stackSize - getRemainingItems().stackSize;
+			quantity = getOriginalItems().stackSize - (getRemainingItems() == null ? 0 : getRemainingItems().stackSize);
 		
 		return quantity;
 	}
