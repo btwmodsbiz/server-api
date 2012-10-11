@@ -3,15 +3,14 @@ package btwmods.api.player.events;
 import java.util.EventObject;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 
-import btwmods.api.player.PlayerAPI;
-
 public abstract class AbstractBlockEvent extends EventObject {
 
-	protected PlayerAPI api;
+	protected EntityPlayer player;
 	protected Block block = null;
 	protected int metadata = -1;
 	protected World world = null;
@@ -22,8 +21,8 @@ public abstract class AbstractBlockEvent extends EventObject {
 	protected boolean checkedTileEntity = false;
 	protected TileEntity tileEntity = null;
 	
-	public PlayerAPI getApi() {
-		return api;
+	public EntityPlayer getPlayer() {
+		return player;
 	}
 	
 	public Block getBlock() {
@@ -36,7 +35,7 @@ public abstract class AbstractBlockEvent extends EventObject {
 	
 	public World getWorld() {
 		if (world == null)
-			world = api.player.worldObj;
+			world = player.worldObj;
 		
 		return world;
 	}
@@ -66,8 +65,8 @@ public abstract class AbstractBlockEvent extends EventObject {
 		return getTileEntity() instanceof IInventory;
 	}
 	
-	protected AbstractBlockEvent(PlayerAPI api) {
-		super(api);
-		this.api = api;
+	protected AbstractBlockEvent(EntityPlayer player) {
+		super(player);
+		this.player = player;
 	}
 }

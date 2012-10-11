@@ -1,12 +1,7 @@
 package btwmods.api.player.events;
 
-import java.util.EventObject;
-
 import net.minecraft.src.Block;
-import net.minecraft.src.IInventory;
-import net.minecraft.src.TileEntity;
-import net.minecraft.src.World;
-import btwmods.api.player.PlayerAPI;
+import net.minecraft.src.EntityPlayer;
 
 public class BlockEvent extends AbstractBlockEvent {
 	
@@ -18,8 +13,8 @@ public class BlockEvent extends AbstractBlockEvent {
 		return type;
 	}
 	
-	public static BlockEvent Activated(PlayerAPI api, Block block, int x, int y, int z) {
-		BlockEvent event = new BlockEvent(TYPE.ACTIVATED, api);
+	public static BlockEvent Activated(EntityPlayer player, Block block, int x, int y, int z) {
+		BlockEvent event = new BlockEvent(TYPE.ACTIVATED, player);
 		event.block = block;
 		event.x = x;
 		event.y = y;
@@ -27,8 +22,8 @@ public class BlockEvent extends AbstractBlockEvent {
 		return event;
 	}
 	
-	private BlockEvent(TYPE type, PlayerAPI api) {
-		super(api);
+	private BlockEvent(TYPE type, EntityPlayer player) {
+		super(player);
 		this.type = type;
 	}
 }

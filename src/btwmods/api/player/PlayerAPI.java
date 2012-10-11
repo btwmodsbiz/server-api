@@ -1,12 +1,8 @@
 package btwmods.api.player;
 
-import java.awt.event.ItemListener;
 import java.util.EventListener;
 import java.util.HashSet;
-import java.util.Properties;
 
-import btwmods.ModLoader;
-import btwmods.ModProperties;
 import btwmods.api.player.events.BlockEvent;
 import btwmods.api.player.events.ContainerEvent;
 import btwmods.api.player.events.DropEvent;
@@ -16,7 +12,6 @@ import btwmods.api.player.listeners.IContainerListener;
 import btwmods.api.player.listeners.IDropListener;
 import btwmods.api.player.listeners.ISlotListener;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.Container;
@@ -26,29 +21,14 @@ import net.minecraft.src.Slot;
 import net.minecraft.src.World;
 
 public class PlayerAPI {
-	public EntityPlayer player;
+	private static HashSet<IBlockListener> blockListeners = new HashSet<IBlockListener>();
+	private static HashSet<ISlotListener> slotListeners = new HashSet<ISlotListener>();
+	private static HashSet<IContainerListener> containerListeners = new HashSet<IContainerListener>();
+	private static HashSet<IDropListener> dropListeners = new HashSet<IDropListener>();
 	
-	private static ModLoader<PlayerAPI,IPlayerAPIMod> ModLoader = new ModLoader<PlayerAPI,IPlayerAPIMod>(PlayerAPI.class, IPlayerAPIMod.class);
-	private ModLoader.Mods mods;
-
-	private HashSet<IBlockListener> blockListeners = new HashSet<IBlockListener>();
-	private HashSet<ISlotListener> slotListeners = new HashSet<ISlotListener>();
-	private HashSet<IContainerListener> containerListeners = new HashSet<IContainerListener>();
-	private HashSet<IDropListener> dropListeners = new HashSet<IDropListener>();
+	private PlayerAPI() {}
 	
-	public final static String MOD_LIST_KEY = "PlayerAPI.Mods";
-	
-	public PlayerAPI(EntityPlayer player) {
-		this.player = player;
-		mods = ModLoader.createMods(ModProperties.Get(MOD_LIST_KEY, ""));
-		mods.initMods(this);
-	}
-	
-	public void unload() {
-		mods.unloadMods(this);
-	}
-	
-	public void addListener(EventListener listener) {
+	public static void addListener(EventListener listener) {
 		if (listener instanceof IBlockListener)
 			blockListeners.add((IBlockListener)listener);
 		if (listener instanceof ISlotListener)
@@ -59,7 +39,7 @@ public class PlayerAPI {
 			dropListeners.add((IDropListener)listener);
 	}
 
-	public void removeListener(EventListener listener) {
+	public static void removeListener(EventListener listener) {
 		if (listener instanceof IBlockListener)
 			blockListeners.remove((IBlockListener)listener);
 		if (listener instanceof ISlotListener)
@@ -81,57 +61,35 @@ public class PlayerAPI {
 	 * @param y coordinate of the block
 	 * @param z coordinate of the block
 	 */
-	public void activatedBlock(Block block, int x, int y, int z) {
-		/*
-		 * BlockContainers checked:
-		 * - O C BrewingStand
-		 * - O C Chest
-		 * - O C Dispenser
-		 * - O C EnchantmentTable
-		 * - O C EnderChest
-		 * - O C Furance
-		 * - O C JukeBox (opens as ContainerPlayer. does not close)
-		 * - O C Note (opens as ContainerPlayer. does not close)
-		 * - O C PistonMoving (does not trigger #activatedBlock)
-		 * - O C FCAnvil
-		 * - O C BlockDispenser
-		 * - O C Hopper
-		 * - O C CookingVessel (use Block to determine sub-type)
-		 * - O C InfernalEnchanter
-		 * - O C Millstone
-		 * - O C Pully
-		 * - O C Turntable (opens as ContainerPlayer. does not close)
-		 * - O C Vase (opens as ContainerPlayer only on deposit. does not close)
-		 */
-
+	public static void activatedBlock(EntityPlayer player, Block block, int x, int y, int z) {
 		if (!blockListeners.isEmpty()) {
-			BlockEvent event = BlockEvent.Activated(this, block, x, y, z);
+			BlockEvent event = BlockEvent.Activated(player, block, x, y, z);
 			
 			for (IBlockListener listener : blockListeners)
 				listener.blockActivated(event);
 		}
 
 		if (block instanceof BlockContainer) {
-			containerOpened(block, this.player.craftingInventory, x, y, z);
+			containerOpened(player, block, player.craftingInventory, x, y, z);
 		}
 	}
 	
-	public void blockRemoved(Block block, int metadata, int x, int y, int z) {
+	public static void blockRemoved(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
 		if (block instanceof BlockContainer && !containerListeners.isEmpty()) {
-			ContainerEvent event = ContainerEvent.Removed(this, block, metadata, x, y, z);
+			ContainerEvent event = ContainerEvent.Removed(player, block, metadata, x, y, z);
 			
 			for (IContainerListener listener : containerListeners)
 				listener.containerAction(event);
 		}
 	}
 	
-	public void containerPlaced(Container container, World world, int x, int y, int z) {
+	public static void containerPlaced(EntityPlayer player, Container container, World world, int x, int y, int z) {
 		//TODO: this.items.containerPlaced(player, container, world, x, y, z);
 	}
 	
-	public void containerOpened(Block block, Container container, int x, int y, int z) {
+	public static void containerOpened(EntityPlayer player, Block block, Container container, int x, int y, int z) {
 		if (!containerListeners.isEmpty()) {
-			ContainerEvent event = ContainerEvent.Open(this, block, container, x, y, z);
+			ContainerEvent event = ContainerEvent.Open(player, block, container, x, y, z);
 			
 			for (IContainerListener listener : containerListeners)
 				listener.containerAction(event);
@@ -143,14 +101,14 @@ public class PlayerAPI {
 	 * @param itemStack
 	 * @param mouseButton
 	 */
-	public void itemDropped(ItemStack itemStack, int mouseButton) {
+	public static void itemDropped(EntityPlayer player, ItemStack itemStack, int mouseButton) {
 		if (!dropListeners.isEmpty()) {
 			DropEvent event;
 			
 			if (mouseButton == 1)
-				event = DropEvent.One(this, itemStack);
+				event = DropEvent.One(player, itemStack);
 			else
-				event = DropEvent.Stack(this, itemStack);
+				event = DropEvent.Stack(player, itemStack);
 			
 			for (IDropListener listener : dropListeners)
 				listener.dropAction(event);
@@ -161,9 +119,9 @@ public class PlayerAPI {
 	 * An item is dropped from a player's inventory for any reason (purposefully drops an item or closed a crafting window).
 	 * @param items
 	 */
-	public void itemEjected(ItemStack items) {
+	public static void itemEjected(EntityPlayer player, ItemStack items) {
 		if (!dropListeners.isEmpty()) {
-			DropEvent event = DropEvent.Eject(this, items);
+			DropEvent event = DropEvent.Eject(player, items);
 		
 			for (IDropListener listener : dropListeners)
 				listener.dropAction(event);
@@ -173,48 +131,56 @@ public class PlayerAPI {
 	/**
 	 * All player items are dropped.
 	 */
-	public void itemsDroppedAll() {
+	public static void itemsDroppedAll(EntityPlayer player) {
 		if (!dropListeners.isEmpty()) {
-			DropEvent event = DropEvent.All(this);
+			DropEvent event = DropEvent.All(player);
 			
 			for (IDropListener listener : dropListeners)
 				listener.dropAction(event);
 		}
 	}
 	
-	public void itemTransfered(Container container, int slotId, ItemStack original) {
+	public static void itemTransfered(EntityPlayer player, Container container, int slotId, ItemStack original) {
 		if (!slotListeners.isEmpty()) {
-        	SlotEvent event = SlotEvent.Transfer(this, container, slotId, original);
+        	SlotEvent event = SlotEvent.Transfer(player, container, slotId, original);
         	
 			for (ISlotListener listener : slotListeners)
 				listener.slotAction(event);
 		}
 	}
 	
-	public void itemAddedToSlot(Container container, Slot clickedSlot, int quantity) {
+	public static void itemAddedToSlot(EntityPlayer player, Container container, Slot clickedSlot, int quantity) {
 		if (!slotListeners.isEmpty()) {
-        	SlotEvent event = SlotEvent.Add(this, container, clickedSlot, quantity);
+        	SlotEvent event = SlotEvent.Add(player, container, clickedSlot, quantity);
         	
 			for (ISlotListener listener : slotListeners)
 				listener.slotAction(event);
 		}
 	}
 	
-	public void itemRemovedFromSlot(Container container, Slot clickedSlot, int quantity) {
+	public static void itemRemovedFromSlot(EntityPlayer player, Container container, Slot clickedSlot, int quantity) {
 		if (!slotListeners.isEmpty()) {
-        	SlotEvent event = SlotEvent.Remove(this, container, clickedSlot, quantity);
+        	SlotEvent event = SlotEvent.Remove(player, container, clickedSlot, quantity);
         	
 			for (ISlotListener listener : slotListeners)
 				listener.slotAction(event);
 		}
 	}
 	
-	public void itemSwitchedWithSlot(Container container, Slot clickedSlot) {
+	public static void itemSwitchedWithSlot(EntityPlayer player, Container container, Slot clickedSlot) {
 		if (!slotListeners.isEmpty()) {
-        	SlotEvent event = SlotEvent.Switch(this, container, clickedSlot);
+        	SlotEvent event = SlotEvent.Switch(player, container, clickedSlot);
         	
 			for (ISlotListener listener : slotListeners)
 				listener.slotAction(event);
 		}
+	}
+	
+	public static void login(EntityPlayer player) {
+		// TODO: 
+	}
+	
+	public static void logout(EntityPlayer player) {
+		// TODO: 
 	}
 }

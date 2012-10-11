@@ -3,17 +3,19 @@ package btwmods.api.world.events;
 import java.util.EventObject;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.Chunk;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.TileEntity;
-import btwmods.api.world.WorldAPI;
+import net.minecraft.src.World;
 
 public class BlockEvent extends EventObject {
 	
 	public enum TYPE { BROKEN };
 
 	private TYPE type;
-	private WorldAPI api;
+	private World world;
+	private Chunk chunk;
 	private Block block;
 	private int metadata;
 	private int x;
@@ -28,8 +30,12 @@ public class BlockEvent extends EventObject {
 		return type;
 	}
 	
-	public WorldAPI getApi() {
-		return api;
+	public World getWorld() {
+		return world;
+	}
+	
+	public Chunk getChunk() {
+		return chunk;
 	}
 	
 	public Block getBlock() {
@@ -38,7 +44,7 @@ public class BlockEvent extends EventObject {
 	
 	public TileEntity getTileEntity() {
 		if (!checkedTileEntity) {
-			tileEntity = api.world.getBlockTileEntity(x, y, z);
+			tileEntity = world.getBlockTileEntity(x, y, z);
 			checkedTileEntity = true;
 		}
 		
@@ -78,8 +84,8 @@ public class BlockEvent extends EventObject {
 		return z;
 	}
 	
-	public static BlockEvent Broken(WorldAPI api, Block block, int metadata, int x, int y, int z) {
-		BlockEvent event = new BlockEvent(TYPE.BROKEN, api);
+	public static BlockEvent Broken(World world, Chunk chunk, Block block, int metadata, int x, int y, int z) {
+		BlockEvent event = new BlockEvent(TYPE.BROKEN, world, chunk);
 		event.block = block;
 		event.metadata = metadata;
 		event.x = x;
@@ -88,9 +94,10 @@ public class BlockEvent extends EventObject {
 		return event;
 	}
 	
-	private BlockEvent(TYPE type, WorldAPI api) {
-		super(api);
+	private BlockEvent(TYPE type, World world, Chunk chunk) {
+		super(chunk);
 		this.type = type;
-		this.api = api;
+		this.world = world;
+		this.chunk = chunk;
 	}
 }

@@ -7,39 +7,38 @@ import net.minecraft.src.BlockBed;
 import net.minecraft.src.ChunkCoordinates;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityMob;
-import net.minecraft.src.EnumStatus;
-import btwmods.api.player.IPlayerAPIMod;
+import net.minecraft.src.EntityPlayer;
+import btwmods.IMod;
 import btwmods.api.player.PlayerAPI;
 import btwmods.api.player.events.BlockEvent;
 import btwmods.api.player.listeners.IBlockListener;
 
-public class SpawnBeds implements IPlayerAPIMod, IBlockListener {
+public class SpawnBeds implements IMod, IBlockListener {
 	
 	private PlayerAPI api;
 
 	@Override
-	public void init(PlayerAPI parent) {
-		api = parent;
-		parent.addListener(this);
+	public void init() {
+		PlayerAPI.addListener(this);
 	}
 
 	@Override
-	public void unload(PlayerAPI parent) {
-		api = parent;
-		parent.removeListener(this);
+	public void unload() {
+		PlayerAPI.removeListener(this);
 	}
 
 	@Override
 	public void blockActivated(BlockEvent event) {
-		api.player.sendChatToPlayer("sheeet");
-		if (event.getBlock() instanceof BlockBed && !api.player.worldObj.isRemote) {
+		EntityPlayer player = event.getPlayer();
+		player.sendChatToPlayer("sheeet");
+		if (event.getBlock() instanceof BlockBed && !player.worldObj.isRemote) {
 			
 			int metadata = event.getMetadata();
 			int x = event.getX();
 			int y = event.getY();
 			int z = event.getZ();
 
-			api.player.sendChatToPlayer(event.getWorld().provider.getClass().toString());
+			player.sendChatToPlayer(event.getWorld().provider.getClass().toString());
 			
 			if (!BlockBed.isBlockHeadOfBed(metadata)) {
                 int var11 = BlockBed.getDirection(metadata);
@@ -75,36 +74,36 @@ public class SpawnBeds implements IPlayerAPIMod, IBlockListener {
                 return;
             }
 			
-            if (api.player.isPlayerSleeping() || !api.player.isEntityAlive()) {
+            if (player.isPlayerSleeping() || !player.isEntityAlive()) {
                 return; // EnumStatus.OTHER_PROBLEM;
             }
 
-            if (!api.player.worldObj.provider.isSurfaceWorld()) {
+            if (!player.worldObj.provider.isSurfaceWorld()) {
                 return; // EnumStatus.NOT_POSSIBLE_HERE;
             }
 
-            if (api.player.worldObj.isDaytime()) {
-    			api.player.sendChatToPlayer("... it would be better to sleep at night.");
+            if (player.worldObj.isDaytime()) {
+    			player.sendChatToPlayer("... it would be better to sleep at night.");
                 return; // EnumStatus.NOT_POSSIBLE_NOW;
             }
 
-            if (Math.abs(api.player.posX - (double)event.getX()) > 3.0D || Math.abs(api.player.posY - (double)event.getY()) > 2.0D || Math.abs(api.player.posZ - (double)event.getZ()) > 3.0D) {
-    			api.player.sendChatToPlayer("... and that bed is too far away.");
+            if (Math.abs(player.posX - (double)event.getX()) > 3.0D || Math.abs(player.posY - (double)event.getY()) > 2.0D || Math.abs(player.posZ - (double)event.getZ()) > 3.0D) {
+    			player.sendChatToPlayer("... and that bed is too far away.");
                 return; // EnumStatus.TOO_FAR_AWAY;
             }
 
             double var4 = 8.0D;
             double var6 = 5.0D;
-            List var8 = api.player.worldObj.getEntitiesWithinAABB(EntityMob.class, AxisAlignedBB.getAABBPool().addOrModifyAABBInPool((double)event.getX() - var4, (double)event.getY() - var6, (double)event.getZ() - var4, (double)event.getX() + var4, (double)event.getY() + var6, (double)event.getZ() + var4));
+            List var8 = player.worldObj.getEntitiesWithinAABB(EntityMob.class, AxisAlignedBB.getAABBPool().addOrModifyAABBInPool((double)event.getX() - var4, (double)event.getY() - var6, (double)event.getZ() - var4, (double)event.getX() + var4, (double)event.getY() + var6, (double)event.getZ() + var4));
 
             if (!var8.isEmpty()) {
-            	api.player.addChatMessage("tile.bed.notSafe");
-    			api.player.sendChatToPlayer("... there are monsters nearby!");
+            	player.addChatMessage("tile.bed.notSafe");
+    			player.sendChatToPlayer("... there are monsters nearby!");
                 return; // EnumStatus.NOT_SAFE;
             }
 
-			api.player.setSpawnChunk(new ChunkCoordinates(event.getX(), event.getY(), event.getZ()));
-			api.player.sendChatToPlayer("... but you feel as if this is your new home.");
+			player.setSpawnChunk(new ChunkCoordinates(event.getX(), event.getY(), event.getZ()));
+			player.sendChatToPlayer("... but you feel as if this is your new home.");
 
 	        //return EnumStatus.OK;
 		}

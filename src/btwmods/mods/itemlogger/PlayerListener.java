@@ -1,17 +1,12 @@
 package btwmods.mods.itemlogger;
 
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import net.minecraft.src.Container;
-import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.ItemStack;
-import net.minecraft.src.TileEntity;
 
-import btwmods.api.player.IPlayerAPIMod;
+import btwmods.IMod;
 import btwmods.api.player.PlayerAPI;
 import btwmods.api.player.events.ContainerEvent;
 import btwmods.api.player.events.DropEvent;
@@ -19,29 +14,26 @@ import btwmods.api.player.events.SlotEvent;
 import btwmods.api.player.listeners.IContainerListener;
 import btwmods.api.player.listeners.IDropListener;
 import btwmods.api.player.listeners.ISlotListener;
-import btwmods.api.world.IWorldAPIMod;
 
-public class PlayerListener implements IPlayerAPIMod, ISlotListener, IDropListener, IContainerListener {
+public class PlayerListener implements IMod, ISlotListener, IDropListener, IContainerListener {
 	
 	private PlayerAPI api;
 	private Logger logger;
 
 	@Override
-	public void init(PlayerAPI parent) {
-		api = parent;
+	public void init() {
 		logger = ItemLogger.GetLogger();
-		api.addListener(this);
+		PlayerAPI.addListener(this);
 	}
 
 	@Override
-	public void unload(PlayerAPI parent) {
-		parent.removeListener(this);
+	public void unload() {
+		PlayerAPI.removeListener(this);
 	}
 
 	@Override
 	public void containerAction(ContainerEvent event) {
-		EntityPlayer player = api.player;
-		
+		EntityPlayer player = event.getPlayer();
 		if (event.getType() == ContainerEvent.TYPE.OPENED) {
 			logger.log(Level.INFO, player.username + " at " + (int)player.posX + "/" + (int)player.posY + "/" + (int)player.posZ + " opened " + event.getBlock().getBlockName() + " at " + event.getX() + "/" + event.getY() + "/" + event.getZ(),
 					new Object[] { "opened container", event });
@@ -62,8 +54,6 @@ public class PlayerListener implements IPlayerAPIMod, ISlotListener, IDropListen
 
 	@Override
 	public void slotAction(SlotEvent event) {
-		EntityPlayer player = api.player;
-		
 		ItemStack withdrawn = null;
 		int withdrawnQuantity = -1;
 		
@@ -109,6 +99,8 @@ public class PlayerListener implements IPlayerAPIMod, ISlotListener, IDropListen
 			// TODO: use proper logging.
 			ItemLogger.GetLogger().log(Level.SEVERE, "Unknown slotAction: " + event.getType().toString());
 		}
+		
+		EntityPlayer player = event.getPlayer();
 		
 		if (withdrawn != null)
 			logger.log(Level.INFO, player.username + " at " + (int)player.posX + "/" + (int)player.posY + "/" + (int)player.posZ + " withdrew " + withdrawnQuantity + " " + withdrawn.getItemName() + " from " + event.getContainer().getClass().getSimpleName() + " (" + event.getSlot().inventory.getInvName() + ")",

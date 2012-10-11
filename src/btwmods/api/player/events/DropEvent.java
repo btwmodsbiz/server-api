@@ -1,8 +1,7 @@
 package btwmods.api.player.events;
 
 import java.util.EventObject;
-
-import btwmods.api.player.PlayerAPI;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 
 public class DropEvent extends EventObject {
@@ -10,7 +9,7 @@ public class DropEvent extends EventObject {
 	public enum TYPE { ONE, STACK, EJECT, ALL };
 
 	private TYPE type;
-	private PlayerAPI api;
+	private EntityPlayer player;
 	private ItemStack items = null;
 	private int reduceTo = -1;
 	
@@ -18,8 +17,8 @@ public class DropEvent extends EventObject {
 		return type;
 	}
 	
-	public PlayerAPI getApi() {
-		return api;
+	public EntityPlayer getPlayer() {
+		return player;
 	}
 	
 	public ItemStack getItems() {
@@ -31,31 +30,31 @@ public class DropEvent extends EventObject {
 		return items;
 	}
 	
-	public static DropEvent One(PlayerAPI api, ItemStack items) {
-		DropEvent event = new DropEvent(TYPE.ONE, api, items);
+	public static DropEvent One(EntityPlayer player, ItemStack items) {
+		DropEvent event = new DropEvent(TYPE.ONE, player, items);
 		event.reduceTo = 1;
 		return event;
 	}
 	
-	public static DropEvent Stack(PlayerAPI api, ItemStack items) {
-		DropEvent event = new DropEvent(TYPE.STACK, api, items);
+	public static DropEvent Stack(EntityPlayer player, ItemStack items) {
+		DropEvent event = new DropEvent(TYPE.STACK, player, items);
 		return event;
 	}
 	
-	public static DropEvent Eject(PlayerAPI api, ItemStack items) {
-		DropEvent event = new DropEvent(TYPE.EJECT, api, items);
+	public static DropEvent Eject(EntityPlayer player, ItemStack items) {
+		DropEvent event = new DropEvent(TYPE.EJECT, player, items);
 		return event;
 	}
 	
-	public static DropEvent All(PlayerAPI api) {
-		DropEvent event = new DropEvent(TYPE.ALL, api, null);
+	public static DropEvent All(EntityPlayer player) {
+		DropEvent event = new DropEvent(TYPE.ALL, player, null);
 		return event;
 	}
 	
-	private DropEvent(TYPE type, PlayerAPI api, ItemStack items) {
-		super(api);
+	private DropEvent(TYPE type, EntityPlayer player, ItemStack items) {
+		super(player);
 		this.type = type;
-		this.api = api;
+		this.player = player;
 		this.items = items;
 	}
 }

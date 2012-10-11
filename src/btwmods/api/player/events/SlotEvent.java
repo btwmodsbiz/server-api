@@ -1,12 +1,9 @@
 package btwmods.api.player.events;
 
 import java.util.EventObject;
-
-import btwmods.api.player.PlayerAPI;
-import btwmods.api.player.events.DropEvent.TYPE;
 import net.minecraft.src.Container;
 import net.minecraft.src.Entity;
-import net.minecraft.src.IInventory;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryLargeChest;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
@@ -17,7 +14,7 @@ public class SlotEvent extends EventObject {
 	public enum TYPE { ADD, REMOVE, SWITCH, TRANSFER };
 
 	private TYPE type;
-	private PlayerAPI api;
+	private EntityPlayer player;
 	private Container container;
 	private int slotId = -1;
 	private Slot slot = null;
@@ -31,8 +28,8 @@ public class SlotEvent extends EventObject {
 		return type;
 	}
 	
-	public PlayerAPI getApi() {
-		return api;
+	public EntityPlayer getPlayer() {
+		return player;
 	}
 	
 	public Container getContainer() {
@@ -66,7 +63,7 @@ public class SlotEvent extends EventObject {
 	
 	public ItemStack getHeldItems() {
 		if (heldItems == null && type != TYPE.TRANSFER)
-			heldItems = api.player.inventory.getItemStack();
+			heldItems = player.inventory.getItemStack();
 		
 		return heldItems;
 	}
@@ -89,33 +86,33 @@ public class SlotEvent extends EventObject {
 		return quantity;
 	}
 	
-	public static SlotEvent Add(PlayerAPI api, Container container, Slot slot, int quantity) {
-		SlotEvent event = new SlotEvent(TYPE.ADD, api, container, slot.slotNumber, slot);
+	public static SlotEvent Add(EntityPlayer player, Container container, Slot slot, int quantity) {
+		SlotEvent event = new SlotEvent(TYPE.ADD, player, container, slot.slotNumber, slot);
 		event.quantity = quantity;
 		return event;
 	}
 	
-	public static SlotEvent Remove(PlayerAPI api, Container container, Slot slot, int quantity) {
-		SlotEvent event = new SlotEvent(TYPE.REMOVE, api, container, slot.slotNumber, slot);
+	public static SlotEvent Remove(EntityPlayer player, Container container, Slot slot, int quantity) {
+		SlotEvent event = new SlotEvent(TYPE.REMOVE, player, container, slot.slotNumber, slot);
 		event.quantity = quantity;
 		return event;
 	}
 	
-	public static SlotEvent Switch(PlayerAPI api, Container container, Slot slot) {
-		SlotEvent event = new SlotEvent(TYPE.SWITCH, api, container, slot.slotNumber, slot);
+	public static SlotEvent Switch(EntityPlayer player, Container container, Slot slot) {
+		SlotEvent event = new SlotEvent(TYPE.SWITCH, player, container, slot.slotNumber, slot);
 		return event;
 	}
 	
-	public static SlotEvent Transfer(PlayerAPI api, Container container, int slotId, ItemStack originalItems) {
-		SlotEvent event = new SlotEvent(TYPE.TRANSFER, api, container, slotId, null);
+	public static SlotEvent Transfer(EntityPlayer player, Container container, int slotId, ItemStack originalItems) {
+		SlotEvent event = new SlotEvent(TYPE.TRANSFER, player, container, slotId, null);
 		event.originalItems = originalItems;
 		return event;
 	}
 	
-	private SlotEvent(TYPE type, PlayerAPI api, Container container, int slotId, Slot slot) {
-		super(api);
+	private SlotEvent(TYPE type, EntityPlayer player, Container container, int slotId, Slot slot) {
+		super(player);
 		this.type = type;
-		this.api = api;
+		this.player = player;
 		this.container = container;
 		this.slotId = slotId;
 		this.slot = slot;

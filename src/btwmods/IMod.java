@@ -1,13 +1,11 @@
 package btwmods;
 
-import java.util.Properties;
-
-public interface IMod<T> {
+public interface IMod {
 	
-	public void init(T parent);
+	public void init();
 	
 	/**
 	 * Cleanup and remove listeners.
 	 */
-	public void unload(T parent);
+	public void unload();
 }

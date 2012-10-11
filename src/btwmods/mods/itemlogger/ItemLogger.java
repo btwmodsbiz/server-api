@@ -19,9 +19,6 @@ public class ItemLogger {
 				handler.setFormatter(new BasicFormatter());
 				logger.addHandler(handler);
 				
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

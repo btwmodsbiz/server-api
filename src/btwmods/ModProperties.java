@@ -4,12 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Enumeration;
 import java.util.Properties;
-
-import btwmods.api.player.PlayerAPI;
-import btwmods.api.world.WorldAPI;
 
 import net.minecraft.server.MinecraftServer;
 
@@ -24,8 +19,8 @@ public class ModProperties {
 			properties = new Properties();
 			
 			// Some basic defaults.
-			properties.setProperty(PlayerAPI.MOD_LIST_KEY, "");
-			properties.setProperty(WorldAPI.MOD_LIST_KEY, "");
+			//properties.setProperty(PlayerAPI.MOD_LIST_KEY, "");
+			//properties.setProperty(WorldAPI.MOD_LIST_KEY, "");
 			
 			propertiesFile = new File(".", "btwmod.properties");
 			

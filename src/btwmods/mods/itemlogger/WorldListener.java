@@ -6,26 +6,24 @@ import java.util.logging.Logger;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.ItemStack;
 
-import btwmods.api.world.IWorldAPIMod;
+import btwmods.IMod;
 import btwmods.api.world.WorldAPI;
 import btwmods.api.world.events.BlockEvent;
 import btwmods.api.world.listeners.IBlockListener;
 
-public class WorldListener implements IWorldAPIMod, IBlockListener {
+public class WorldListener implements IMod, IBlockListener {
 
-	private WorldAPI api;
 	private Logger logger;
 	
 	@Override
-	public void init(WorldAPI parent) {
-		api = parent;
+	public void init() {
 		logger = ItemLogger.GetLogger();
-		parent.addListener(this);
+		WorldAPI.addListener(this);
 	}
 
 	@Override
-	public void unload(WorldAPI parent) {
-		parent.removeListener(this);
+	public void unload() {
+		WorldAPI.removeListener(this);
 	}
 
 	@Override
