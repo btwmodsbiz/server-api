@@ -1,4 +1,4 @@
-package btwmods.mods.itemlogger;
+package btwmod.itemlogger;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -6,24 +6,15 @@ import java.util.logging.Logger;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.ItemStack;
 
-import btwmods.IMod;
-import btwmods.api.world.WorldAPI;
 import btwmods.api.world.events.BlockEvent;
 import btwmods.api.world.listeners.IBlockListener;
 
-public class WorldListener implements IMod, IBlockListener {
-
-	private Logger logger;
+public class WorldListener implements IBlockListener {
 	
-	@Override
-	public void init() {
-		logger = ItemLogger.GetLogger();
-		WorldAPI.addListener(this);
-	}
+	private Logger logger;
 
-	@Override
-	public void unload() {
-		WorldAPI.removeListener(this);
+	public WorldListener(Logger logger) {
+		this.logger = logger;
 	}
 
 	@Override

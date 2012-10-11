@@ -1,4 +1,4 @@
-package btwmods.mods.itemlogger;
+package btwmod.itemlogger;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -6,8 +6,6 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.ItemStack;
 
-import btwmods.IMod;
-import btwmods.api.player.PlayerAPI;
 import btwmods.api.player.events.ContainerEvent;
 import btwmods.api.player.events.DropEvent;
 import btwmods.api.player.events.SlotEvent;
@@ -15,20 +13,12 @@ import btwmods.api.player.listeners.IContainerListener;
 import btwmods.api.player.listeners.IDropListener;
 import btwmods.api.player.listeners.ISlotListener;
 
-public class PlayerListener implements IMod, ISlotListener, IDropListener, IContainerListener {
+public class PlayerListener implements ISlotListener, IDropListener, IContainerListener {
 	
-	private PlayerAPI api;
 	private Logger logger;
-
-	@Override
-	public void init() {
-		logger = ItemLogger.GetLogger();
-		PlayerAPI.addListener(this);
-	}
-
-	@Override
-	public void unload() {
-		PlayerAPI.removeListener(this);
+	
+	public PlayerListener(Logger logger) {
+		this.logger = logger;
 	}
 
 	@Override
@@ -97,7 +87,7 @@ public class PlayerListener implements IMod, ISlotListener, IDropListener, ICont
 		}
 		else {
 			// TODO: use proper logging.
-			ItemLogger.GetLogger().log(Level.SEVERE, "Unknown slotAction: " + event.getType().toString());
+			logger.log(Level.SEVERE, "Unknown slotAction: " + event.getType().toString());
 		}
 		
 		EntityPlayer player = event.getPlayer();
