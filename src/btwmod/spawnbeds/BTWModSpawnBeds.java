@@ -1,4 +1,4 @@
-package btwmods.mods.spawnbeds;
+package btwmod.spawnbeds;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import btwmods.api.player.PlayerAPI;
 import btwmods.api.player.events.BlockEvent;
 import btwmods.api.player.listeners.IBlockListener;
 
-public class SpawnBeds implements IMod, IBlockListener {
+public class BTWModSpawnBeds implements IMod, IBlockListener {
 	
 	private PlayerAPI api;
 
