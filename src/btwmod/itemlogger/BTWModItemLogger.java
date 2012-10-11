@@ -7,8 +7,8 @@ import java.util.logging.Logger;
 
 import btwmods.BasicFormatter;
 import btwmods.IMod;
-import btwmods.api.player.PlayerAPI;
-import btwmods.api.world.WorldAPI;
+import btwmods.PlayerAPI;
+import btwmods.WorldAPI;
 
 public class BTWModItemLogger implements IMod {
 	

@@ -1,4 +1,4 @@
-package btwmods.api.player.events;
+package btwmods.player.events;
 
 import java.util.EventObject;
 import net.minecraft.src.EntityPlayer;

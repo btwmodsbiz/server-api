@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.ItemStack;
 
-import btwmods.api.world.events.BlockEvent;
-import btwmods.api.world.listeners.IBlockListener;
+import btwmods.world.events.BlockEvent;
+import btwmods.world.listeners.IBlockListener;
 
 public class WorldListener implements IBlockListener {
 	

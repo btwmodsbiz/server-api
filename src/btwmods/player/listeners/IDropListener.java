@@ -1,7 +1,8 @@
-package btwmods.api.player.listeners;
+package btwmods.player.listeners;
 
 import java.util.EventListener;
-import btwmods.api.player.events.DropEvent;
+
+import btwmods.player.events.DropEvent;
 
 public interface IDropListener extends EventListener {
 	void dropAction(DropEvent event);

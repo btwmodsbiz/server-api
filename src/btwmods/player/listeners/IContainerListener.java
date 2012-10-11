@@ -1,7 +1,8 @@
-package btwmods.api.player.listeners;
+package btwmods.player.listeners;
 
 import java.util.EventListener;
-import btwmods.api.player.events.ContainerEvent;
+
+import btwmods.player.events.ContainerEvent;
 
 public interface IContainerListener extends EventListener {
 	public void containerAction(ContainerEvent event);

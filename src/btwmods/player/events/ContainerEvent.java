@@ -1,4 +1,4 @@
-package btwmods.api.player.events;
+package btwmods.player.events;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.Container;

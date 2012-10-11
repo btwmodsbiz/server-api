@@ -1,16 +1,16 @@
-package btwmods.api.player;
+package btwmods;
 
 import java.util.EventListener;
 import java.util.HashSet;
 
-import btwmods.api.player.events.BlockEvent;
-import btwmods.api.player.events.ContainerEvent;
-import btwmods.api.player.events.DropEvent;
-import btwmods.api.player.events.SlotEvent;
-import btwmods.api.player.listeners.IBlockListener;
-import btwmods.api.player.listeners.IContainerListener;
-import btwmods.api.player.listeners.IDropListener;
-import btwmods.api.player.listeners.ISlotListener;
+import btwmods.player.events.BlockEvent;
+import btwmods.player.events.ContainerEvent;
+import btwmods.player.events.DropEvent;
+import btwmods.player.events.SlotEvent;
+import btwmods.player.listeners.IBlockListener;
+import btwmods.player.listeners.IContainerListener;
+import btwmods.player.listeners.IDropListener;
+import btwmods.player.listeners.ISlotListener;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;

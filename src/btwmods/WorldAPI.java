@@ -1,4 +1,4 @@
-package btwmods.api.world;
+package btwmods;
 
 import java.util.EventListener;
 import java.util.HashSet;
@@ -6,8 +6,8 @@ import java.util.HashSet;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.World;
-import btwmods.api.world.events.BlockEvent;
-import btwmods.api.world.listeners.IBlockListener;
+import btwmods.world.events.BlockEvent;
+import btwmods.world.listeners.IBlockListener;
 
 public class WorldAPI {
 	//public World world;
