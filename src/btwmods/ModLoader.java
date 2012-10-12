@@ -2,10 +2,8 @@ package btwmods;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.io.PrintStream;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -26,11 +24,14 @@ public class ModLoader {
 	private static Set<URL> classLoaderUrls = new HashSet<URL>();
 	private static Method classLoaderAddURLMethod = null;
 	
+	public static final String VERSION = "1.0 (vMC 1.3.2 BTW 4.21)";
+	
 	/**
 	 * Initialize the {@link ModLoader} and mods. Should only be called from 
 	 */
 	public static void init() {
 		if (!hasInit) {
+			net.minecraft.server.MinecraftServer.logger.info("BTWMods " + VERSION + " Initializing...");
 			
 			// Attempt to get the URLClassLoader and its private addURL() method.
 			if (classLoader == null) {
@@ -41,15 +42,18 @@ public class ModLoader {
 						classLoaderUrls.addAll(Arrays.asList(((URLClassLoader)classLoader).getURLs()));
 						classLoaderAddURLMethod = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
 						classLoaderAddURLMethod.setAccessible(true);
-					} catch (NoSuchMethodException e) {
+					} catch (Throwable e) {
+						outputError(e, "BTWMods could not load mods from the class path (i.e. any mods directly in your minecraft_server.jar).");
 					}
 				}
 				
 				// TODO: Can we use our own URLClassLoader instead?
 			}
 			
-			loadModsFromClassPath();
-			loadModsFromFolder(new File(".", "btwmods"));
+			findModsInClassPath();
+			findModsInFolder(new File(".", "btwmods"));
+
+			net.minecraft.server.MinecraftServer.logger.info("BTWMods Initialization Complete.");
 		}
 		
 		hasInit = true;
@@ -82,8 +86,6 @@ public class ModLoader {
 	 * @throws IllegalArgumentException
 	 */
 	public static boolean addClassLoaderURL(URL url) throws IllegalArgumentException {
-		// TODO: Unhandled exceptions in addClassLoaderURL()
-		
 		if (url == null)
 			throw new IllegalArgumentException("url argument cannot be null");
 		
@@ -95,17 +97,15 @@ public class ModLoader {
 			try {
 				classLoaderAddURLMethod.invoke((URLClassLoader)classLoader, new Object[] { url });
 				return true;
-			} catch (IllegalAccessException e) {
-				// TODO: IllegalAccessException in ModLoader#addClassLoaderURL()
-			} catch (InvocationTargetException e) {
-				// TODO: InvocationTargetException in ModLoader#addClassLoaderURL()
+			} catch (Throwable e) {
+				outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to add the following mod path: " + url.toString());
 			}
 		}
 		
 		return false;
 	}
 	
-	private static void loadModsFromFolder(File modsDir) {
+	private static void findModsInFolder(File modsDir) {
 		if (!modsDir.exists()) {
 			modsDir.mkdir();
 		}
@@ -116,42 +116,49 @@ public class ModLoader {
 			File[] file = modsDir.listFiles();
 			if (file != null) {
 				for (int i = 0; i < file.length; i++) {
-					String name = file[i].getName();
-					
-					// Load mod from a regular directory.
-					if (file[i].isDirectory()) {
-						String[] binaryNames = getModBinaryNamesFromDirectory(file[i]);
-						try {
-							if (binaryNames.length > 0) {
-								addClassLoaderURL(file[i].toURI().toURL());
+					try {
+						String name = file[i].getName();
+						
+						// Load mod from a regular directory.
+						if (file[i].isDirectory()) {
+							String[] binaryNames = getModBinaryNamesFromDirectory(file[i]);
+							if (binaryNames.length > 0 && addClassLoaderURL(file[i].toURI().toURL())) {
 								loadMods(binaryNames);
 							}
-						} catch (MalformedURLException e) {
-							// TODO: MalformedURLException in ModLoader#loadModsFromFolder()
 						}
-					}
-					
-					// Load mod from a zip or jar.
-					else if (file[i].isFile() && name.startsWith("BTWMod") && (name.endsWith(".jar") || name.endsWith(".zip"))) {
-						// TODO
-						throw new UnsupportedOperationException();
+						
+						// Load mod from a zip or jar.
+						else if (file[i].isFile() && (name.endsWith(".jar") || name.endsWith(".zip"))) {
+							String[] binaryNames = getModBinaryNamesFromZip(file[i]);
+							if (binaryNames.length > 0 && addClassLoaderURL(file[i].toURI().toURL())) {
+								loadMods(binaryNames);
+							}
+						}
+					} catch (Throwable e) {
+						outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to load mods from: " + file[i].getPath());
 					}
 				}
 			}
 		}
 	}
 	
-	private static void loadModsFromClassPath() {
+	private static void findModsInClassPath() {
 		for (URL url : classLoaderUrls) {
 			try {
 				File path = new File(url.toURI());
+				String name = path.getName();
+				
+				// Load mod from a regular directory.
 				if (path.isDirectory()) {
-					String[] binaryNames = getModBinaryNamesFromDirectory(path);
+					loadMods(getModBinaryNamesFromDirectory(path));
 				}
-			} catch (URISyntaxException e) {
-				// if this URL is not formatted strictly according to to RFC2396 and cannot be converted to a URI.
-			} catch (IllegalArgumentException e) {
-				// if the URI cannot be parsed by File(URI).
+				
+				// Load mod from a zip or jar.
+				else if (path.isFile() && (name.endsWith(".jar") || name.endsWith(".zip"))) {
+					loadMods(getModBinaryNamesFromZip(path));
+				}
+			} catch (Throwable e) {
+				outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to search the following classpath for mods: " + url.toString());
 			}
 		}
 	}
@@ -179,8 +186,8 @@ public class ModLoader {
 						File[] classNames = modPackages[p].listFiles();
 						if (classNames != null) {
 							for (int c = 0; c < classNames.length; c++) {
-								if (classNames[c].isFile() && classNames[c].getName().startsWith("BTWMod") && classNames[c].getName().startsWith(".class")) {
-									names.add("btwmod." + modPackages[p].getName() + "." + classNames[c].getName());
+								if (classNames[c].isFile() && classNames[c].getName().startsWith("BTWMod") && classNames[c].getName().endsWith(".class")) {
+									names.add("btwmod." + modPackages[p].getName() + "." + classNames[c].getName().substring(0, classNames[c].getName().length() - ".class".length()));
 								}
 							}
 						}
@@ -198,8 +205,11 @@ public class ModLoader {
 	 * @see <a href="http://www.javamex.com/tutorials/compression/zip_individual_entries.shtml">http://www.javamex.com/tutorials/compression/zip_individual_entries.shtml</a>
 	 * @param zip The zip (or jar) file to search.
 	 * @return An array of binary names (see {@link ClassLoader}.
+	 * @throws IllegalStateException If an action is taken on a closed zip file.
+	 * @throws ZipException
+	 * @throws IOException If the zip file could not be loaded.
 	 */
-	private static String[] getModBinaryNamesFromZip(File zip) {
+	private static String[] getModBinaryNamesFromZip(File zip) throws IllegalStateException, ZipException, IOException {
 		ArrayList<String> names = new ArrayList<String>();
 		
 		ZipFile zipFile = null;
@@ -209,31 +219,28 @@ public class ModLoader {
 			for (Enumeration<? extends ZipEntry> list = zipFile.entries(); list.hasMoreElements(); ) {
 				ZipEntry entry = list.nextElement();
 				if (!entry.isDirectory() && entry.getName().matches("^btwmod/[^/]+/BTWMod.+\\.class$")) {
-					names.add(entry.getName().substring(0, entry.getName().length() - ".class".length() - 1).replace('/',  '.'));
+					names.add(entry.getName().substring(0, entry.getName().length() - ".class".length()).replace('/',  '.'));
 				}
 			}
 			
 			return names.toArray(new String[names.size()]);
 			
-		} catch (IllegalStateException e) {
-			// If action was taken but zip is closed.
-			// TODO
-		} catch (ZipException e1) {
-			// TODO
-		} catch (IOException e1) {
-			// TODO
-		}
-		finally {
+		} finally {
 			if (zipFile != null)
-				try { zipFile.close(); } catch (Exception e) { }
+				try { zipFile.close(); } catch (Throwable e) { }
 		}
-		
-		// Do not return binary names if an exception was caught.
-		return new String[0];
 	}
 	
 	private static void loadMod(String binaryName) {
-		System.out.println("Loading mod " + binaryName + "...");
+		try {
+			Class mod = classLoader.loadClass(binaryName);
+			if (IMod.class.isAssignableFrom(mod)) {
+				IMod modInstance = (IMod)mod.newInstance();
+				net.minecraft.server.MinecraftServer.logger.info("BTWMod loaded: " + binaryName);
+			}
+		} catch (Throwable e) {
+			outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to initialize: " + binaryName);
+		}
 	}
 	
 	private static void loadMods(String[] binaryNames) {
@@ -242,25 +249,8 @@ public class ModLoader {
 		}
 	}
 	
-	public class Mods {
-		
-		private HashSet<IMod> mods;
-		
-		private Mods(HashSet<IMod> mods) {
-			this.mods = mods;
-		}
-		
-		public void initMods() {
-			for (IMod mod : mods) {
-				mod.init();
-			}
-		}
-
-		public void unloadMods() {
-			for (IMod mod : mods) {
-				mod.unload();
-			}
-			mods.clear();
-		}
+	private static void outputError(Throwable throwable, String message) {
+		net.minecraft.server.MinecraftServer.logger.warning(message);
+		throwable.printStackTrace(new PrintStream(System.out));
 	}
 }
