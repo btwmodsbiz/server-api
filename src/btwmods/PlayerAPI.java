@@ -6,21 +6,25 @@ import java.util.HashSet;
 import btwmods.player.events.BlockEvent;
 import btwmods.player.events.ContainerEvent;
 import btwmods.player.events.DropEvent;
+import btwmods.player.events.InstanceEvent;
 import btwmods.player.events.SlotEvent;
 import btwmods.player.listeners.IBlockListener;
 import btwmods.player.listeners.IContainerListener;
 import btwmods.player.listeners.IDropListener;
+import btwmods.player.listeners.IInstanceListener;
 import btwmods.player.listeners.ISlotListener;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.Container;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
 import net.minecraft.src.World;
 
 public class PlayerAPI {
+	private static HashSet<IInstanceListener> instanceListeners = new HashSet<IInstanceListener>();
 	private static HashSet<IBlockListener> blockListeners = new HashSet<IBlockListener>();
 	private static HashSet<ISlotListener> slotListeners = new HashSet<ISlotListener>();
 	private static HashSet<IContainerListener> containerListeners = new HashSet<IContainerListener>();
@@ -37,6 +41,8 @@ public class PlayerAPI {
 			containerListeners.add((IContainerListener)listener);
 		if (listener instanceof IDropListener)
 			dropListeners.add((IDropListener)listener);
+		if (listener instanceof IInstanceListener)
+			instanceListeners.add((IInstanceListener)listener);
 	}
 
 	public static void removeListener(EventListener listener) {
@@ -48,6 +54,8 @@ public class PlayerAPI {
 			containerListeners.remove((IContainerListener)listener);
 		if (listener instanceof IDropListener)
 			dropListeners.remove((IDropListener)listener);
+		if (listener instanceof IInstanceListener)
+			instanceListeners.remove((IInstanceListener)listener);
 	}
 	
 	/**
@@ -176,11 +184,35 @@ public class PlayerAPI {
 		}
 	}
 	
-	public static void login(EntityPlayer player) {
-		// TODO: 
+	public static void login(EntityPlayerMP player) {
+		if (!instanceListeners.isEmpty()) {
+        	InstanceEvent event = InstanceEvent.Login(player);
+        	
+			for (IInstanceListener listener : instanceListeners)
+				listener.instanceAction(event);
+		}
 	}
 	
-	public static void logout(EntityPlayer player) {
-		// TODO: 
+	public static void logout(EntityPlayerMP player) {
+		if (!instanceListeners.isEmpty()) {
+        	InstanceEvent event = InstanceEvent.Logout(player);
+        	
+			for (IInstanceListener listener : instanceListeners)
+				listener.instanceAction(event);
+		}
+	}
+
+	public static boolean handleRespawn(EntityPlayerMP oldPlayerInstance, EntityPlayerMP newPlayerInstance) {
+		if (!instanceListeners.isEmpty()) {
+        	InstanceEvent event = InstanceEvent.Respawn(oldPlayerInstance, newPlayerInstance);
+        	
+			for (IInstanceListener listener : instanceListeners) {
+				listener.instanceAction(event);
+				if (event.isRespawnHandled()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
