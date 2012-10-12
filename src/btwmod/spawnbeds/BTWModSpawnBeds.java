@@ -30,7 +30,6 @@ public class BTWModSpawnBeds implements IMod, IBlockListener {
 	@Override
 	public void blockActivated(BlockEvent event) {
 		EntityPlayer player = event.getPlayer();
-		player.sendChatToPlayer("sheeet");
 		if (event.getBlock() instanceof BlockBed && !player.worldObj.isRemote) {
 			
 			int metadata = event.getMetadata();
