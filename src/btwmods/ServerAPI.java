@@ -1,6 +1,5 @@
 package btwmods;
 
-import java.util.EventListener;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -17,7 +16,7 @@ public class ServerAPI {
 	
 	private ServerAPI() {}
 
-	public static void addListener(EventListener listener) {
+	public static void addListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
 			synchronized (statsListeners) {
 				statsListeners.add((IStatsListener) listener);
@@ -31,7 +30,7 @@ public class ServerAPI {
 		}
 	}
 
-	public static void removeListener(EventListener listener) {
+	public static void removeListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
 			synchronized (statsListeners) {
 				statsListeners.remove((IStatsListener)listener);

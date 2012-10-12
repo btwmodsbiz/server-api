@@ -33,8 +33,8 @@ public class BTWModItemLogger implements IMod {
 			}
 		}
 		
-		PlayerAPI.addListener(playerListener = new PlayerListener(logger));
-		WorldAPI.addListener(worldListener = new WorldListener(logger));
+		PlayerAPI.addListener(playerListener = new PlayerListener(this, logger));
+		WorldAPI.addListener(worldListener = new WorldListener(this, logger));
 	}
 
 	@Override

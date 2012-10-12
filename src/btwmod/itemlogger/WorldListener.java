@@ -6,15 +6,23 @@ import java.util.logging.Logger;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.ItemStack;
 
+import btwmods.IMod;
 import btwmods.world.events.BlockEvent;
 import btwmods.world.listeners.IBlockListener;
 
 public class WorldListener implements IBlockListener {
-	
+
+	private IMod mod;
 	private Logger logger;
 
-	public WorldListener(Logger logger) {
+	public WorldListener(BTWModItemLogger mod, Logger logger) {
+		this.mod = mod;
 		this.logger = logger;
+	}
+
+	@Override
+	public IMod getMod() {
+		return mod;
 	}
 
 	@Override

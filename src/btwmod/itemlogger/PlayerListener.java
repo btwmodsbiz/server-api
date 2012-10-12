@@ -6,6 +6,7 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.ItemStack;
 
+import btwmods.IMod;
 import btwmods.player.events.ContainerEvent;
 import btwmods.player.events.DropEvent;
 import btwmods.player.events.SlotEvent;
@@ -14,11 +15,18 @@ import btwmods.player.listeners.IDropListener;
 import btwmods.player.listeners.ISlotListener;
 
 public class PlayerListener implements ISlotListener, IDropListener, IContainerListener {
-	
+
+	private IMod mod;
 	private Logger logger;
 	
-	public PlayerListener(Logger logger) {
+	public PlayerListener(BTWModItemLogger mod, Logger logger) {
+		this.mod = mod;
 		this.logger = logger;
+	}
+
+	@Override
+	public IMod getMod() {
+		return mod;
 	}
 
 	@Override

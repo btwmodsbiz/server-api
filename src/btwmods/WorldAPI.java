@@ -1,6 +1,5 @@
 package btwmods;
 
-import java.util.EventListener;
 import java.util.HashSet;
 
 import net.minecraft.src.Block;
@@ -21,12 +20,12 @@ public class WorldAPI {
 	
 	private WorldAPI() {}
 
-	public static void addListener(EventListener listener) {
+	public static void addListener(IAPIListener listener) {
 		if (listener instanceof IBlockListener)
 			blockListeners.add((IBlockListener)listener);
 	}
 
-	public static void removeListener(EventListener listener) {
+	public static void removeListener(IAPIListener listener) {
 		if (listener instanceof IBlockListener)
 			blockListeners.remove((IBlockListener)listener);
 	}

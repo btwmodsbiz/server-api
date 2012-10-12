@@ -1,8 +1,8 @@
 package btwmods.server.listeners;
 
-import java.util.EventListener;
+import btwmods.IAPIListener;
 import btwmods.server.events.StatsEvent;
 
-public interface IStatsListener extends EventListener {
+public interface IStatsListener extends IAPIListener {
 	public void statsAction(StatsEvent event);
 }

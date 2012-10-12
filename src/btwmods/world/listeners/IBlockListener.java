@@ -1,9 +1,8 @@
 package btwmods.world.listeners;
 
-import java.util.EventListener;
-
+import btwmods.IAPIListener;
 import btwmods.world.events.BlockEvent;
 
-public interface IBlockListener extends EventListener {
+public interface IBlockListener extends IAPIListener {
 	public void blockAction(BlockEvent event);
 }

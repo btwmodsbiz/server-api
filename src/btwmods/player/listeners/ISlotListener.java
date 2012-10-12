@@ -1,9 +1,8 @@
 package btwmods.player.listeners;
 
-import java.util.EventListener;
-
+import btwmods.IAPIListener;
 import btwmods.player.events.SlotEvent;
 
-public interface ISlotListener extends EventListener {
+public interface ISlotListener extends IAPIListener {
 	public void slotAction(SlotEvent event);
 }

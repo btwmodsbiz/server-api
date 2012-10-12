@@ -1,8 +1,8 @@
 package btwmods.player.listeners;
 
-import java.util.EventListener;
+import btwmods.IAPIListener;
 import btwmods.player.events.InstanceEvent;
 
-public interface IInstanceListener extends EventListener {
+public interface IInstanceListener extends IAPIListener {
 	void instanceAction(InstanceEvent event);
 }

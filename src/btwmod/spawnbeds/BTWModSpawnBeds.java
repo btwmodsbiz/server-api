@@ -108,4 +108,9 @@ public class BTWModSpawnBeds implements IMod, IBlockListener {
 		}
 	}
 
+	@Override
+	public IMod getMod() {
+		return this;
+	}
+
 }
