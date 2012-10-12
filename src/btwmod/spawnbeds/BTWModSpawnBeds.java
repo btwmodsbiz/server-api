@@ -15,6 +15,11 @@ import btwmods.player.listeners.IBlockListener;
 
 public class BTWModSpawnBeds implements IMod, IBlockListener {
 	
+	@Override
+	public String getName() {
+		return "Spawn Beds";
+	}
+	
 	private PlayerAPI api;
 
 	@Override

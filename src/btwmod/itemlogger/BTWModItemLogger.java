@@ -16,6 +16,11 @@ public class BTWModItemLogger implements IMod {
 	
 	private PlayerListener playerListener;
 	private WorldListener worldListener;
+	
+	@Override
+	public String getName() {
+		return "Item Logger";
+	}
 
 	@Override
 	public void init() {
