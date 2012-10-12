@@ -129,7 +129,11 @@ public class ServerAPI {
 					// Run all the listeners.
 					StatsEvent event = new StatsEvent(MinecraftServer.getServer(), this);
 					for (IStatsListener listener : statsListeners)
-						listener.statsAction(event);
+						try {
+							listener.statsAction(event);
+						} catch (Throwable t) {
+							ModLoader.reportListenerFailure(t, listener);
+						}
 				}
 
 				try {

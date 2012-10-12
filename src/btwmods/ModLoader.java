@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -250,7 +251,15 @@ public class ModLoader {
 	}
 	
 	private static void outputError(Throwable throwable, String message) {
-		net.minecraft.server.MinecraftServer.logger.warning(message);
+		outputError(throwable, message, Level.WARNING);
+	}
+	
+	private static void outputError(Throwable throwable, String message, Level level) {
+		net.minecraft.server.MinecraftServer.logger.log(level, message);
 		throwable.printStackTrace(new PrintStream(System.out));
+	}
+	
+	public static void reportListenerFailure(Throwable t, IAPIListener listener) {
+		outputError(t, "BTWMod " + listener.getMod().getName() + " (" + listener.getClass().getName() + ") threw a " + t.getClass().getSimpleName() + ": " + t.getMessage(), Level.SEVERE);
 	}
 }

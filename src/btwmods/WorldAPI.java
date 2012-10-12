@@ -35,7 +35,11 @@ public class WorldAPI {
 			BlockEvent event = BlockEvent.Broken(world, chunk, block, blockMetadata, x, y, z);
 			
 			for (IBlockListener listener : blockListeners)
-				listener.blockAction(event);
+				try {
+					listener.blockAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 }

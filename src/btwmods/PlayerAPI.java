@@ -73,7 +73,11 @@ public class PlayerAPI {
 			BlockEvent event = BlockEvent.Activated(player, block, x, y, z);
 			
 			for (IBlockListener listener : blockListeners)
-				listener.blockActivated(event);
+				try {
+					listener.blockActivated(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 
 		if (block instanceof BlockContainer) {
@@ -86,7 +90,11 @@ public class PlayerAPI {
 			ContainerEvent event = ContainerEvent.Removed(player, block, metadata, x, y, z);
 			
 			for (IContainerListener listener : containerListeners)
-				listener.containerAction(event);
+				try {
+					listener.containerAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 	
@@ -99,7 +107,11 @@ public class PlayerAPI {
 			ContainerEvent event = ContainerEvent.Open(player, block, container, x, y, z);
 			
 			for (IContainerListener listener : containerListeners)
-				listener.containerAction(event);
+				try {
+					listener.containerAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 	
@@ -118,7 +130,11 @@ public class PlayerAPI {
 				event = DropEvent.Stack(player, itemStack);
 			
 			for (IDropListener listener : dropListeners)
-				listener.dropAction(event);
+				try {
+					listener.dropAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 	
@@ -131,7 +147,11 @@ public class PlayerAPI {
 			DropEvent event = DropEvent.Eject(player, items);
 		
 			for (IDropListener listener : dropListeners)
-				listener.dropAction(event);
+				try {
+					listener.dropAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 	
@@ -143,7 +163,11 @@ public class PlayerAPI {
 			DropEvent event = DropEvent.All(player);
 			
 			for (IDropListener listener : dropListeners)
-				listener.dropAction(event);
+				try {
+					listener.dropAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 	
@@ -152,7 +176,11 @@ public class PlayerAPI {
         	SlotEvent event = SlotEvent.Transfer(player, container, slotId, original);
         	
 			for (ISlotListener listener : slotListeners)
-				listener.slotAction(event);
+				try {
+					listener.slotAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 	
@@ -161,7 +189,11 @@ public class PlayerAPI {
         	SlotEvent event = SlotEvent.Add(player, container, clickedSlot, quantity);
         	
 			for (ISlotListener listener : slotListeners)
-				listener.slotAction(event);
+				try {
+					listener.slotAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 	
@@ -170,7 +202,11 @@ public class PlayerAPI {
         	SlotEvent event = SlotEvent.Remove(player, container, clickedSlot, quantity);
         	
 			for (ISlotListener listener : slotListeners)
-				listener.slotAction(event);
+				try {
+					listener.slotAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 	
@@ -179,7 +215,11 @@ public class PlayerAPI {
         	SlotEvent event = SlotEvent.Switch(player, container, clickedSlot);
         	
 			for (ISlotListener listener : slotListeners)
-				listener.slotAction(event);
+				try {
+					listener.slotAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 	
@@ -188,7 +228,11 @@ public class PlayerAPI {
         	InstanceEvent event = InstanceEvent.Login(player);
         	
 			for (IInstanceListener listener : instanceListeners)
-				listener.instanceAction(event);
+				try {
+					listener.instanceAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 	
@@ -197,7 +241,11 @@ public class PlayerAPI {
         	InstanceEvent event = InstanceEvent.Logout(player);
         	
 			for (IInstanceListener listener : instanceListeners)
-				listener.instanceAction(event);
+				try {
+					listener.instanceAction(event);
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
+				}
 		}
 	}
 
@@ -206,9 +254,13 @@ public class PlayerAPI {
         	InstanceEvent event = InstanceEvent.Respawn(oldPlayerInstance, newPlayerInstance);
         	
 			for (IInstanceListener listener : instanceListeners) {
-				listener.instanceAction(event);
-				if (event.isRespawnHandled()) {
-					return true;
+				try {
+					listener.instanceAction(event);
+					if (event.isRespawnHandled()) {
+						return true;
+					}
+				} catch (Throwable t) {
+					ModLoader.reportListenerFailure(t, listener);
 				}
 			}
 		}
