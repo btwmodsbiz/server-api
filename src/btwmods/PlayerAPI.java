@@ -1,7 +1,5 @@
 package btwmods;
 
-import java.util.HashSet;
-
 import btwmods.player.events.BlockEvent;
 import btwmods.player.events.ContainerEvent;
 import btwmods.player.events.DropEvent;
@@ -23,38 +21,16 @@ import net.minecraft.src.Slot;
 import net.minecraft.src.World;
 
 public class PlayerAPI {
-	private static HashSet<IInstanceListener> instanceListeners = new HashSet<IInstanceListener>();
-	private static HashSet<IBlockListener> blockListeners = new HashSet<IBlockListener>();
-	private static HashSet<ISlotListener> slotListeners = new HashSet<ISlotListener>();
-	private static HashSet<IContainerListener> containerListeners = new HashSet<IContainerListener>();
-	private static HashSet<IDropListener> dropListeners = new HashSet<IDropListener>();
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IInstanceListener.class, IBlockListener.class, ISlotListener.class, IContainerListener.class, IDropListener.class });
 	
 	private PlayerAPI() {}
 	
 	public static void addListener(IAPIListener listener) {
-		if (listener instanceof IBlockListener)
-			blockListeners.add((IBlockListener)listener);
-		if (listener instanceof ISlotListener)
-			slotListeners.add((ISlotListener)listener);
-		if (listener instanceof IContainerListener)
-			containerListeners.add((IContainerListener)listener);
-		if (listener instanceof IDropListener)
-			dropListeners.add((IDropListener)listener);
-		if (listener instanceof IInstanceListener)
-			instanceListeners.add((IInstanceListener)listener);
+		listeners.addListener(listener);
 	}
 
 	public static void removeListener(IAPIListener listener) {
-		if (listener instanceof IBlockListener)
-			blockListeners.remove((IBlockListener)listener);
-		if (listener instanceof ISlotListener)
-			slotListeners.remove((ISlotListener)listener);
-		if (listener instanceof IContainerListener)
-			containerListeners.remove((IContainerListener)listener);
-		if (listener instanceof IDropListener)
-			dropListeners.remove((IDropListener)listener);
-		if (listener instanceof IInstanceListener)
-			instanceListeners.remove((IInstanceListener)listener);
+		listeners.removeListener(listener);
 	}
 	
 	/**
@@ -69,15 +45,9 @@ public class PlayerAPI {
 	 * @param z coordinate of the block
 	 */
 	public static void activatedBlock(EntityPlayer player, Block block, int x, int y, int z) {
-		if (!blockListeners.isEmpty()) {
+		if (!listeners.isEmpty(IBlockListener.class)) {
 			BlockEvent event = BlockEvent.Activated(player, block, x, y, z);
-			
-			for (IBlockListener listener : blockListeners)
-				try {
-					listener.blockActivated(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+			((IBlockListener)listeners).blockActivated(event);
 		}
 
 		if (block instanceof BlockContainer) {
@@ -86,15 +56,9 @@ public class PlayerAPI {
 	}
 	
 	public static void blockRemoved(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
-		if (block instanceof BlockContainer && !containerListeners.isEmpty()) {
+		if (block instanceof BlockContainer && !listeners.isEmpty(IContainerListener.class)) {
 			ContainerEvent event = ContainerEvent.Removed(player, block, metadata, x, y, z);
-			
-			for (IContainerListener listener : containerListeners)
-				try {
-					listener.containerAction(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+			((IContainerListener)listeners).containerAction(event);
 		}
 	}
 	
@@ -103,15 +67,9 @@ public class PlayerAPI {
 	}
 	
 	public static void containerOpened(EntityPlayer player, Block block, Container container, int x, int y, int z) {
-		if (!containerListeners.isEmpty()) {
+		if (!listeners.isEmpty(IContainerListener.class)) {
 			ContainerEvent event = ContainerEvent.Open(player, block, container, x, y, z);
-			
-			for (IContainerListener listener : containerListeners)
-				try {
-					listener.containerAction(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+			((IContainerListener)listeners).containerAction(event);
 		}
 	}
 	
@@ -121,20 +79,15 @@ public class PlayerAPI {
 	 * @param mouseButton
 	 */
 	public static void itemDropped(EntityPlayer player, ItemStack itemStack, int mouseButton) {
-		if (!dropListeners.isEmpty()) {
+		if (!listeners.isEmpty(IDropListener.class)) {
 			DropEvent event;
 			
 			if (mouseButton == 1)
 				event = DropEvent.One(player, itemStack);
 			else
 				event = DropEvent.Stack(player, itemStack);
-			
-			for (IDropListener listener : dropListeners)
-				try {
-					listener.dropAction(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+
+        	((IDropListener)listeners).dropAction(event);
 		}
 	}
 	
@@ -143,15 +96,9 @@ public class PlayerAPI {
 	 * @param items
 	 */
 	public static void itemEjected(EntityPlayer player, ItemStack items) {
-		if (!dropListeners.isEmpty()) {
+		if (!listeners.isEmpty(IDropListener.class)) {
 			DropEvent event = DropEvent.Eject(player, items);
-		
-			for (IDropListener listener : dropListeners)
-				try {
-					listener.dropAction(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+        	((IDropListener)listeners).dropAction(event);
 		}
 	}
 	
@@ -159,101 +106,62 @@ public class PlayerAPI {
 	 * All player items are dropped.
 	 */
 	public static void itemsDroppedAll(EntityPlayer player) {
-		if (!dropListeners.isEmpty()) {
+		if (!listeners.isEmpty(IDropListener.class)) {
 			DropEvent event = DropEvent.All(player);
-			
-			for (IDropListener listener : dropListeners)
-				try {
-					listener.dropAction(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+        	((IDropListener)listeners).dropAction(event);
 		}
 	}
 	
 	public static void itemTransfered(EntityPlayer player, Container container, int slotId, ItemStack original) {
-		if (!slotListeners.isEmpty()) {
+		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Transfer(player, container, slotId, original);
-        	
-			for (ISlotListener listener : slotListeners)
-				try {
-					listener.slotAction(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+        	((ISlotListener)listeners).slotAction(event);
 		}
 	}
 	
 	public static void itemAddedToSlot(EntityPlayer player, Container container, Slot clickedSlot, int quantity) {
-		if (!slotListeners.isEmpty()) {
+		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Add(player, container, clickedSlot, quantity);
-        	
-			for (ISlotListener listener : slotListeners)
-				try {
-					listener.slotAction(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+        	((ISlotListener)listeners).slotAction(event);
 		}
 	}
 	
 	public static void itemRemovedFromSlot(EntityPlayer player, Container container, Slot clickedSlot, int quantity) {
-		if (!slotListeners.isEmpty()) {
+		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Remove(player, container, clickedSlot, quantity);
-        	
-			for (ISlotListener listener : slotListeners)
-				try {
-					listener.slotAction(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+        	((ISlotListener)listeners).slotAction(event);
 		}
 	}
 	
 	public static void itemSwitchedWithSlot(EntityPlayer player, Container container, Slot clickedSlot) {
-		if (!slotListeners.isEmpty()) {
+		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Switch(player, container, clickedSlot);
-        	
-			for (ISlotListener listener : slotListeners)
-				try {
-					listener.slotAction(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+        	((ISlotListener)listeners).slotAction(event);
 		}
 	}
 	
 	public static void login(EntityPlayerMP player) {
-		if (!instanceListeners.isEmpty()) {
+		if (!listeners.isEmpty(IInstanceListener.class)) {
         	InstanceEvent event = InstanceEvent.Login(player);
-        	
-			for (IInstanceListener listener : instanceListeners)
-				try {
-					listener.instanceAction(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+        	((IInstanceListener)listeners).instanceAction(event);
 		}
 	}
 	
 	public static void logout(EntityPlayerMP player) {
-		if (!instanceListeners.isEmpty()) {
+		if (!listeners.isEmpty(IInstanceListener.class)) {
         	InstanceEvent event = InstanceEvent.Logout(player);
-        	
-			for (IInstanceListener listener : instanceListeners)
-				try {
-					listener.instanceAction(event);
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
+        	((IInstanceListener)listeners).instanceAction(event);
 		}
 	}
 
 	public static boolean handleRespawn(EntityPlayerMP oldPlayerInstance, EntityPlayerMP newPlayerInstance) {
-		if (!instanceListeners.isEmpty()) {
+		if (!listeners.isEmpty(IInstanceListener.class)) {
         	InstanceEvent event = InstanceEvent.Respawn(oldPlayerInstance, newPlayerInstance);
         	
-			for (IInstanceListener listener : instanceListeners) {
+        	// TODO: need to process events one at a time.
+        	//((IInstanceListener)listeners).instanceAction(event);
+        	
+			/*for (IInstanceListener listener : instanceListeners) {
 				try {
 					listener.instanceAction(event);
 					if (event.isRespawnHandled()) {
@@ -262,7 +170,7 @@ public class PlayerAPI {
 				} catch (Throwable t) {
 					ModLoader.reportListenerFailure(t, listener);
 				}
-			}
+			}*/
 		}
 		return false;
 	}

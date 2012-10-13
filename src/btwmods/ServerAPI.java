@@ -1,26 +1,24 @@
 package btwmods;
 
-import java.util.AbstractMap.SimpleEntry;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
+import btwmods.EventDispatcher;
 import btwmods.server.events.StatsEvent;
 import btwmods.server.listeners.IStatsListener;
 
 public class ServerAPI {
 
-	private enum QueueAction { ADD, REMOVE };
 	private static volatile StatsProcessor statsProcessor = null;
 	
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IStatsListener.class });
 	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<QueuedTickStats>();
-	private static ConcurrentLinkedQueue<SimpleEntry<QueueAction, IStatsListener>> statListenerQueue = new ConcurrentLinkedQueue<SimpleEntry<QueueAction, IStatsListener>>();
 	
 	private ServerAPI() {}
 
 	public static void addListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
-			statListenerQueue.add(new SimpleEntry<QueueAction, IStatsListener>(QueueAction.ADD, (IStatsListener)listener));
+			listeners.queuedAddListener(listener, IStatsListener.class);
 
 			if (statsProcessor == null) {
 				Thread thread = new Thread(statsProcessor = new StatsProcessor());
@@ -32,7 +30,7 @@ public class ServerAPI {
 
 	public static void removeListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
-			statListenerQueue.add(new SimpleEntry<QueueAction, IStatsListener>(QueueAction.REMOVE, (IStatsListener)listener));
+			listeners.queuedRemoveListener(listener, IStatsListener.class);
 		}
 	}
 
@@ -69,8 +67,6 @@ public class ServerAPI {
 	}
 
 	public static class StatsProcessor implements Runnable {
-		private static HashSet<IStatsListener> statsListeners = new HashSet<IStatsListener>();
-
 		public int tickCounter;
 		
 		public long[] tickTimeArray = new long[100];
@@ -96,17 +92,8 @@ public class ServerAPI {
 		public void run() {
 			while (statsProcessor == this) {
 				
-				// Add and remove IStatListeners if they are in the queue.
-				SimpleEntry<QueueAction, IStatsListener> entry;
-				while ((entry = statListenerQueue.poll()) != null) {
-					if (entry.getKey() == QueueAction.ADD)
-						statsListeners.add(entry.getValue());
-					else if (entry.getKey() == QueueAction.REMOVE)
-						statsListeners.remove(entry.getValue());
-				}
-				
 				// Stop if the thread if there are no listeners.
-				if (statsListeners.isEmpty()) {
+				if (listeners.isEmpty(IStatsListener.class)) {
 					statsProcessor = null;
 				}
 				else {
@@ -141,15 +128,7 @@ public class ServerAPI {
 					
 					// Run all the listeners.
 					StatsEvent event = new StatsEvent(MinecraftServer.getServer(), this);
-					for (IStatsListener listener : statsListeners)
-						try {
-							listener.statsAction(event);
-						} catch (Throwable t) {
-							// Remove the listener right away since we're running in a thread.
-							statsListeners.remove(listener);
-							
-							ModLoader.reportListenerFailure(t, listener);
-						}
+					((IStatsListener)listeners).statsAction(event);
 
 					try {
 						Thread.sleep(50L);
