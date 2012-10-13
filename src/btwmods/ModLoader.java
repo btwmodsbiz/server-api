@@ -268,6 +268,10 @@ public class ModLoader {
 	}
 	
 	public static void reportListenerFailure(Throwable t, IAPIListener listener) {
+		ServerAPI.removeListener(listener);
+		WorldAPI.removeListener(listener);
+		NetworkAPI.unregisterCustomChannels(listener);
+		PlayerAPI.removeListener(listener);
 		outputError(t, "BTWMod " + listener.getMod().getName() + " (" + listener.getClass().getName() + ") threw a " + t.getClass().getSimpleName() + ": " + t.getMessage(), Level.SEVERE);
 	}
 }

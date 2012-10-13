@@ -56,7 +56,7 @@ public class NetworkAPI {
 	 * @param listener the listener that implements {@link INetworkListener}.
 	 * @throws IllegalArgumentException if listener is null.
 	 */
-	public static void unregisterCustomChannels(INetworkListener listener) throws IllegalArgumentException {
+	public static void unregisterCustomChannels(IAPIListener listener) throws IllegalArgumentException {
 		if (listener == null)
 			throw new IllegalArgumentException("listener cannot be null or a zero length string");
 		
