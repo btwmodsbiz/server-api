@@ -1,6 +1,5 @@
 package btwmods;
 
-import java.io.PrintStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -9,8 +8,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.concurrent.ConcurrentLinkedQueue;
 public class EventDispatcherFactory implements InvocationHandler, EventDispatcher {
+
+	public enum QueueAction { ADD, REMOVE };
+	public class QueuedListener {
+		public final QueueAction action;
+		public final IAPIListener listener;
+		public final Class listenerClass;
+		
+		public QueuedListener(QueueAction action, IAPIListener listener, Class listenerClass) {
+			this.action = action;
+			this.listener = listener;
+			this.listenerClass = listenerClass;
+		}
+	}
 	
 	/**
 	 * Create a new event dispatcher that supports the supplied IAPIListener classes.
@@ -34,6 +46,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 	
 	private Map<Class, Set<IAPIListener>> lookup = new HashMap<Class, Set<IAPIListener>>();
+	private ConcurrentLinkedQueue<QueuedListener> listenerQueue = new ConcurrentLinkedQueue<QueuedListener>();
 	private Class[] listenerClasses;
 	private Object proxy;
 	
@@ -61,14 +74,14 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 		return getListeners(listenerClass).size() == 0;
 	}
 	
+	// Note: If any other methods access 'lookup' then they should call processQueue() first.
 	private Set<IAPIListener> getListeners(Class listenerClass) {
+		processQueue();
 		return lookup.get(listenerClass);
 	}
 	
 	/**
-	 * Add the listener to all the matching IAPIListeners supported by this dispatcher.
-	 * 
-	 * @return true if the listener was added successfully; false if the listener did not exist or is not not supported by this dispatcher.
+	 * @see {@link EventDispatcher#addListener(IAPIListener)}
 	 */
 	public void addListener(IAPIListener listener) {
 		Class listenerClass = listener.getClass();
@@ -80,28 +93,26 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 
 	/**
-	 * Adds the listener for only the specified listener class.
-	 * 
-	 * @return true if the listener was added successfully; false if the listener did not exist or is not not supported by this dispatcher.
+	 * @see {@link EventDispatcher#addListener(IAPIListener, Class)}
 	 */
-	public boolean addListener(IAPIListener listener, Class listenerClass) {
-		if (!IAPIListener.class.isAssignableFrom(listenerClass))
-			throw new IllegalArgumentException("listenerClass is not an instance of IAPIListener");
-		
-		if (!listenerClass.isAssignableFrom(listener.getClass()))
-			throw new IllegalArgumentException("listener is not an instance of listenerClass");
-
-		return listenerClass.isAssignableFrom(proxy.getClass()) && addListenerInternal(listener, listenerClass);
+	public boolean addListener(IAPIListener listener, Class listenerClass) throws IllegalArgumentException {
+		return checkIsSupportedListener(listener, listenerClass) && listenerClass.isAssignableFrom(proxy.getClass())
+				&& addListenerInternal(listener, listenerClass);
 	}
 
 	private boolean addListenerInternal(IAPIListener listener, Class listenerClass) {
 		return getListeners(listenerClass).add(listener);
 	}
+	
+	/**
+	 * @see {@link EventDispatcher#queuedAddListener(IAPIListener, Class)}
+	 */
+	public void queuedAddListener(IAPIListener listener, Class listenerClass) {
+		listenerQueue.add(new QueuedListener(QueueAction.ADD, listener, listenerClass));
+	}
 
 	/**
-	 * Removes the listener to all the matching IAPIListeners supported by this dispatcher.
-	 * 
-	 * @return true if the listener was removed successfully; false if the listener did not exist or is not not supported by this dispatcher.
+	 * @see {@link EventDispatcher#removeListener(IAPIListener)}
 	 */
 	public void removeListener(IAPIListener listener) {
 		Class listenerClass = listener.getClass();
@@ -113,22 +124,49 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 
 	/**
-	 * Removes the listener from only the specified listener class.
-	 * 
-	 * @return true if the listener was added successfully; false if the listener did not exist or is not not supported by this dispatcher.
+	 * @see {@link EventDispatcher#removeListener(IAPIListener, Class)}
 	 */
-	public boolean removeListener(IAPIListener listener, Class listenerClass) {
-		if (!IAPIListener.class.isAssignableFrom(listenerClass))
-			throw new IllegalArgumentException("listenerClass is not an instance of IAPIListener");
-		
-		if (!listenerClass.isAssignableFrom(listener.getClass()))
-			throw new IllegalArgumentException("listener is not an instance of listenerClass");
-
-		return listenerClass.isAssignableFrom(proxy.getClass()) && removeListenerInternal(listener, listenerClass);
+	public boolean removeListener(IAPIListener listener, Class listenerClass) throws IllegalArgumentException {
+		return checkIsSupportedListener(listener, listenerClass) && listenerClass.isAssignableFrom(proxy.getClass())
+				&& removeListenerInternal(listener, listenerClass);
 	}
 
 	private boolean removeListenerInternal(IAPIListener listener, Class listenerClass) {
 		return getListeners(listenerClass).remove(listener);
+	}
+
+	/**
+	 * @see {@link EventDispatcher#queuedRemoveListener(IAPIListener, Class)}
+	 */
+	public void queuedRemoveListener(IAPIListener listener, Class listenerClass) {
+
+		listenerQueue.add(new QueuedListener(QueueAction.REMOVE, listener, listenerClass));
+	}
+	
+	private boolean checkIsSupportedListener(IAPIListener listener, Class listenerClass) throws IllegalArgumentException {
+		if (listener == null)
+			throw new IllegalArgumentException("listener cannot be null");
+		
+		if (listenerClass == null)
+			throw new IllegalArgumentException("listenerClass cannot be null");
+		
+		if (!IAPIListener.class.isAssignableFrom(listenerClass))
+			throw new IllegalArgumentException("listenerClass is not an instance of IAPIListener");
+
+		if (!listenerClass.isAssignableFrom(listener.getClass()))
+			throw new IllegalArgumentException("listener is not an instance of listenerClass");
+
+		return listenerClass.isAssignableFrom(proxy.getClass());
+	}
+	
+	private void processQueue() {
+		QueuedListener entry;
+		while ((entry = listenerQueue.poll()) != null) {
+			if (entry.action == QueueAction.ADD)
+				addListener(entry.listener, entry.listenerClass);
+			else if (entry.action == QueueAction.REMOVE)
+				removeListener(entry.listener, entry.listenerClass);
+		}
 	}
 
 	@Override
