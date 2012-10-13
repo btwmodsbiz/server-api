@@ -237,10 +237,18 @@ public class ModLoader {
 			Class mod = classLoader.loadClass(binaryName);
 			if (IMod.class.isAssignableFrom(mod)) {
 				IMod modInstance = (IMod)mod.newInstance();
+				
+				try {
+				modInstance.init();
+				}
+				catch (Throwable e) {
+					outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") while running init for: " + binaryName);
+				}
+				
 				net.minecraft.server.MinecraftServer.logger.info("BTWMod loaded: " + binaryName);
 			}
 		} catch (Throwable e) {
-			outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to initialize: " + binaryName);
+			outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to create an instance of: " + binaryName);
 		}
 	}
 	
