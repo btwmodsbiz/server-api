@@ -15,41 +15,41 @@ public class StatsEvent extends EventObject {
 	private long[][] worldTickTimeArray = null;
 	
 	public final int tickCounter;
-	public final double tickTimeAverage;
-	public final double sentPacketCountAverage;
-	public final double sentPacketSizeAverage;
-	public final double receivedPacketCountAverage;
-	public final double receivedPacketSizeAverage;
+	public final double averageTickTime;
+	public final double averageSentPacketCount;
+	public final double averageSentPacketSize;
+	public final double averageReceivedPacketCount;
+	public final double averageReceivedPacketSize;
 
-	public long[] getTickTimeArray() {
+	public long[] getLast100TickTimes() {
 		if (tickTimeArray == null)
 			tickTimeArray = processor.tickTimeArray.clone();
 			
 		return tickTimeArray;
 	}
 	
-	public long[] getSentPacketCountArray() {
+	public long[] getLast100SentPacketCounts() {
 		if (sentPacketCountArray == null)
 			sentPacketCountArray = processor.sentPacketCountArray.clone();
 			
 		return sentPacketCountArray;
 	}
 	
-	public long[] getSentPacketSizeArray() {
+	public long[] getLast100SentPacketSizes() {
 		if (sentPacketSizeArray == null)
 			sentPacketSizeArray = processor.sentPacketSizeArray.clone();
 			
 		return sentPacketSizeArray;
 	}
 	
-	public long[] getReceivedPacketCountArray() {
+	public long[] getLast100ReceivedPacketCounts() {
 		if (receivedPacketCountArray == null)
 			receivedPacketCountArray = processor.receivedPacketCountArray.clone();
 			
 		return receivedPacketCountArray;
 	}
 	
-	public long[] getReceivedPacketSizeArray() {
+	public long[] getLast100ReceivedPacketSizes() {
 		if (receivedPacketSizeArray == null)
 			receivedPacketSizeArray = processor.receivedPacketSizeArray.clone();
 			
@@ -57,7 +57,7 @@ public class StatsEvent extends EventObject {
 	}
 	
 	
-	public long[][] getWorldTickTimeArray() {
+	public long[][] getLast100WorldTickTimes() {
 		if (worldTickTimeArray == null) {
 			worldTickTimeArray = new long[processor.worldTickTimeArray.length][];
 			for (int i = 0; i < worldTickTimeArray.length; i++) {
@@ -72,10 +72,10 @@ public class StatsEvent extends EventObject {
 		this.processor = processor;
 		
 		tickCounter = processor.tickCounter;
-		tickTimeAverage = (double)processor.tickTimeTotal / (double)Math.min(100, tickCounter);
-		sentPacketCountAverage = (double)processor.sentPacketCountTotal / (double)Math.min(100, tickCounter);
-		sentPacketSizeAverage = (double)processor.sentPacketSizeTotal / (double)Math.min(100, tickCounter);
-		receivedPacketCountAverage = (double)processor.receivedPacketCountTotal / (double)Math.min(100, tickCounter);
-		receivedPacketSizeAverage = (double)processor.receivedPacketSizeTotal / (double)Math.min(100, tickCounter);
+		averageTickTime = (double)processor.tickTimeTotal / (double)Math.min(100, tickCounter);
+		averageSentPacketCount = (double)processor.sentPacketCountTotal / (double)Math.min(100, tickCounter);
+		averageSentPacketSize = (double)processor.sentPacketSizeTotal / (double)Math.min(100, tickCounter);
+		averageReceivedPacketCount = (double)processor.receivedPacketCountTotal / (double)Math.min(100, tickCounter);
+		averageReceivedPacketSize = (double)processor.receivedPacketSizeTotal / (double)Math.min(100, tickCounter);
 	}
 }
