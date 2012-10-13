@@ -239,7 +239,7 @@ public class ModLoader {
 				IMod modInstance = (IMod)mod.newInstance();
 				
 				try {
-				modInstance.init();
+					modInstance.init();
 				}
 				catch (Throwable e) {
 					outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") while running init for: " + binaryName);
@@ -258,13 +258,25 @@ public class ModLoader {
 		}
 	}
 	
+	private static void outputError(String message) {
+		outputError(message, Level.WARNING);
+	}
+	
+	private static void outputError(String message, Level level) {
+		net.minecraft.server.MinecraftServer.logger.log(level, message);
+	}
+	
 	private static void outputError(Throwable throwable, String message) {
 		outputError(throwable, message, Level.WARNING);
 	}
 	
 	private static void outputError(Throwable throwable, String message, Level level) {
-		net.minecraft.server.MinecraftServer.logger.log(level, message);
+		outputError(message, level);
 		throwable.printStackTrace(new PrintStream(System.out));
+	}
+	
+	private static void outputInfo(String message) {
+		net.minecraft.server.MinecraftServer.logger.info(message);
 	}
 	
 	public static void reportListenerFailure(Throwable t, IAPIListener listener) {
