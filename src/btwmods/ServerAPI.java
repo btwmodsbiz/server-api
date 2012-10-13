@@ -35,7 +35,8 @@ public class ServerAPI {
 	}
 
 	public static void startTick(MinecraftServer server, int tickCounter) {
-		
+		// Process any failures that may be queued from the last tick.
+		ModLoader.processFailureQueue();
 	}
 
 	public static void endTick(MinecraftServer server, int tickCounter) {

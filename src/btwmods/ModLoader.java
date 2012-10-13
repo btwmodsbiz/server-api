@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -20,6 +22,7 @@ public class ModLoader {
 	
 	private ModLoader() {}
 
+	private static Thread thread = null;
 	private static boolean hasInit = false;
 	private static ClassLoader classLoader = null;
 	private static Set<URL> classLoaderUrls = new HashSet<URL>();
@@ -28,10 +31,19 @@ public class ModLoader {
 	public static final String VERSION = "1.0 (vMC 1.3.2 BTW 4.21)";
 	
 	/**
+	 * Holds failed listeners from other threads.
+	 */
+	private static ConcurrentLinkedQueue<SimpleEntry<Throwable, IAPIListener>> failedListenerQueue = new ConcurrentLinkedQueue<SimpleEntry<Throwable, IAPIListener>>();
+	
+	/**
 	 * Initialize the {@link ModLoader} and mods. Should only be called from 
 	 */
 	public static void init() {
 		if (!hasInit) {
+			
+			// Mark the current thread as the main one.
+			thread = Thread.currentThread();
+			
 			net.minecraft.server.MinecraftServer.logger.info("BTWMods " + VERSION + " Initializing...");
 			
 			// Attempt to get the URLClassLoader and its private addURL() method.
@@ -58,6 +70,13 @@ public class ModLoader {
 		}
 		
 		hasInit = true;
+	}
+	
+	/**
+	 * Return if the current thread is the same one that ModLoader was initialized in.
+	 */
+	public static boolean inInitThread() {
+		return Thread.currentThread() == thread;
 	}
 	
 	/**
@@ -279,9 +298,28 @@ public class ModLoader {
 		net.minecraft.server.MinecraftServer.logger.info(message);
 	}
 	
+	/**
+	 * Process any failed listeners that were queued due to being from another thread.
+	 */
+	public static void processFailureQueue() {
+		SimpleEntry<Throwable, IAPIListener> entry;
+		if (inInitThread()) {
+			while ((entry = failedListenerQueue.poll()) != null) {
+				reportListenerFailure(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+	
 	public static void reportListenerFailure(Throwable t, IAPIListener listener) {
-		// TODO: check if the report is coming from another thread.
+		// Queue the failure if it is coming from another thread.
+		if (!inInitThread()) {
+			failedListenerQueue.add(new SimpleEntry<Throwable, IAPIListener>(t, listener));
+			return;
+		}
 		
+		processFailureQueue();
+		
+		// Remove the listener from all APIs.
 		ServerAPI.removeListener(listener);
 		WorldAPI.removeListener(listener);
 		NetworkAPI.unregisterCustomChannels(listener);
@@ -292,13 +330,13 @@ public class ModLoader {
 		
 		try {
 			mod = listener.getMod();
-			name = mod.getName() + " (" + listener.getClass().getName() + ")";
+			name = mod.getName() + " (" + name + ")";
 			mod.unload();
 		}
 		catch (Throwable e) { }
 		
 		// TODO: alert server admins to failed mods.
 		outputError(t, "BTWMod " + name + " threw a " + t.getClass().getSimpleName() + (t.getMessage() == null ? "." : ": " + t.getMessage()), Level.SEVERE);
-		outputError("BTWMod " + name + " has been disabled.");
+		outputError("BTWMod " + name + " has been disabled.", Level.SEVERE);
 	}
 }

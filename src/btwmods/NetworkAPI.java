@@ -95,6 +95,9 @@ public class NetworkAPI {
 	}
 
 	public static boolean handleCustomPayload(String channel, byte[] data, int length) {
+		// Process any queued failures before invoking a method on a mod.
+		ModLoader.processFailureQueue();
+		
 		if (networkListeners.containsKey(channel)) {
 			CustomPacketEvent event = new CustomPacketEvent(channel, data, length);
 			networkListeners.get(channel).customPacketAction(event);

@@ -230,6 +230,9 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 			return method.invoke(this, args);
 		}
 		else {
+			// Process any queued failures before invoking a method on a mod.
+			ModLoader.processFailureQueue();
+			
 			// Get the listeners for method's declaring class.
 			Set<IAPIListener> listeners = getListeners(method.getDeclaringClass());
 			
