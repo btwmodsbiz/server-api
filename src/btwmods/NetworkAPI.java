@@ -11,11 +11,23 @@ import btwmods.network.INetworkListener;
 public class NetworkAPI {
 	
 	private static final String BASE_CHANNEL_NAME = "BM|";
+	
+	// Normal channel lookup (by channel extension).
 	private static Map<String, INetworkListener> networkListeners = new HashMap<String, INetworkListener>();
+	
+	// Reverse channel lookup (by INetworkListener).
 	private static Map<INetworkListener, Set<String>> channelListeners = new HashMap<INetworkListener, Set<String>>();
 	
 	private NetworkAPI() { }
 	
+	/**
+	 * Registered a custom channel to a {@link INetworkListener}.
+	 * 
+	 * @param channelExtension the extension that will be added to the base channel name used by the API.
+	 * @param listener the listener that implements {@link INetworkListener}.
+	 * @return true if the channel was registered; false if the channel is already registered.
+	 * @throws IllegalArgumentException if channelExtension is null or empty, or if listener is null.
+	 */
 	public static boolean registerCustomChannel(String channelExtension, INetworkListener listener) throws IllegalArgumentException {
 		if (channelExtension == null || channelExtension.length() == 0)
 			throw new IllegalArgumentException("channelExtension cannot be null or a zero length string");
@@ -38,6 +50,12 @@ public class NetworkAPI {
 		return false;
 	}
 	
+	/**
+	 * Unregister all custom channels for a listener.
+	 * 
+	 * @param listener the listener that implements {@link INetworkListener}.
+	 * @throws IllegalArgumentException if listener is null.
+	 */
 	public static void unregisterCustomChannels(INetworkListener listener) throws IllegalArgumentException {
 		if (listener == null)
 			throw new IllegalArgumentException("listener cannot be null or a zero length string");
@@ -51,6 +69,14 @@ public class NetworkAPI {
 		channelListeners.remove(listener);
 	}
 	
+	/**
+	 * Unregister a channel attached to a listener.
+	 * 
+	 * @param channelExtension the extension that will be added to the base channel name used by the API.
+	 * @param listener the listener that implements {@link INetworkListener}.
+	 * @return true if the channel was unregistered; false if a channel was not found by that name, or it is registered to another listener.
+	 * @throws IllegalArgumentException if channelExtension is null or empty, or if listener is null.
+	 */
 	public static boolean unregisterCustomChannel(String channelExtension, INetworkListener listener) throws IllegalArgumentException {
 		if (channelExtension == null || channelExtension.length() == 0)
 			throw new IllegalArgumentException("channelExtension cannot be null or a zero length string");
