@@ -134,12 +134,12 @@ public class ServerAPI {
 						} catch (Throwable t) {
 							ModLoader.reportListenerFailure(t, listener);
 						}
-				}
 
-				try {
-					Thread.sleep(50L);
-				} catch (InterruptedException e) {
-					
+					try {
+						Thread.sleep(50L);
+					} catch (InterruptedException e) {
+						
+					}
 				}
 				
 				statsProcessor = null;
