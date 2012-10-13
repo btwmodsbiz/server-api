@@ -71,7 +71,8 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 	
 	public boolean isEmpty(Class listenerClass) {
-		return getListeners(listenerClass).size() == 0;
+		Set<IAPIListener> listeners = listenerClass == null ? null : getListeners(listenerClass);
+		return listeners == null || listeners.size() == 0;
 	}
 	
 	// Note: If any other methods access 'lookup' then they should call processQueue() first.
@@ -84,6 +85,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	 * @see {@link EventDispatcher#addListener(IAPIListener)}
 	 */
 	public void addListener(IAPIListener listener) {
+		isValidArgument(listener);
 		Class listenerClass = listener.getClass();
 		for (int i = 0; i < listenerClasses.length; i++) {
 			if (listenerClasses[i].isAssignableFrom(listenerClass)) {
@@ -105,16 +107,27 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 	
 	/**
+	 * @see {@link EventDispatcher#queuedAddListener(IAPIListener)}
+	 */
+	public void queuedAddListener(IAPIListener listener) {
+		isValidArgument(listener);
+		listenerQueue.add(new QueuedListener(QueueAction.ADD, listener, null));
+	}
+	
+	/**
 	 * @see {@link EventDispatcher#queuedAddListener(IAPIListener, Class)}
 	 */
 	public void queuedAddListener(IAPIListener listener, Class listenerClass) {
-		listenerQueue.add(new QueuedListener(QueueAction.ADD, listener, listenerClass));
+		if (checkIsSupportedListener(listener, listenerClass)) {
+			listenerQueue.add(new QueuedListener(QueueAction.ADD, listener, listenerClass));
+		}
 	}
 
 	/**
 	 * @see {@link EventDispatcher#removeListener(IAPIListener)}
 	 */
 	public void removeListener(IAPIListener listener) {
+		isValidArgument(listener);
 		Class listenerClass = listener.getClass();
 		for (int i = 0; i < listenerClasses.length; i++) {
 			if (listenerClasses[i].isAssignableFrom(listenerClass)) {
@@ -136,14 +149,32 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 
 	/**
+	 * @see {@link EventDispatcher#queuedRemoveListener(IAPIListener)}
+	 */
+	public void queuedRemoveListener(IAPIListener listener) {
+		isValidArgument(listener);
+		listenerQueue.add(new QueuedListener(QueueAction.REMOVE, listener, null));
+	}
+
+	/**
 	 * @see {@link EventDispatcher#queuedRemoveListener(IAPIListener, Class)}
 	 */
 	public void queuedRemoveListener(IAPIListener listener, Class listenerClass) {
-
-		listenerQueue.add(new QueuedListener(QueueAction.REMOVE, listener, listenerClass));
+		if (checkIsSupportedListener(listener, listenerClass)) {
+			listenerQueue.add(new QueuedListener(QueueAction.REMOVE, listener, listenerClass));
+		}
 	}
 	
-	private boolean checkIsSupportedListener(IAPIListener listener, Class listenerClass) throws IllegalArgumentException {
+	@SuppressWarnings("static-method")
+	private boolean isValidArgument(IAPIListener listener) throws IllegalArgumentException {
+		if (listener == null)
+			throw new IllegalArgumentException("listener cannot be null");
+		
+		return true;
+	}
+	
+	@SuppressWarnings("static-method")
+	private boolean areValidArguments(IAPIListener listener, Class listenerClass) throws IllegalArgumentException {
 		if (listener == null)
 			throw new IllegalArgumentException("listener cannot be null");
 		
@@ -155,25 +186,33 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 
 		if (!listenerClass.isAssignableFrom(listener.getClass()))
 			throw new IllegalArgumentException("listener is not an instance of listenerClass");
-
-		return listenerClass.isAssignableFrom(proxy.getClass());
+		
+		return true;
+	}
+	
+	private boolean checkIsSupportedListener(IAPIListener listener, Class listenerClass) throws IllegalArgumentException {
+		return areValidArguments(listener, listenerClass) && listenerClass.isAssignableFrom(proxy.getClass());
 	}
 	
 	private void processQueue() {
 		QueuedListener entry;
 		while ((entry = listenerQueue.poll()) != null) {
-			if (entry.action == QueueAction.ADD)
-				addListener(entry.listener, entry.listenerClass);
+			if (entry.action == QueueAction.ADD) {
+				if (entry.listenerClass == null)
+					addListener(entry.listener);
+				else
+					addListener(entry.listener, entry.listenerClass);
+			}
 			else if (entry.action == QueueAction.REMOVE)
-				removeListener(entry.listener, entry.listenerClass);
+				if (entry.listenerClass == null)
+					removeListener(entry.listener);
+				else
+					removeListener(entry.listener, entry.listenerClass);
 		}
 	}
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		// Prevent someone using this by accident.
-		if (proxy != this.proxy) throw new UnsupportedOperationException();
-		
 		Class declaringClass = method.getDeclaringClass();
 		
 		if (declaringClass == EventDispatcher.class) {
