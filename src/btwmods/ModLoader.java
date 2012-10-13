@@ -280,10 +280,25 @@ public class ModLoader {
 	}
 	
 	public static void reportListenerFailure(Throwable t, IAPIListener listener) {
+		// TODO: check if the report is coming from another thread.
+		
 		ServerAPI.removeListener(listener);
 		WorldAPI.removeListener(listener);
 		NetworkAPI.unregisterCustomChannels(listener);
 		PlayerAPI.removeListener(listener);
-		outputError(t, "BTWMod " + listener.getMod().getName() + " (" + listener.getClass().getName() + ") threw a " + t.getClass().getSimpleName() + ": " + t.getMessage(), Level.SEVERE);
+		
+		IMod mod = null;
+		String name = listener.getClass().getName();
+		
+		try {
+			mod = listener.getMod();
+			name = mod.getName() + " (" + listener.getClass().getName() + ")";
+			mod.unload();
+		}
+		catch (Throwable e) { }
+		
+		// TODO: alert server admins to failed mods.
+		outputError(t, "BTWMod " + name + " threw a " + t.getClass().getSimpleName() + (t.getMessage() == null ? "." : ": " + t.getMessage()), Level.SEVERE);
+		outputError("BTWMod " + name + " has been disabled.");
 	}
 }

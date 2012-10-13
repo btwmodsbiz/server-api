@@ -61,8 +61,11 @@ public class NetworkAPI {
 			throw new IllegalArgumentException("listener cannot be null or a zero length string");
 		
 		// Remove the listener from the normal lookup.
-		for (String channelExtension : channelListeners.get(listener)) {
-			networkListeners.remove(channelExtension);
+		Set<String> channels = channelListeners.get(listener);
+		if (channels != null) {
+			for (String channelExtension : channelListeners.get(listener)) {
+				networkListeners.remove(channelExtension);
+			}
 		}
 		
 		// Remove the listener from the reverse lookup.

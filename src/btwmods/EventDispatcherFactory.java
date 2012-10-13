@@ -1,6 +1,8 @@
 package btwmods;
 
+import java.io.PrintStream;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -20,11 +22,12 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 		if (listenerClasses == null || listenerClasses.length == 0)
 			throw new IllegalArgumentException("listenerClasses cannot be null or an empty array");
 		
-		
+		// Add the EventDispatcher interface to the end of the list.
 		Class[] listenerClassesExtended = new Class[listenerClasses.length + 1];
 		System.arraycopy(listenerClasses, 0, listenerClassesExtended, 0, listenerClasses.length);
 		listenerClassesExtended[listenerClasses.length] = EventDispatcher.class;
 		
+		// Create a new factory as the handler and create the proxy.
 		EventDispatcherFactory dispatcher = new EventDispatcherFactory(listenerClasses);
 		dispatcher.proxy = Proxy.newProxyInstance(EventDispatcherFactory.class.getClassLoader(), listenerClassesExtended, dispatcher);
 		return (EventDispatcher)dispatcher.proxy;
@@ -52,6 +55,10 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 				lookup.put(listenerClasses[i], new HashSet<IAPIListener>());
 			}
 		}
+	}
+	
+	public boolean isEmpty(Class listenerClass) {
+		return getListeners(listenerClass).size() == 0;
 	}
 	
 	private Set<IAPIListener> getListeners(Class listenerClass) {
@@ -143,10 +150,12 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 				try {
 					method.invoke(listener, args);
 				}
-				catch (Throwable t) {
-					// Immediately remove the listener from this dispatcher.
-					// TODO: Remove the listener from this dispatcher.
-					handleListenerFailure(t, listener);
+				catch (InvocationTargetException e) {
+					removeListener(listener);
+					handleListenerFailure(e.getCause(), listener);
+				} catch (Throwable e) {
+					removeListener(listener);
+					handleListenerFailure(e.getCause(), listener);
 				}
 			}
 			
@@ -156,7 +165,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 	
 	@SuppressWarnings("static-method")
-	private void handleListenerFailure(Throwable t, IAPIListener listener) throws Throwable {
-		throw t;
+	protected void handleListenerFailure(Throwable t, IAPIListener listener) {
+		ModLoader.reportListenerFailure(t, listener);
 	}
 }

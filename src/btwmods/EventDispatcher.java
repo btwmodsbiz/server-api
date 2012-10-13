@@ -5,4 +5,5 @@ public interface EventDispatcher {
 	public boolean addListener(IAPIListener listener, Class listenerClass);
 	public void removeListener(IAPIListener listener);
 	public boolean removeListener(IAPIListener listener, Class listenerClass);
+	public boolean isEmpty(Class listenerClass);
 }
