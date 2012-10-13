@@ -129,7 +129,7 @@ public class ServerAPI {
 						receivedPacketCountTotal += receivedPacketCountArray[tickCounter % 100] = stats.receivedPacketCount;
 						receivedPacketSizeTotal += receivedPacketSizeArray[tickCounter % 100] = stats.receivedPacketSize;
 						for (int i = 0; i < worldTickTimeTotals.length; i++) {
-							worldTickTimeTotals[i] += stats.worldTickTimes[i];
+							worldTickTimeTotals[i] += worldTickTimeArray[i][tickCounter % 100] = stats.worldTickTimes[i];
 						}
 					}
 					
