@@ -11,30 +11,26 @@ public class ServerAPI {
 	
 	private static volatile StatsProcessor statsProcessor = null;
 	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<ServerAPI.QueuedTickStats>();
-	
-	private static HashSet<IStatsListener> statsListeners = new HashSet<IStatsListener>();
+	private static ConcurrentLinkedQueue<IStatsListener> addListenerQueue = new ConcurrentLinkedQueue<IStatsListener>();
+	private static ConcurrentLinkedQueue<IStatsListener> removeListenerQueue = new ConcurrentLinkedQueue<IStatsListener>();
 	
 	private ServerAPI() {}
 
 	public static void addListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
-			synchronized (statsListeners) {
-				statsListeners.add((IStatsListener) listener);
-				
-				if (statsProcessor == null) {
-					Thread thread = new Thread(statsProcessor = new StatsProcessor());
-					thread.setName("ServerAPI StatsListeners");
-					thread.start();
-				}
+			addListenerQueue.add((IStatsListener)listener);
+
+			if (statsProcessor == null) {
+				Thread thread = new Thread(statsProcessor = new StatsProcessor());
+				thread.setName("ServerAPI StatsListeners");
+				thread.start();
 			}
 		}
 	}
 
 	public static void removeListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
-			synchronized (statsListeners) {
-				statsListeners.remove((IStatsListener)listener);
-			}
+			removeListenerQueue.add((IStatsListener)listener);
 		}
 	}
 
@@ -71,6 +67,7 @@ public class ServerAPI {
 	}
 
 	public static class StatsProcessor implements Runnable {
+		private static HashSet<IStatsListener> statsListeners = new HashSet<IStatsListener>();
 
 		public int tickCounter;
 		
@@ -95,8 +92,17 @@ public class ServerAPI {
 
 		@Override
 		public void run() {
-			synchronized (statsListeners) {
-				while (!statsListeners.isEmpty()) {
+			while (statsProcessor == this) {
+					
+				IStatsListener removeListener;
+				while ((removeListener = removeListenerQueue.poll()) != null) {
+					statsListeners.remove(removeListener);
+				}
+				
+				if (statsListeners.isEmpty()) {
+					statsProcessor = null;
+				}
+				else {
 					
 					// Process all the queued tick stats.
 					QueuedTickStats stats;
@@ -141,8 +147,6 @@ public class ServerAPI {
 						
 					}
 				}
-				
-				statsProcessor = null;
 			}
 		}
 	}
