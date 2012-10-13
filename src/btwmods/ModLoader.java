@@ -327,16 +327,29 @@ public class ModLoader {
 		
 		IMod mod = null;
 		String name = listener.getClass().getName();
+		boolean unloadSuccess = false;
 		
 		try {
 			mod = listener.getMod();
-			name = mod.getName() + " (" + name + ")";
-			mod.unload();
+			if (mod != null) {
+				try {
+					name = mod.getName() + " (" + name + ")";
+				}
+				catch (Throwable e) { }
+				
+				mod.unload();
+				unloadSuccess = true;
+			}
 		}
 		catch (Throwable e) { }
 		
 		// TODO: alert server admins to failed mods.
 		outputError(t, "BTWMod " + name + " threw a " + t.getClass().getSimpleName() + (t.getMessage() == null ? "." : ": " + t.getMessage()), Level.SEVERE);
-		outputError("BTWMod " + name + " has been disabled.", Level.SEVERE);
+		
+		if (unloadSuccess)
+			outputError("BTWMod " + name + " has been unloaded successfully.", Level.INFO);
+		else
+			outputError("BTWMod " + name + " has been unloaded disabled as much as possible.", Level.SEVERE);
+			
 	}
 }
