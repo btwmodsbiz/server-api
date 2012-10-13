@@ -1,5 +1,6 @@
 package btwmods;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -8,17 +9,18 @@ import btwmods.server.events.StatsEvent;
 import btwmods.server.listeners.IStatsListener;
 
 public class ServerAPI {
-	
+
+	private enum QueueAction { ADD, REMOVE };
 	private static volatile StatsProcessor statsProcessor = null;
-	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<ServerAPI.QueuedTickStats>();
-	private static ConcurrentLinkedQueue<IStatsListener> addListenerQueue = new ConcurrentLinkedQueue<IStatsListener>();
-	private static ConcurrentLinkedQueue<IStatsListener> removeListenerQueue = new ConcurrentLinkedQueue<IStatsListener>();
+	
+	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<QueuedTickStats>();
+	private static ConcurrentLinkedQueue<SimpleEntry<QueueAction, IStatsListener>> statListenerQueue = new ConcurrentLinkedQueue<SimpleEntry<QueueAction, IStatsListener>>();
 	
 	private ServerAPI() {}
 
 	public static void addListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
-			addListenerQueue.add((IStatsListener)listener);
+			statListenerQueue.add(new SimpleEntry<QueueAction, IStatsListener>(QueueAction.ADD, (IStatsListener)listener));
 
 			if (statsProcessor == null) {
 				Thread thread = new Thread(statsProcessor = new StatsProcessor());
@@ -30,7 +32,7 @@ public class ServerAPI {
 
 	public static void removeListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
-			removeListenerQueue.add((IStatsListener)listener);
+			statListenerQueue.add(new SimpleEntry<QueueAction, IStatsListener>(QueueAction.REMOVE, (IStatsListener)listener));
 		}
 	}
 
@@ -93,12 +95,17 @@ public class ServerAPI {
 		@Override
 		public void run() {
 			while (statsProcessor == this) {
-					
-				IStatsListener removeListener;
-				while ((removeListener = removeListenerQueue.poll()) != null) {
-					statsListeners.remove(removeListener);
+				
+				// Add and remove IStatListeners if they are in the queue.
+				SimpleEntry<QueueAction, IStatsListener> entry;
+				while ((entry = statListenerQueue.poll()) != null) {
+					if (entry.getKey() == QueueAction.ADD)
+						statsListeners.add(entry.getValue());
+					else if (entry.getKey() == QueueAction.REMOVE)
+						statsListeners.remove(entry.getValue());
 				}
 				
+				// Stop if the thread if there are no listeners.
 				if (statsListeners.isEmpty()) {
 					statsProcessor = null;
 				}
@@ -138,6 +145,9 @@ public class ServerAPI {
 						try {
 							listener.statsAction(event);
 						} catch (Throwable t) {
+							// Remove the listener right away since we're running in a thread.
+							statsListeners.remove(listener);
+							
 							ModLoader.reportListenerFailure(t, listener);
 						}
 
