@@ -210,6 +210,17 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 					removeListener(entry.listener, entry.listenerClass);
 		}
 	}
+	
+	public boolean isSupportedListener(IAPIListener listener) {
+		isValidArgument(listener);
+		Class listenerClass = listener.getClass();
+		for (int i = 0; i < listenerClasses.length; i++) {
+			if (listenerClasses[i].isAssignableFrom(listenerClass)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {

@@ -76,4 +76,10 @@ public interface EventDispatcher {
 	 * @return true if there are; false otherwise.
 	 */
 	public boolean isEmpty(Class listenerClass);
+	
+	/**
+	 * Check if the listener implements interfaces supported by this dispatcher.
+	 * @return true if one or more interfaces are supported; false otherwise
+	 */
+	public boolean isSupportedListener(IAPIListener listener);
 }
