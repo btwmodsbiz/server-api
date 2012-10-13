@@ -100,8 +100,15 @@ public class NetworkAPI {
 		
 		if (networkListeners.containsKey(channel)) {
 			CustomPacketEvent event = new CustomPacketEvent(channel, data, length);
-			networkListeners.get(channel).customPacketAction(event);
-			return event.isHandled();
+			INetworkListener listener = networkListeners.get(channel);
+			try {
+				listener.customPacketAction(event);
+				return event.isHandled();
+			}
+			catch (Throwable e) {
+				unregisterCustomChannels(listener);
+				ModLoader.reportListenerFailure(e, listener);
+			}
 		}
 		return false;
 	}
