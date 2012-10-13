@@ -10,7 +10,7 @@ import btwmods.server.listeners.IStatsListener;
 public class ServerAPI {
 	
 	private static volatile StatsProcessor statsProcessor = null;
-	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue;
+	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<ServerAPI.QueuedTickStats>();
 	
 	private static HashSet<IStatsListener> statsListeners = new HashSet<IStatsListener>();
 	
