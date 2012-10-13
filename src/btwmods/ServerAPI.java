@@ -26,11 +26,17 @@ public class ServerAPI {
 				thread.start();
 			}
 		}
+		else {
+			listeners.addListener(listener);
+		}
 	}
 
 	public static void removeListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
 			listeners.queuedRemoveListener(listener, IStatsListener.class);
+		}
+		else {
+			listeners.removeListener(listener);
 		}
 	}
 
