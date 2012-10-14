@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Date;
 
+import btwmods.BasicFormatter;
 import btwmods.IMod;
 import btwmods.NetworkAPI;
 import btwmods.ServerAPI;
@@ -47,6 +49,8 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			lastStatsTime = System.currentTimeMillis();
 			
 			StringBuilder html = new StringBuilder("<html><head><title>Minecraft Server Stats</title><meta http-equiv=\"refresh\" content=\"2\"></head><body><h1>Minecraft Server Stats</h1><table border=\"0\"><tbody>"); 
+			
+			html.append("<tr><th align=\"right\">Updated:<th><td>" + BasicFormatter.dateFormat.format(new Date()) + "</td>");
 			
 			html.append("<tr><th align=\"right\">Tick Num:<th><td>" + event.tickCounter + "</td>");
 			html.append("<tr><th align=\"right\">Average Tick Time:<th><td>" + decimalFormat.format(event.averageTickTime * 1.0E-6D) + " ms</td>");
