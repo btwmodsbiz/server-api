@@ -1,7 +1,6 @@
-package btwmods.server.listeners;
+package btwmods.server;
 
 import btwmods.IAPIListener;
-import btwmods.server.events.StatsEvent;
 
 public interface IStatsListener extends IAPIListener {
 	

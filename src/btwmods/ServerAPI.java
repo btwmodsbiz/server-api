@@ -8,11 +8,11 @@ import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.World;
 import btwmods.EventDispatcher;
-import btwmods.server.Average;
-import btwmods.server.Measurements;
+import btwmods.measure.Average;
+import btwmods.measure.Measurements;
+import btwmods.server.IStatsListener;
+import btwmods.server.StatsEvent;
 import btwmods.server.Tick;
-import btwmods.server.events.StatsEvent;
-import btwmods.server.listeners.IStatsListener;
 
 public class ServerAPI {
 

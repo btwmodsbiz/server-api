@@ -1,7 +1,6 @@
-package btwmods.player.listeners;
+package btwmods.player;
 
 import btwmods.IAPIListener;
-import btwmods.player.events.InstanceEvent;
 
 public interface IInstanceListener extends IAPIListener {
 	void instanceAction(InstanceEvent event);

@@ -7,12 +7,12 @@ import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.ItemStack;
 
 import btwmods.IMod;
-import btwmods.player.events.ContainerEvent;
-import btwmods.player.events.DropEvent;
-import btwmods.player.events.SlotEvent;
-import btwmods.player.listeners.IContainerListener;
-import btwmods.player.listeners.IDropListener;
-import btwmods.player.listeners.ISlotListener;
+import btwmods.player.ContainerEvent;
+import btwmods.player.DropEvent;
+import btwmods.player.IContainerListener;
+import btwmods.player.IDropListener;
+import btwmods.player.ISlotListener;
+import btwmods.player.SlotEvent;
 
 public class PlayerListener implements ISlotListener, IDropListener, IContainerListener {
 

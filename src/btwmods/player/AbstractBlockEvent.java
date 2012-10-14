@@ -1,4 +1,4 @@
-package btwmods.player.events;
+package btwmods.player;
 
 import java.util.EventObject;
 

@@ -1,15 +1,15 @@
 package btwmods;
 
-import btwmods.player.events.BlockEvent;
-import btwmods.player.events.ContainerEvent;
-import btwmods.player.events.DropEvent;
-import btwmods.player.events.InstanceEvent;
-import btwmods.player.events.SlotEvent;
-import btwmods.player.listeners.IBlockListener;
-import btwmods.player.listeners.IContainerListener;
-import btwmods.player.listeners.IDropListener;
-import btwmods.player.listeners.IInstanceListener;
-import btwmods.player.listeners.ISlotListener;
+import btwmods.player.BlockEvent;
+import btwmods.player.ContainerEvent;
+import btwmods.player.DropEvent;
+import btwmods.player.IBlockListener;
+import btwmods.player.IContainerListener;
+import btwmods.player.IDropListener;
+import btwmods.player.IInstanceListener;
+import btwmods.player.ISlotListener;
+import btwmods.player.InstanceEvent;
+import btwmods.player.SlotEvent;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;

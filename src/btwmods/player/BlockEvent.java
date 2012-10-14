@@ -1,4 +1,4 @@
-package btwmods.player.events;
+package btwmods.player;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;

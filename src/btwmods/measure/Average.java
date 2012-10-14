@@ -1,4 +1,4 @@
-package btwmods.server;
+package btwmods.measure;
 
 public class Average {
 	

@@ -7,8 +7,8 @@ import net.minecraft.src.BlockContainer;
 import net.minecraft.src.ItemStack;
 
 import btwmods.IMod;
-import btwmods.world.events.BlockEvent;
-import btwmods.world.listeners.IBlockListener;
+import btwmods.world.BlockEvent;
+import btwmods.world.IBlockListener;
 
 public class WorldListener implements IBlockListener {
 

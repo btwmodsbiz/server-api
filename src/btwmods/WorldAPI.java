@@ -3,8 +3,8 @@ package btwmods;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.World;
-import btwmods.world.events.BlockEvent;
-import btwmods.world.listeners.IBlockListener;
+import btwmods.world.BlockEvent;
+import btwmods.world.IBlockListener;
 
 public class WorldAPI {
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IBlockListener.class });

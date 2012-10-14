@@ -1,4 +1,4 @@
-package btwmods.world.events;
+package btwmods.world;
 
 import java.util.EventObject;
 

@@ -1,7 +1,6 @@
-package btwmods.player.listeners;
+package btwmods.player;
 
 import btwmods.IAPIListener;
-import btwmods.player.events.DropEvent;
 
 public interface IDropListener extends IAPIListener {
 	void dropAction(DropEvent event);
