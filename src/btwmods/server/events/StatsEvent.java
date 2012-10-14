@@ -82,5 +82,13 @@ public class StatsEvent extends EventObject {
 		for (int i = 0; i < averageWorldTickTime.length; i++) {
 			averageWorldTickTime[i] = (double)(processor.worldTickTimeTotals[i]) / (double)Math.min(100, tickCounter);
 		}
+		
+		// TODO: added these here for now since I can safely trust mods to not modify these arrays.
+		tickTimeArray = processor.tickTimeArray;
+		sentPacketCountArray = processor.sentPacketCountArray;
+		sentPacketSizeArray = processor.sentPacketSizeArray;
+		receivedPacketCountArray = processor.receivedPacketCountArray;
+		receivedPacketSizeArray = processor.receivedPacketSizeArray;
+		worldTickTimeArray = processor.worldTickTimeArray;
 	}
 }
