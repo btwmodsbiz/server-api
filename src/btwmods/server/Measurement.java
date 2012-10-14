@@ -11,6 +11,9 @@ public abstract class Measurement<E> {
 	
 	public Measurement(E identifier) {
 		this.identifier = identifier;
+	}
+	
+	public void start() {
 		this.time = System.nanoTime();
 	}
 	

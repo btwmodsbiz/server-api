@@ -40,8 +40,10 @@ public class Measurements<T extends Measurement> {
 	}
 	
 	public void begin(T data) {
-		if (enabled && measurements != null)
+		if (enabled && measurements != null) {
 			dataStack.push(data);
+			data.start();
+		}
 	}
 	
 	public void end() {
