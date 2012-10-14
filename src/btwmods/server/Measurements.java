@@ -7,7 +7,6 @@ public class Measurements<T extends Measurement> {
 	private boolean enabled = true;
 	private ArrayDeque<T> measurements;
 	private ArrayDeque<T> dataStack;
-	private ArrayDeque<Long> timeStack;
 	
 	public boolean isEnabled() {
 		return enabled;
@@ -18,7 +17,6 @@ public class Measurements<T extends Measurement> {
 		if (!enabled) {
 			dataStack = null;
 			measurements = null;
-			timeStack = null;
 		}
 	}
 	
@@ -31,7 +29,6 @@ public class Measurements<T extends Measurement> {
 			ArrayDeque<T> old = measurements;
 			measurements = new ArrayDeque<T>();
 			dataStack = new ArrayDeque<T>();
-			timeStack = new ArrayDeque<Long>();
 			return old;
 		}
 		else {
