@@ -79,10 +79,21 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
 			
 			for (int i = 0; i < event.worldStats.length; i++) {
+				
+				double checkedTotal = 
+						event.worldStats[i].mobSpawning.getAverage()
+						+ event.worldStats[i].blockTick.getAverage()
+						+ event.worldStats[i].tickBlocksAndAmbiance.getAverage()
+						+ event.worldStats[i].tickBlocksAndAmbianceSuper.getAverage()
+						+ event.worldStats[i].entities.getAverage();
+				
 				html.append("<tr><th align=\"right\">Average World ").append(i)
-				.append(" Tick Time:<th><td>").append(decimalFormat.format(event.worldStats[i].worldTickTime.getAverage() * 1.0E-6D)).append(" ms (")
+				.append(" Tick Time:<th><td>").append(decimalFormat.format(event.worldStats[i].worldTick.getAverage() * 1.0E-6D) + " == " + decimalFormat.format(event.worldStats[i].worldTickTime.getAverage() * 1.0E-6D) + " == " + decimalFormat.format(checkedTotal * 1.0E-6D) + " ms (")
 				.append("M: ").append(decimalFormat.format(event.worldStats[i].mobSpawning.getAverage() * 1.0E-6D)).append("ms")
-				.append(" -- B: ").append(decimalFormat.format(event.worldStats[i].tickUpdate.getAverage() * 1.0E-6D)).append("ms")
+				.append(" -- B: ").append(decimalFormat.format(event.worldStats[i].blockTick.getAverage() * 1.0E-6D)).append("ms")
+				.append(" -- A: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbiance.getAverage() * 1.0E-6D)).append("ms")
+				.append(" -- AS: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbianceSuper.getAverage() * 1.0E-6D)).append("ms")
+				.append(" -- AS: ").append(decimalFormat.format(event.worldStats[i].entities.getAverage() * 1.0E-6D)).append("ms")
 				.append(")</td></tr>");
 			}
 			
