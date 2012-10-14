@@ -10,8 +10,8 @@ import net.minecraft.src.EntityMob;
 import net.minecraft.src.EntityPlayer;
 import btwmods.IMod;
 import btwmods.PlayerAPI;
-import btwmods.player.events.BlockEvent;
-import btwmods.player.listeners.IBlockListener;
+import btwmods.player.BlockEvent;
+import btwmods.player.IBlockListener;
 
 public class BTWModSpawnBeds implements IMod, IBlockListener {
 	

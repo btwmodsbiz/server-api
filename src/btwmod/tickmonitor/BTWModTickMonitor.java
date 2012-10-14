@@ -10,8 +10,8 @@ import btwmods.IMod;
 import btwmods.ServerAPI;
 import btwmods.network.CustomPacketEvent;
 import btwmods.network.INetworkListener;
-import btwmods.server.events.StatsEvent;
-import btwmods.server.listeners.IStatsListener;
+import btwmods.server.IStatsListener;
+import btwmods.server.StatsEvent;
 
 public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener {
 
