@@ -1,9 +1,11 @@
 package btwmods.player;
 
 import java.util.EventObject;
+
+import btwmods.IEventInterrupter;
 import net.minecraft.src.EntityPlayerMP;
 
-public class InstanceEvent extends EventObject {
+public class InstanceEvent extends EventObject implements IEventInterrupter {
 	
 	public enum TYPE { LOGIN, LOGOUT, RESPAWN };
 
@@ -55,5 +57,10 @@ public class InstanceEvent extends EventObject {
 	private InstanceEvent(TYPE type, EntityPlayerMP playerInstance) {
 		super(playerInstance);
 		this.type = type;
+	}
+
+	@Override
+	public boolean isInterrupted() {
+		return type == TYPE.RESPAWN && respawnHandled;
 	}
 }

@@ -240,6 +240,10 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 			for (IAPIListener listener : listeners) {
 				try {
 					method.invoke(listener, args);
+					
+					// Stop processing events if there is an event argument that has flagged for the event handling to stop.
+					if (args.length > 0 && args[0] instanceof IEventInterrupter && ((IEventInterrupter)args[0]).isInterrupted())
+						break;
 				}
 				catch (InvocationTargetException e) {
 					removeListener(listener);
