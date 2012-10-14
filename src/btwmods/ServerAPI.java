@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.ChunkCoordIntPair;
 import btwmods.EventDispatcher;
 import btwmods.server.Average;
 import btwmods.server.Measurements;
@@ -99,8 +100,12 @@ public class ServerAPI {
 		
 		public static class WorldStats {
 			public final Average worldTickTime = new Average();
+			public final Average worldTick = new Average();
 			public final Average mobSpawning = new Average();
-			public final Average tickUpdate = new Average();
+			public final Average blockTick = new Average();
+			public final Average tickBlocksAndAmbiance = new Average();
+			public final Average tickBlocksAndAmbianceSuper = new Average();
+			public final Average entities = new Average();
 		}
 		
 		public StatsProcessor() {
@@ -136,31 +141,43 @@ public class ServerAPI {
 							worldStats[i].worldTickTime.record(stats.worldTickTimes[i]);
 
 							// Reset the measurement entries to 0
+							worldStats[i].worldTick.resetCurrent();
 							worldStats[i].mobSpawning.resetCurrent();
-							worldStats[i].tickUpdate.resetCurrent();
+							worldStats[i].blockTick.resetCurrent();
+							worldStats[i].tickBlocksAndAmbiance.resetCurrent();
+							worldStats[i].tickBlocksAndAmbianceSuper.resetCurrent();
+							worldStats[i].entities.resetCurrent();
 						}
 						
 						// Add the time taken by each measurement type.
 						Tick tick;
 						while ((tick = stats.measurements.poll()) != null) {
+							//ChunkCoordIntPair.chunkXZ2Int(par0, par1);
+							
 							switch (tick.identifier) {
-								case MobSpawning:
-									worldStats[tick.dimension].mobSpawning.incrementCurrent(tick.getTime());
+								case worldTick:
+									worldStats[tick.worldIndex].worldTick.incrementCurrent(tick.getTime());
+									break;
+								
+								case mobSpawning:
+									worldStats[tick.worldIndex].mobSpawning.incrementCurrent(tick.getTime());
 									break;
 									
 								case tickBlocksAndAmbiance:
+									worldStats[tick.worldIndex].tickBlocksAndAmbiance.incrementCurrent(tick.getTime());
 									break;
 									
 								case tickBlocksAndAmbianceSuper:
+									worldStats[tick.worldIndex].tickBlocksAndAmbianceSuper.incrementCurrent(tick.getTime());
 									break;
 									
-								case TickUpdate:
-									worldStats[tick.dimension].mobSpawning.incrementCurrent(tick.getTime());
+								case blockTick:
+									worldStats[tick.worldIndex].blockTick.incrementCurrent(tick.getTime());
 									break;
 									
-								default:
-									// TODO: display error if not handled?
-									break; 
+								case entities:
+									worldStats[tick.worldIndex].entities.record(tick.getTime());
+									break;
 							}
 						}
 					}

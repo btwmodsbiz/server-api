@@ -1,30 +1,39 @@
 package btwmods.server;
 
+import btwmods.ModLoader;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.World;
 
 public class Tick extends Measurement<Tick.Type> {
 
-	public final int dimension;
+	public final int worldIndex;
 	public final BlockTick blockTick;
+	
+	public Tick(Type identifier) {
+		super(identifier);
+		worldIndex = -1;
+		blockTick = null;
+	}
 	
 	public Tick(Type identifier, World world) {
 		super(identifier);
-		dimension = world.getWorldInfo().getDimension();
+		worldIndex = ModLoader.getWorldIndexFromDimension(world.provider.dimensionId);
 		blockTick = null;
 	}
 	
 	public Tick(Type identifier, World world, NextTickListEntry entry) {
 		super(identifier);
-		dimension = world.getWorldInfo().getDimension();
+		worldIndex = ModLoader.getWorldIndexFromDimension(world.provider.dimensionId);
 		blockTick = new BlockTick(entry);
 	}
 
 	public enum Type {
-		MobSpawning, // 
-		TickUpdate, // 
-		tickBlocksAndAmbianceSuper, // 
-		tickBlocksAndAmbiance // 
+		mobSpawning, //
+		blockTick, //
+		tickBlocksAndAmbianceSuper, //
+		tickBlocksAndAmbiance, //
+		entities, //
+		worldTick
 	};
 	
 	private class BlockTick {
