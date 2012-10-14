@@ -28,12 +28,14 @@ public class Tick extends Measurement<Tick.Type> {
 	}
 
 	public enum Type {
-		mobSpawning, //
-		blockTick, //
-		tickBlocksAndAmbianceSuper, //
-		tickBlocksAndAmbiance, //
-		entities, //
-		worldTick
+		mobSpawning,
+		blockTick,
+		tickBlocksAndAmbianceSuper,
+		tickBlocksAndAmbiance,
+		entities,
+		buildActiveChunkSet,
+		checkPlayerLight,
+		timeSync
 	};
 	
 	private class BlockTick {
