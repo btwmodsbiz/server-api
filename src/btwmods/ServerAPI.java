@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.NextTickListEntry;
+import net.minecraft.src.World;
 import btwmods.EventDispatcher;
 import btwmods.server.Average;
 import btwmods.server.Measurements;
@@ -14,7 +16,7 @@ import btwmods.server.listeners.IStatsListener;
 
 public class ServerAPI {
 
-	public static Measurements measurements = new Measurements<Tick>();
+	private static Measurements measurements = new Measurements<Tick>();
 	
 	private static volatile StatsProcessor statsProcessor = null;
 	
@@ -71,6 +73,34 @@ public class ServerAPI {
 		stats.measurements = measurements.startNew();
 		
 		statsQueue.add(stats);
+	}
+	
+	/**
+	 * Begin a measurement.
+	 */
+	public static void begin(Tick.Type type) {
+		measurements.begin(new Tick(type));
+	}
+	
+	/**
+	 * Begin a measurement for a specific world.
+	 */
+	public static void begin(Tick.Type type, World world) {
+		measurements.begin(new Tick(type, world));
+	}
+
+	/**
+	 * Begin a measurement for a specific entity tick in a world world.
+	 */
+	public static void begin(Tick.Type type, World world, NextTickListEntry entityTick) {
+		measurements.begin(new Tick(type, world, entityTick));
+	}
+	
+	/**
+	 * End a measurement.
+	 */
+	public static void end() {
+		measurements.end();
 	}
 	
 	private static class QueuedTickStats {
