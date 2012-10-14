@@ -352,4 +352,10 @@ public class ModLoader {
 			outputError("BTWMod " + name + " has been unloaded disabled as much as possible.", Level.SEVERE);
 			
 	}
+	
+	public static int getWorldIndexFromDimension(int dimension) {
+		if (dimension == -1) return 1;
+		else if (dimension == 1) return 2;
+		return 0;
+	}
 }
