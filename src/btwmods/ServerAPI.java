@@ -130,12 +130,14 @@ public class ServerAPI {
 		
 		public static class WorldStats {
 			public final Average worldTickTime = new Average();
-			public final Average worldTick = new Average();
 			public final Average mobSpawning = new Average();
 			public final Average blockTick = new Average();
 			public final Average tickBlocksAndAmbiance = new Average();
 			public final Average tickBlocksAndAmbianceSuper = new Average();
 			public final Average entities = new Average();
+			public final Average timeSync = new Average();
+			public final Average buildActiveChunkSet = new Average();
+			public final Average checkPlayerLight = new Average();
 		}
 		
 		public StatsProcessor() {
@@ -171,12 +173,14 @@ public class ServerAPI {
 							worldStats[i].worldTickTime.record(stats.worldTickTimes[i]);
 
 							// Reset the measurement entries to 0
-							worldStats[i].worldTick.resetCurrent();
 							worldStats[i].mobSpawning.resetCurrent();
 							worldStats[i].blockTick.resetCurrent();
 							worldStats[i].tickBlocksAndAmbiance.resetCurrent();
 							worldStats[i].tickBlocksAndAmbianceSuper.resetCurrent();
 							worldStats[i].entities.resetCurrent();
+							worldStats[i].timeSync.resetCurrent();
+							worldStats[i].buildActiveChunkSet.resetCurrent();
+							worldStats[i].checkPlayerLight.resetCurrent();
 						}
 						
 						// Add the time taken by each measurement type.
@@ -185,9 +189,6 @@ public class ServerAPI {
 							//ChunkCoordIntPair.chunkXZ2Int(par0, par1);
 							
 							switch (tick.identifier) {
-								case worldTick:
-									worldStats[tick.worldIndex].worldTick.incrementCurrent(tick.getTime());
-									break;
 								
 								case mobSpawning:
 									worldStats[tick.worldIndex].mobSpawning.incrementCurrent(tick.getTime());
@@ -206,7 +207,19 @@ public class ServerAPI {
 									break;
 									
 								case entities:
-									worldStats[tick.worldIndex].entities.record(tick.getTime());
+									worldStats[tick.worldIndex].entities.incrementCurrent(tick.getTime());
+									break;
+									
+								case timeSync:
+									worldStats[tick.worldIndex].timeSync.incrementCurrent(tick.getTime());
+									break;
+									
+								case buildActiveChunkSet:
+									worldStats[tick.worldIndex].buildActiveChunkSet.incrementCurrent(tick.getTime());
+									break;
+									
+								case checkPlayerLight:
+									worldStats[tick.worldIndex].checkPlayerLight.incrementCurrent(tick.getTime());
 									break;
 							}
 						}
