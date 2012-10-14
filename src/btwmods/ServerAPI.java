@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
 import btwmods.EventDispatcher;
+import btwmods.server.Average;
 import btwmods.server.Measurements;
 import btwmods.server.Tick;
 import btwmods.server.events.StatsEvent;
@@ -83,37 +84,31 @@ public class ServerAPI {
 	}
 
 	public static class StatsProcessor implements Runnable {
+		
 		public int tickCounter;
+		private final ServerStats serverStats = new ServerStats();
+		private final WorldStats[] worldStats;
 		
-		public long[] tickTimeArray = new long[100];
-		public long[] sentPacketCountArray = new long[100];
-		public long[] sentPacketSizeArray = new long[100];
-		public long[] receivedPacketCountArray = new long[100];
-		public long[] receivedPacketSizeArray = new long[100];
+		public static class ServerStats {
+			public final Average tickTime = new Average();
+			public final Average sentPacketCount = new Average();
+			public final Average sentPacketSize = new Average();
+			public final Average receivedPacketCount = new Average();
+			public final Average receivedPacketSize = new Average();
+		}
 		
-		public long[][] worldTickTimeArray;
-		public long[][] mobSpawningArray;
-		public long[][] tickUpdateArray;
-
-		public long tickTimeTotal;
-		public long sentPacketCountTotal;
-		public long sentPacketSizeTotal;
-		public long receivedPacketCountTotal;
-		public long receivedPacketSizeTotal;
-		
-		public long[] worldTickTimeTotals;
-		public long[] mobSpawningTotals;
-		public long[] tickUpdateTotals;
+		public static class WorldStats {
+			public final Average worldTickTime = new Average();
+			public final Average mobSpawning = new Average();
+			public final Average tickUpdate = new Average();
+		}
 		
 		public StatsProcessor() {
-			worldTickTimeTotals = new long[MinecraftServer.getServer().worldServers.length];
-			worldTickTimeArray = new long[worldTickTimeTotals.length][100];
-
-			mobSpawningTotals = new long[worldTickTimeTotals.length];
-			mobSpawningArray = new long[worldTickTimeTotals.length][100];
-
-			tickUpdateTotals = new long[worldTickTimeTotals.length];
-			tickUpdateArray = new long[worldTickTimeTotals.length][100];
+			// Initialize per-world stats.
+			worldStats = new WorldStats[MinecraftServer.getServer().worldServers.length];
+			for (int i = 0; i < worldStats.length; i++) {
+				worldStats[i] = new WorldStats();
+			}
 		}
 
 		@Override
@@ -131,50 +126,26 @@ public class ServerAPI {
 					while ((stats = statsQueue.poll()) != null) {
 						tickCounter = stats.tickCounter;
 						
-						// Remove the stats we are replacing from the totals, if we have looped through the last 100 arrays at least once.
-						if (tickCounter >= 100) {
-							tickTimeTotal -= tickTimeArray[tickCounter % 100];
-							sentPacketCountTotal -= sentPacketCountArray[tickCounter % 100];
-							sentPacketSizeTotal -= sentPacketSizeArray[tickCounter % 100];
-							receivedPacketCountTotal -= receivedPacketCountArray[tickCounter % 100];
-							receivedPacketSizeTotal -= receivedPacketSizeArray[tickCounter % 100];
-							for (int i = 0; i < worldTickTimeTotals.length; i++) {
-								worldTickTimeTotals[i] -= worldTickTimeArray[i][tickCounter % 100];
-								mobSpawningTotals[i] -= mobSpawningArray[i][tickCounter % 100];
-								tickUpdateTotals[i] -= tickUpdateArray[i][tickCounter % 100];
-							}
-						}
+						serverStats.tickTime.record(stats.tickTime);
+						serverStats.sentPacketCount.record(stats.sentPacketCount);
+						serverStats.sentPacketSize.record(stats.sentPacketSize);
+						serverStats.receivedPacketCount.record(stats.receivedPacketCount);
+						serverStats.receivedPacketSize.record(stats.receivedPacketSize);
 						
-						// Increment the total with the new stats, and also add them to the last 100 arrays.
-						tickTimeTotal += tickTimeArray[tickCounter % 100] = stats.tickTime;
-						sentPacketCountTotal += sentPacketCountArray[tickCounter % 100] = stats.sentPacketCount;
-						sentPacketSizeTotal += sentPacketSizeArray[tickCounter % 100] = stats.sentPacketSize;
-						receivedPacketCountTotal += receivedPacketCountArray[tickCounter % 100] = stats.receivedPacketCount;
-						receivedPacketSizeTotal += receivedPacketSizeArray[tickCounter % 100] = stats.receivedPacketSize;
-						for (int i = 0; i < worldTickTimeTotals.length; i++) {
-							worldTickTimeTotals[i] += worldTickTimeArray[i][tickCounter % 100] = stats.worldTickTimes[i];
-						}
-						
-						// Process all the tick measurements.
-						Tick tick;
-						
-						// TODO: Keep track of totals for measurements.
+						for (int i = 0; i < worldStats.length; i++) {
+							worldStats[i].worldTickTime.record(stats.worldTickTimes[i]);
 
-						if (tickCounter >= 100) {
-							// TODO: Remove previous values from the totals for the array index that is being reset below.
-						}
-						
-						// Reset the measurement entries to 0
-						for (int i = 0; i < worldTickTimeTotals.length; i++) {
-							mobSpawningArray[i][tickCounter % 100] = 0;
-							tickUpdateArray[i][tickCounter % 100] = 0;
+							// Reset the measurement entries to 0
+							worldStats[i].mobSpawning.resetCurrent();
+							worldStats[i].tickUpdate.resetCurrent();
 						}
 						
 						// Add the time taken by each measurement type.
+						Tick tick;
 						while ((tick = stats.measurements.poll()) != null) {
 							switch (tick.identifier) {
 								case MobSpawning:
-									mobSpawningArray[tick.dimension][tickCounter % 100] += tick.getTime();
+									worldStats[tick.dimension].mobSpawning.incrementCurrent(tick.getTime());
 									break;
 									
 								case tickBlocksAndAmbiance:
@@ -184,7 +155,7 @@ public class ServerAPI {
 									break;
 									
 								case TickUpdate:
-									tickUpdateArray[tick.dimension][tickCounter % 100] += tick.getTime();
+									worldStats[tick.dimension].mobSpawning.incrementCurrent(tick.getTime());
 									break;
 									
 								default:
@@ -192,12 +163,10 @@ public class ServerAPI {
 									break; 
 							}
 						}
-						
-						// TODO: process measurements first? (from stats.measurements)
 					}
 					
 					// Run all the listeners.
-					StatsEvent event = new StatsEvent(MinecraftServer.getServer(), this);
+					StatsEvent event = new StatsEvent(MinecraftServer.getServer(), tickCounter, serverStats, worldStats);
 					((IStatsListener)listeners).statsAction(event);
 
 					try {
