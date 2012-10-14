@@ -58,22 +58,32 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			
 			StringBuilder html = new StringBuilder("<html><head><title>Minecraft Server Stats</title><meta http-equiv=\"refresh\" content=\"2\"></head><body><h1>Minecraft Server Stats</h1><table border=\"0\"><tbody>"); 
 			
-			html.append("<tr><th align=\"right\">Updated:<th><td>").append(BasicFormatter.dateFormat.format(new Date())).append("</td>");
+			html.append("<tr><th align=\"right\">Updated:<th><td>").append(BasicFormatter.dateFormat.format(new Date())).append("</td></tr>");
 			
 			html.append("<tr><th align=\"right\">Tick Num:<th><td>").append(event.tickCounter);
 			if (lastTickCounter >= 0) html.append(" (~").append(decimalFormat.format((double)numTicks / (double)timeElapsed * 1000D)).append("/sec)");
-			html.append("</td>");
+			html.append("</td></tr>");
 			
-			html.append("<tr><th align=\"right\">Average Tick Time:<th><td>").append(decimalFormat.format(event.averageTickTime * 1.0E-6D)).append(" ms</td>");
+			html.append("<tr><th align=\"right\">Average Tick Time:<th><td>").append(decimalFormat.format(event.serverStats.tickTime.getAverage() * 1.0E-6D)).append(" ms</td></tr>");
 			
-			html.append("<tr><th align=\"right\">Average Received Packet Size:<th><td>").append((int)event.averageReceivedPacketSize).append(" bytes</td>");
-			html.append("<tr><th align=\"right\">Average Received Packet Count:<th><td>").append((int)event.averageReceivedPacketCount).append("</td>");
+			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
 			
-			html.append("<tr><th align=\"right\">Average Sent Packet Size:<th><td>").append((int)event.averageSentPacketSize).append(" bytes</td>");
-			html.append("<tr><th align=\"right\">Average Sent Packet Count:<th><td>").append((int)event.averageSentPacketCount).append("</td>");
+			html.append("<tr><th align=\"right\">Average Received Packet Count:<th><td>").append(decimalFormat.format(event.serverStats.receivedPacketCount.getAverage())).append("</td></tr>");
+			html.append("<tr><th align=\"right\">Average Sent Packet Count:<th><td>").append(decimalFormat.format(event.serverStats.sentPacketCount.getAverage())).append("</td></tr>");
 			
-			for (int i = 0; i < event.averageWorldTickTime.length; i++) {
-				html.append("<tr><th align=\"right\">Average World ").append(i).append(" Tick Time:<th><td>").append(decimalFormat.format(event.averageWorldTickTime[i] * 1.0E-6D)).append(" ms</td>");
+			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
+
+			html.append("<tr><th align=\"right\">Average Received Packet Size:<th><td>").append((int)event.serverStats.receivedPacketSize.getAverage()).append(" bytes</td></tr>");
+			html.append("<tr><th align=\"right\">Average Sent Packet Size:<th><td>").append((int)event.serverStats.sentPacketSize.getAverage()).append(" bytes</td></tr>");
+			
+			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
+			
+			for (int i = 0; i < event.worldStats.length; i++) {
+				html.append("<tr><th align=\"right\">Average World ").append(i)
+				.append(" Tick Time:<th><td>").append(decimalFormat.format(event.worldStats[i].worldTickTime.getAverage() * 1.0E-6D)).append(" ms (")
+				.append("M: ").append(decimalFormat.format(event.worldStats[i].mobSpawning.getAverage() * 1.0E-6D)).append("ms")
+				.append(" -- B: ").append(decimalFormat.format(event.worldStats[i].tickUpdate.getAverage() * 1.0E-6D)).append("ms")
+				.append(")</td></tr>");
 			}
 			
 			html.append("</tbody></table></body></html>");
