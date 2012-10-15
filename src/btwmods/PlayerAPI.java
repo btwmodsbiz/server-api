@@ -16,7 +16,6 @@ import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.Container;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
 import net.minecraft.src.World;
@@ -141,14 +140,14 @@ public class PlayerAPI {
 		}
 	}
 	
-	public static void login(EntityPlayerMP player) {
+	public static void login(EntityPlayer player) {
 		if (!listeners.isEmpty(IInstanceListener.class)) {
         	InstanceEvent event = InstanceEvent.Login(player);
         	((IInstanceListener)listeners).instanceAction(event);
 		}
 	}
 	
-	public static void logout(EntityPlayerMP player) {
+	public static void logout(EntityPlayer player) {
 		if (!listeners.isEmpty(IInstanceListener.class)) {
         	InstanceEvent event = InstanceEvent.Logout(player);
         	((IInstanceListener)listeners).instanceAction(event);
@@ -158,7 +157,7 @@ public class PlayerAPI {
 	/**
 	 * @return true if the event has been handled and no others (e.g. hardcore spawning handler) should be called.
 	 */
-	public static RespawnPosition handleRespawn(EntityPlayerMP oldPlayerInstance) {
+	public static RespawnPosition handleRespawn(EntityPlayer oldPlayerInstance) {
 		if (!listeners.isEmpty(IInstanceListener.class)) {
         	InstanceEvent event = InstanceEvent.Respawn(oldPlayerInstance);
         	((IInstanceListener)listeners).instanceAction(event);
