@@ -33,7 +33,7 @@ public class StatsAPI {
 
 			if (statsProcessor == null) {
 				Thread thread = new Thread(statsProcessor = new StatsProcessor());
-				thread.setName("ServerAPI StatsListeners");
+				thread.setName(StatsAPI.class.getSimpleName());
 				thread.start();
 			}
 		}
