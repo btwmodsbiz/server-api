@@ -70,6 +70,16 @@ public class Settings {
 		return Integer.parseInt(settings.get(key));
 	}
 	
+	public boolean isLong(String key) {
+		try { return settings.containsKey(key) && Long.valueOf(settings.get(key)) != null; }
+		catch (NumberFormatException e) { return false; }
+	}
+	
+	public long getLong(String key) {
+		if (!isLong(key)) throw new IllegalArgumentException("setting is not a valid Long. check with isLong() first");
+		return Long.parseLong(settings.get(key));
+	}
+	
 	public boolean hasKey(String key) {
 		return settings.containsKey(key);
 	}
