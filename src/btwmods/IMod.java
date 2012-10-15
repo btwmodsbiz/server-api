@@ -1,5 +1,7 @@
 package btwmods;
 
+import java.util.Map;
+
 public interface IMod {
 	
 	/**
@@ -8,7 +10,7 @@ public interface IMod {
 	 */
 	public String getName();
 	
-	public void init();
+	public void init(Map<String, String> settings);
 	
 	/**
 	 * Cleanup and remove listeners.

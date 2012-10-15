@@ -9,7 +9,9 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -19,6 +21,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import btwmods.events.IAPIListener;
+import btwmods.io.SettingsReader;
 
 public class ModLoader {
 	
@@ -260,7 +263,7 @@ public class ModLoader {
 				IMod modInstance = (IMod)mod.newInstance();
 				
 				try {
-					modInstance.init();
+					modInstance.init(loadModSettings(binaryName));
 				}
 				catch (Throwable e) {
 					outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") while running init for: " + binaryName);
@@ -277,6 +280,21 @@ public class ModLoader {
 		for (int n = 0; n < binaryNames.length; n++) {
 			loadMod(binaryNames[n]);
 		}
+	}
+	
+	private static Map<String, String> loadModSettings(String binaryName) {
+		File settingsFile = new File(new File("."), binaryName.substring(0, binaryName.indexOf('.', "btwmods.".length())).replace('.', '_') + ".txt");
+		
+		if (settingsFile.isFile()) {
+			try {
+				SettingsReader.readSettings(settingsFile);
+			}
+			catch (IOException e) {
+				outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to read the settings file for " + binaryName);
+			}
+		}
+		
+		return new HashMap<String, String>();
 	}
 	
 	private static void outputError(String message) {
