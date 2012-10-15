@@ -4,15 +4,16 @@ import java.util.EventObject;
 
 import btwmods.IEventInterrupter;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.NBTTagCompound;
 
 public class InstanceEvent extends EventObject implements IEventInterrupter {
 	
-	public enum TYPE { LOGIN, LOGOUT, RESPAWN };
+	public enum TYPE { LOGIN, LOGOUT, RESPAWN, READNBT, WRITENBT };
 
 	private TYPE type;
 	private EntityPlayer playerInstance = null;
 	private RespawnPosition respawnPosition = null;
+	private NBTTagCompound nbtTagCompound = null;
 	
 	public TYPE getType() {
 		return type;
@@ -24,6 +25,10 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 	
 	public RespawnPosition getRespawnPosition() {
 		return respawnPosition;
+	}
+	
+	public NBTTagCompound getNBTTagCompound() {
+		return nbtTagCompound;
 	}
 	
 	public void setRespawnPosition(RespawnPosition respawnPosition) {
@@ -45,6 +50,20 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 	public static InstanceEvent Respawn(EntityPlayer playerInstance) {
 		InstanceEvent event = new InstanceEvent(TYPE.RESPAWN, playerInstance);
 		event.playerInstance = playerInstance;
+		return event;
+	}
+
+	public static InstanceEvent ReadFromNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
+		InstanceEvent event = new InstanceEvent(TYPE.READNBT, player);
+		event.playerInstance = player;
+		event.nbtTagCompound = nbtTagCompound;
+		return event;
+	}
+
+	public static InstanceEvent WriteToNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
+		InstanceEvent event = new InstanceEvent(TYPE.WRITENBT, player);
+		event.playerInstance = player;
+		event.nbtTagCompound = nbtTagCompound;
 		return event;
 	}
 	

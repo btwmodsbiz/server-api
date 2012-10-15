@@ -17,6 +17,7 @@ import net.minecraft.src.BlockContainer;
 import net.minecraft.src.Container;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Slot;
 import net.minecraft.src.World;
 
@@ -165,5 +166,19 @@ public class PlayerAPI {
 		}
 		
 		return null;
+	}
+	
+	public static void readFromNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
+		if (!listeners.isEmpty(IInstanceListener.class)) {
+        	InstanceEvent event = InstanceEvent.ReadFromNBT(player, nbtTagCompound);
+        	((IInstanceListener)listeners).instanceAction(event);
+		}
+	}
+	
+	public static void writeToNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
+		if (!listeners.isEmpty(IInstanceListener.class)) {
+        	InstanceEvent event = InstanceEvent.WriteToNBT(player, nbtTagCompound);
+        	((IInstanceListener)listeners).instanceAction(event);
+		}
 	}
 }
