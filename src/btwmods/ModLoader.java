@@ -283,7 +283,7 @@ public class ModLoader {
 	}
 	
 	private static Settings loadModSettings(String binaryName) {
-		File settingsFile = new File(new File("."), binaryName.substring(0, binaryName.indexOf('.', "btwmods.".length())).replace('.', '_') + ".txt");
+		File settingsFile = new File(new File("."), "btwmods/" + binaryName.replaceAll("^btwmod\\.([^.]+)\\..+$", "$1") + ".txt");
 		
 		if (settingsFile.isFile()) {
 			try {
