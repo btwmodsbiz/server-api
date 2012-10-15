@@ -128,9 +128,12 @@ public class StatsAPI {
 			public final Average sentPacketSize = new Average();
 			public final Average receivedPacketCount = new Average();
 			public final Average receivedPacketSize = new Average();
+			public final Average statsThreadTime = new Average();
+			public final Average statsThreadQueueCount = new Average();
 		}
 		
 		public static class WorldStats {
+			public final Average measurementQueue = new Average();
 			public final Average worldTickTime = new Average();
 			public final Average mobSpawning = new Average();
 			public final Average blockTick = new Average();
@@ -160,9 +163,13 @@ public class StatsAPI {
 				}
 				else {
 					
+					long polled = 0;
+					long threadStart = System.nanoTime();
+					
 					// Process all the queued tick stats.
 					QueuedTickStats stats;
 					while ((stats = statsQueue.poll()) != null) {
+						polled++;
 						tickCounter = stats.tickCounter;
 						
 						serverStats.tickTime.record(stats.tickTime);
@@ -174,7 +181,8 @@ public class StatsAPI {
 						for (int i = 0; i < worldStats.length; i++) {
 							worldStats[i].worldTickTime.record(stats.worldTickTimes[i]);
 
-							// Reset the measurement entries to 0
+							// Reset the measurement entries to 0.
+							worldStats[i].measurementQueue.resetCurrent();
 							worldStats[i].mobSpawning.resetCurrent();
 							worldStats[i].blockTick.resetCurrent();
 							worldStats[i].tickBlocksAndAmbiance.resetCurrent();
@@ -188,7 +196,7 @@ public class StatsAPI {
 						// Add the time taken by each measurement type.
 						Tick tick;
 						while ((tick = stats.measurements.poll()) != null) {
-							//ChunkCoordIntPair.chunkXZ2Int(par0, par1);
+							worldStats[tick.worldIndex].measurementQueue.incrementCurrent(1);
 							
 							switch (tick.identifier) {
 								
@@ -226,6 +234,9 @@ public class StatsAPI {
 							}
 						}
 					}
+					
+					serverStats.statsThreadTime.record(System.nanoTime() - threadStart);
+					serverStats.statsThreadQueueCount.record(polled);
 					
 					// Run all the listeners.
 					StatsEvent event = new StatsEvent(MinecraftServer.getServer(), tickCounter, serverStats, worldStats);
