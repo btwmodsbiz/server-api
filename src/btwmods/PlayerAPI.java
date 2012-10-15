@@ -9,6 +9,7 @@ import btwmods.player.IDropListener;
 import btwmods.player.IInstanceListener;
 import btwmods.player.ISlotListener;
 import btwmods.player.InstanceEvent;
+import btwmods.player.RespawnPosition;
 import btwmods.player.SlotEvent;
 
 import net.minecraft.src.Block;
@@ -154,24 +155,16 @@ public class PlayerAPI {
 		}
 	}
 
-	public static boolean handleRespawn(EntityPlayerMP oldPlayerInstance, EntityPlayerMP newPlayerInstance) {
+	/**
+	 * @return true if the event has been handled and no others (e.g. hardcore spawning handler) should be called.
+	 */
+	public static RespawnPosition handleRespawn(EntityPlayerMP oldPlayerInstance) {
 		if (!listeners.isEmpty(IInstanceListener.class)) {
-        	InstanceEvent event = InstanceEvent.Respawn(oldPlayerInstance, newPlayerInstance);
-        	
-        	// TODO: need to process events one at a time.
-        	//((IInstanceListener)listeners).instanceAction(event);
-        	
-			/*for (IInstanceListener listener : instanceListeners) {
-				try {
-					listener.instanceAction(event);
-					if (event.isRespawnHandled()) {
-						return true;
-					}
-				} catch (Throwable t) {
-					ModLoader.reportListenerFailure(t, listener);
-				}
-			}*/
+        	InstanceEvent event = InstanceEvent.Respawn(oldPlayerInstance);
+        	((IInstanceListener)listeners).instanceAction(event);
+        	return event.getRespawnPosition();
 		}
-		return false;
+		
+		return null;
 	}
 }

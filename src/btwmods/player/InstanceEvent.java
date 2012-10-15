@@ -11,9 +11,7 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 
 	private TYPE type;
 	private EntityPlayerMP playerInstance = null;
-	private EntityPlayerMP playerInstanceNew = null;
-	private EntityPlayerMP playerInstanceOld = null;
-	private boolean respawnHandled = false;
+	private RespawnPosition respawnPosition = null;
 	
 	public TYPE getType() {
 		return type;
@@ -23,16 +21,12 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 		return playerInstance;
 	}
 	
-	public EntityPlayerMP getPlayerInstanceNew() {
-		return playerInstanceNew;
+	public RespawnPosition getRespawnPosition() {
+		return respawnPosition;
 	}
 	
-	public EntityPlayerMP getPlayerInstanceOld() {
-		return playerInstanceOld;
-	}
-	
-	public boolean isRespawnHandled() {
-		return respawnHandled;
+	public void setRespawnPosition(RespawnPosition respawnPosition) {
+		this.respawnPosition = respawnPosition;
 	}
 	
 	public static InstanceEvent Login(EntityPlayerMP playerInstance) {
@@ -47,10 +41,9 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 		return event;
 	}
 	
-	public static InstanceEvent Respawn(EntityPlayerMP playerInstanceOld, EntityPlayerMP playerInstanceNew) {
-		InstanceEvent event = new InstanceEvent(TYPE.RESPAWN, playerInstanceOld);
-		event.playerInstanceOld = playerInstanceOld;
-		event.playerInstanceNew = playerInstanceNew;
+	public static InstanceEvent Respawn(EntityPlayerMP playerInstance) {
+		InstanceEvent event = new InstanceEvent(TYPE.RESPAWN, playerInstance);
+		event.playerInstance = playerInstance;
 		return event;
 	}
 	
@@ -61,6 +54,6 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 
 	@Override
 	public boolean isInterrupted() {
-		return type == TYPE.RESPAWN && respawnHandled;
+		return type == TYPE.RESPAWN && respawnPosition != null;
 	}
 }
