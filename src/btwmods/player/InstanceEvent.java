@@ -2,18 +2,21 @@ package btwmods.player;
 
 import java.util.EventObject;
 
+import btwmods.IMod;
 import btwmods.events.IEventInterrupter;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.NBTTagCompound;
 
 public class InstanceEvent extends EventObject implements IEventInterrupter {
 	
-	public enum TYPE { LOGIN, LOGOUT, RESPAWN, READNBT, WRITENBT };
+	public enum TYPE { LOGIN, LOGOUT, RESPAWN, READ_NBT, WRITE_NBT };
 
 	private TYPE type;
 	private EntityPlayer playerInstance = null;
 	private RespawnPosition respawnPosition = null;
-	private NBTTagCompound nbtTagCompound = null;
+	private NBTTagCompound tagCompound = null;
+	private NBTTagCompound modTagCompound = null;
+	private String modClassName = null;
 	
 	public TYPE getType() {
 		return type;
@@ -28,7 +31,7 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 	}
 	
 	public NBTTagCompound getNBTTagCompound() {
-		return nbtTagCompound;
+		return modTagCompound == null ? tagCompound : modTagCompound;
 	}
 	
 	public void setRespawnPosition(RespawnPosition respawnPosition) {
@@ -54,16 +57,16 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 	}
 
 	public static InstanceEvent ReadFromNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
-		InstanceEvent event = new InstanceEvent(TYPE.READNBT, player);
+		InstanceEvent event = new InstanceEvent(TYPE.READ_NBT, player);
 		event.playerInstance = player;
-		event.nbtTagCompound = nbtTagCompound;
+		event.tagCompound = nbtTagCompound;
 		return event;
 	}
 
 	public static InstanceEvent WriteToNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
-		InstanceEvent event = new InstanceEvent(TYPE.WRITENBT, player);
+		InstanceEvent event = new InstanceEvent(TYPE.WRITE_NBT, player);
 		event.playerInstance = player;
-		event.nbtTagCompound = nbtTagCompound;
+		event.tagCompound = nbtTagCompound;
 		return event;
 	}
 	
@@ -75,5 +78,15 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 	@Override
 	public boolean isInterrupted() {
 		return type == TYPE.RESPAWN && respawnPosition != null;
+	}
+	
+	public void setModCompound(IMod mod) {
+		modTagCompound = tagCompound.getCompoundTag(modClassName = mod.getClass().getName());
+	}
+	
+	public void unsetModCompound() {
+		if (type == TYPE.WRITE_NBT && modTagCompound != null && modTagCompound.getTags().size() != 0) {
+			tagCompound.setTag(modClassName, modTagCompound);
+		}
 	}
 }

@@ -1,8 +1,12 @@
 package btwmods;
 
+import java.lang.reflect.InvocationTargetException;
+
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
+import btwmods.events.EventDispatcherFactory.Invocation;
 import btwmods.events.IAPIListener;
+import btwmods.events.IInvocationWrapper;
 import btwmods.player.BlockEvent;
 import btwmods.player.ContainerEvent;
 import btwmods.player.DropEvent;
@@ -24,7 +28,7 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Slot;
 import net.minecraft.src.World;
 
-public class PlayerAPI {
+public class PlayerAPI implements IInvocationWrapper {
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IInstanceListener.class, IBlockListener.class, ISlotListener.class, IContainerListener.class, IDropListener.class });
 	
 	private PlayerAPI() {}
@@ -183,5 +187,20 @@ public class PlayerAPI {
         	InstanceEvent event = InstanceEvent.WriteToNBT(player, nbtTagCompound);
         	((IInstanceListener)listeners).instanceAction(event);
 		}
+	}
+
+	@Override
+	public void handleInvocation(Invocation invocation) throws InvocationTargetException, IllegalAccessException {
+		if (invocation.args.length == 1 && invocation.args[0] instanceof InstanceEvent) {
+			InstanceEvent event = (InstanceEvent)invocation.args[0];
+			if (event.getType() == InstanceEvent.TYPE.READ_NBT) {
+				event.setModCompound(invocation.listener.getMod());
+				event.getNBTTagCompound();
+				event.unsetModCompound();
+				return;
+			}
+		}
+		
+		invocation.invoke();
 	}
 }
