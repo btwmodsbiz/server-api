@@ -1,16 +1,30 @@
 package btwmods.measure;
 
-public class Average {
+public class Average implements Comparable<Average> {
 	
 	/**
 	 * The number of values to use to calculate the average.
 	 */
 	public static final int RESOLUTION = 100;
 	
+	private int resolution;
 	private int tick = -1;
-	private long[] history = new long[RESOLUTION];
+	private long[] history;
 	private long total = 0;
 	private double average = 0;
+	
+	public Average() {
+		this(RESOLUTION);
+	}
+	
+	public Average(int resolution) {
+		this.resolution = resolution;
+		history = new long[resolution];
+	}
+	
+	public int getResolution() {
+		return resolution;
+	}
 	
 	/**
 	 * The number of times a value has been recorded.
@@ -31,18 +45,18 @@ public class Average {
 	}
 	
 	public double getAverage() {
-		return (double)total / (double)RESOLUTION;
+		return (double)total / (double)Math.min(tick + 1, resolution);
 	}
 	
 	public void resetCurrent() {
 		tick++;
 		
 		// Remove the old value from the total.
-		if (tick >= RESOLUTION) {
-			total -= history[tick % RESOLUTION];
+		if (tick >= resolution) {
+			total -= history[tick % resolution];
 		}
 
-		history[tick % RESOLUTION] = 0;
+		history[tick % resolution] = 0;
 	}
 	
 	/**
@@ -52,12 +66,12 @@ public class Average {
 		resetCurrent();
 
 		// Add the new value to the total and store it in the history.
-		total += history[tick % RESOLUTION] = value;
+		total += (history[tick % resolution] = value);
 	}
 	
 	public void incrementCurrent(long value) {
 		total += value;
-		history[tick % RESOLUTION] += value;
+		history[tick % resolution] += value;
 	}
 	
 	public static Average[] createInitializedArray(int size) {
@@ -66,5 +80,10 @@ public class Average {
 			averages[i] = new Average();
 		}
 		return averages;
+	}
+
+	@Override
+	public int compareTo(Average o) {
+		return new Long(total).compareTo(o.total);
 	}
 }
