@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,22 +28,34 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 	
 	/**
-	 * Create a new event dispatcher that supports the supplied IAPIListener classes.
+	 * Create a new event dispatcher that implements the methods defined in an array of interfaces.
 	 * 
-	 * @param listenerClasses the classes this dispatcher will support.
-	 * @return a proxy that implements all the supplied IAPIListener.
+	 * @param an array of interfaces that will implemented on the returned proxy.
+	 * @return a proxy that implements all the supplied interfaces.
 	 */
-	public static EventDispatcher create(Class<IAPIListener>[] listenerClasses) {
-		if (listenerClasses == null || listenerClasses.length == 0)
+	public static EventDispatcher create(Class<IAPIListener>[] interfaces) {
+		return create(interfaces, null);
+	}
+	
+	/**
+	 * Create a new event dispatcher that implements the methods defined in an array of interfaces.
+	 * EventObject parameters in those methods will be first processed by an event preprocessor.
+	 * 
+	 * @param an array of interfaces that will implemented on the returned proxy.
+	 * @param preprocessor EventObject parameters in the interfaces' methods will be first processed by this.
+	 * @return a proxy that implements all the supplied interfaces.
+	 */
+	public static EventDispatcher create(Class<IAPIListener>[] interfaces, IEventPreprocessor preprocessor) {
+		if (interfaces == null || interfaces.length == 0)
 			throw new IllegalArgumentException("listenerClasses cannot be null or an empty array");
 		
 		// Add the EventDispatcher interface to the end of the list.
-		Class[] listenerClassesExtended = new Class[listenerClasses.length + 1];
-		System.arraycopy(listenerClasses, 0, listenerClassesExtended, 0, listenerClasses.length);
-		listenerClassesExtended[listenerClasses.length] = EventDispatcher.class;
+		Class[] listenerClassesExtended = new Class[interfaces.length + 1];
+		System.arraycopy(interfaces, 0, listenerClassesExtended, 0, interfaces.length);
+		listenerClassesExtended[interfaces.length] = EventDispatcher.class;
 		
 		// Create a new factory as the handler and create the proxy.
-		EventDispatcherFactory dispatcher = new EventDispatcherFactory(listenerClasses);
+		EventDispatcherFactory dispatcher = new EventDispatcherFactory(interfaces, preprocessor);
 		dispatcher.proxy = Proxy.newProxyInstance(EventDispatcherFactory.class.getClassLoader(), listenerClassesExtended, dispatcher);
 		return (EventDispatcher)dispatcher.proxy;
 	}
@@ -51,13 +64,15 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	private ConcurrentLinkedQueue<QueuedListener> listenerQueue = new ConcurrentLinkedQueue<QueuedListener>();
 	private Class[] listenerClasses;
 	private Object proxy;
+	private IEventPreprocessor preprocessor;
 	
 	/**
 	 * Initializes this dispatcher's lookup.
 	 * @param listenerClasses
 	 */
-	private EventDispatcherFactory(Class[] listenerClasses) {
+	private EventDispatcherFactory(Class[] listenerClasses, IEventPreprocessor preprocessor) {
 		this.listenerClasses = listenerClasses;
+		this.preprocessor = preprocessor;
 		init(listenerClasses);
 	}
 	
@@ -241,6 +256,16 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 			// Execute all the listeners.
 			for (IAPIListener listener : listeners) {
 				try {
+					if (preprocessor != null) {
+						for (int i = 0; i < args.length; i++) {
+							if (args[i] instanceof EventObject) {
+								EventObject newEvent = preprocessor.processEvent((EventObject)args[i]);
+								if (newEvent != null)
+									args[i] = newEvent;
+							}
+						}
+					}
+					
 					method.invoke(listener, args);
 					
 					// Stop processing events if there is an event argument that has flagged for the event handling to stop.
