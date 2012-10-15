@@ -28,7 +28,12 @@ public class StatsAPI {
 	 * Whether or not we are recording measurements this tick.
 	 * This should only be modified by startTick().
 	 */
-	private static boolean recordingStats = false;
+	private static boolean doingMeasurements = false;
+	
+	/**
+	 * Whether or not to skip detailed measurements or just simple ones.
+	 */
+	public static volatile boolean detailedMeasurementsEnabled = false;
 	
 	private static volatile StatsProcessor statsProcessor = null;
 	
@@ -66,7 +71,7 @@ public class StatsAPI {
 		ModLoader.processFailureQueue();
 		
 		// Mark if we are recording stats this tick.
-		recordingStats = statsProcessor != null;
+		doingMeasurements = statsProcessor != null && detailedMeasurementsEnabled;
 	}
 
 	public static void endTick(MinecraftServer server, int tickCounter) {
@@ -100,7 +105,7 @@ public class StatsAPI {
 	 * Begin a measurement.
 	 */
 	public static void begin(Tick.Type type) {
-		if (recordingStats)
+		if (doingMeasurements)
 			measurements.begin(new Tick(type));
 	}
 	
@@ -108,7 +113,7 @@ public class StatsAPI {
 	 * Begin a measurement for a specific world.
 	 */
 	public static void begin(Tick.Type type, World world) {
-		if (recordingStats)
+		if (doingMeasurements)
 			measurements.begin(new Tick(type, world));
 	}
 
@@ -116,7 +121,7 @@ public class StatsAPI {
 	 * Begin a measurement for a specific entity tick in a world world.
 	 */
 	public static void begin(Tick.Type type, World world, NextTickListEntry entityTick) {
-		if (recordingStats)
+		if (doingMeasurements)
 			measurements.begin(new Tick(type, world, entityTick));
 	}
 	
@@ -124,7 +129,7 @@ public class StatsAPI {
 	 * End a measurement.
 	 */
 	public static void end() {
-		if (recordingStats)
+		if (doingMeasurements)
 			measurements.end();
 	}
 	
