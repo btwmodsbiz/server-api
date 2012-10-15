@@ -16,9 +16,9 @@ import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
 import btwmods.measure.Average;
 import btwmods.measure.Measurements;
-import btwmods.server.IStatsListener;
-import btwmods.server.StatsEvent;
-import btwmods.server.Tick;
+import btwmods.stats.IStatsListener;
+import btwmods.stats.StatsEvent;
+import btwmods.stats.Tick;
 
 public class StatsAPI {
 

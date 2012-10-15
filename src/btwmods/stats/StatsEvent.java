@@ -1,4 +1,4 @@
-package btwmods.server;
+package btwmods.stats;
 import java.util.EventObject;
 
 import btwmods.StatsAPI.StatsProcessor.ServerStats;

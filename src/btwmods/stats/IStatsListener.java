@@ -1,4 +1,4 @@
-package btwmods.server;
+package btwmods.stats;
 
 import btwmods.events.IAPIListener;
 
