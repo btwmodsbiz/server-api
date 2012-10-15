@@ -271,7 +271,7 @@ public class StatsAPI {
 					((IStatsListener)listeners).statsAction(event);
 
 					try {
-						Thread.sleep(50L);
+						Thread.sleep(40L);
 					} catch (InterruptedException e) {
 						
 					}
