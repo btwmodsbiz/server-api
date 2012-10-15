@@ -58,6 +58,10 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 		StatsAPI.removeListener(this);
 	}
 
+	/**
+	 * WARNING: This runs in a separate thread. Be very strict about what this accesses beyond the passed parameter. Do
+	 * not access any of the APIs, and be careful how class variables are used outside of statsAction().
+	 */
 	@Override
 	public void statsAction(StatsEvent event) {
 		long currentTime = System.currentTimeMillis();
@@ -116,7 +120,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 					.append("</td></tr>");
 			}
 
-			html.append("<tr><th align=\"right\">Worlds Total:<th><td>").append(decimalFormat.format(worldsTotal * 1.0E-6D)).append(" ms</td></tr>");
+			html.append("<tr><th align=\"right\">Worlds Total:<th><td>").append(decimalFormat.format(worldsTotal * 1.0E-6D)).append(" ms (" + (int)(worldsTotal / event.serverStats.tickTime.getAverage() * 100) + "% of full tick)</td></tr>");
 			
 			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
 			
