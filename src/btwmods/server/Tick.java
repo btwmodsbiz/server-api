@@ -39,13 +39,13 @@ public class Tick extends Measurement<Tick.Type> {
 		timeSync
 	};
 	
-	private class BlockTick {
+	public class BlockTick {
 		public final int blockID;
 		public final int x;
 		public final int y;
 		public final int z;
 		
-		public BlockTick(NextTickListEntry entry) {
+		private BlockTick(NextTickListEntry entry) {
 			blockID = entry.blockID;
 			x = entry.xCoord;
 			y = entry.yCoord;
