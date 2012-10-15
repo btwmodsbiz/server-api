@@ -21,7 +21,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import btwmods.events.IAPIListener;
-import btwmods.io.SettingsReader;
+import btwmods.io.Settings;
 
 public class ModLoader {
 	
@@ -282,19 +282,19 @@ public class ModLoader {
 		}
 	}
 	
-	private static Map<String, String> loadModSettings(String binaryName) {
+	private static Settings loadModSettings(String binaryName) {
 		File settingsFile = new File(new File("."), binaryName.substring(0, binaryName.indexOf('.', "btwmods.".length())).replace('.', '_') + ".txt");
 		
 		if (settingsFile.isFile()) {
 			try {
-				SettingsReader.readSettings(settingsFile);
+				return Settings.readSettings(settingsFile);
 			}
 			catch (IOException e) {
 				outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to read the settings file for " + binaryName);
 			}
 		}
 		
-		return new HashMap<String, String>();
+		return new Settings();
 	}
 	
 	private static void outputError(String message) {

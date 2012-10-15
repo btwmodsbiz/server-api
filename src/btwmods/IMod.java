@@ -1,6 +1,6 @@
 package btwmods;
 
-import java.util.Map;
+import btwmods.io.Settings;
 
 public interface IMod {
 	
@@ -10,7 +10,7 @@ public interface IMod {
 	 */
 	public String getName();
 	
-	public void init(Map<String, String> settings);
+	public void init(Settings settings);
 	
 	/**
 	 * Cleanup and remove listeners.
