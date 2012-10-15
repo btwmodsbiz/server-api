@@ -16,7 +16,6 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 	private RespawnPosition respawnPosition = null;
 	private NBTTagCompound tagCompound = null;
 	private NBTTagCompound modTagCompound = null;
-	private String modClassName = null;
 	
 	public TYPE getType() {
 		return type;
@@ -81,12 +80,12 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 	}
 	
 	public void setModCompound(IMod mod) {
-		modTagCompound = tagCompound.getCompoundTag(modClassName = mod.getClass().getName());
+		modTagCompound = tagCompound.getCompoundTag(mod.getClass().getName());
 	}
 	
 	public void unsetModCompound() {
 		if (type == TYPE.WRITE_NBT && modTagCompound != null && modTagCompound.getTags().size() != 0) {
-			tagCompound.setTag(modClassName, modTagCompound);
+			tagCompound.setTag(modTagCompound.getName(), modTagCompound);
 		}
 	}
 }
