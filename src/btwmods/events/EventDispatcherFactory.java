@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,8 +13,8 @@ import btwmods.ModLoader;
 
 public class EventDispatcherFactory implements InvocationHandler, EventDispatcher {
 
-	public enum QueueAction { ADD, REMOVE };
-	public class QueuedListener {
+	private enum QueueAction { ADD, REMOVE };
+	private class QueuedListener {
 		public final QueueAction action;
 		public final IAPIListener listener;
 		public final Class listenerClass;
@@ -24,6 +23,22 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 			this.action = action;
 			this.listener = listener;
 			this.listenerClass = listenerClass;
+		}
+	}
+	
+	public class Invocation {
+		public final IAPIListener listener;
+		public final Method method;
+		public final Object[] args;
+		
+		public Invocation(IAPIListener listener, Method method, Object[] args) {
+			this.listener = listener;
+			this.method = method;
+			this.args = args;
+		}
+		
+		public void invoke() throws InvocationTargetException, IllegalAccessException {
+			method.invoke(listener, args);
 		}
 	}
 	
@@ -45,7 +60,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	 * @param preprocessor EventObject parameters in the interfaces' methods will be first processed by this.
 	 * @return a proxy that implements all the supplied interfaces.
 	 */
-	public static EventDispatcher create(Class<IAPIListener>[] interfaces, IEventPreprocessor preprocessor) {
+	public static EventDispatcher create(Class<IAPIListener>[] interfaces, IInvocationWrapper invocationWrapper) {
 		if (interfaces == null || interfaces.length == 0)
 			throw new IllegalArgumentException("listenerClasses cannot be null or an empty array");
 		
@@ -55,7 +70,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 		listenerClassesExtended[interfaces.length] = EventDispatcher.class;
 		
 		// Create a new factory as the handler and create the proxy.
-		EventDispatcherFactory dispatcher = new EventDispatcherFactory(interfaces, preprocessor);
+		EventDispatcherFactory dispatcher = new EventDispatcherFactory(interfaces, invocationWrapper);
 		dispatcher.proxy = Proxy.newProxyInstance(EventDispatcherFactory.class.getClassLoader(), listenerClassesExtended, dispatcher);
 		return (EventDispatcher)dispatcher.proxy;
 	}
@@ -64,15 +79,15 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	private ConcurrentLinkedQueue<QueuedListener> listenerQueue = new ConcurrentLinkedQueue<QueuedListener>();
 	private Class[] listenerClasses;
 	private Object proxy;
-	private IEventPreprocessor preprocessor;
+	private IInvocationWrapper invocationWrapper;
 	
 	/**
 	 * Initializes this dispatcher's lookup.
 	 * @param listenerClasses
 	 */
-	private EventDispatcherFactory(Class[] listenerClasses, IEventPreprocessor preprocessor) {
+	private EventDispatcherFactory(Class[] listenerClasses, IInvocationWrapper invocationWrapper) {
 		this.listenerClasses = listenerClasses;
-		this.preprocessor = preprocessor;
+		this.invocationWrapper = invocationWrapper;
 		init(listenerClasses);
 	}
 	
@@ -256,17 +271,10 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 			// Execute all the listeners.
 			for (IAPIListener listener : listeners) {
 				try {
-					if (preprocessor != null) {
-						for (int i = 0; i < args.length; i++) {
-							if (args[i] instanceof EventObject) {
-								EventObject newEvent = preprocessor.processEvent((EventObject)args[i]);
-								if (newEvent != null)
-									args[i] = newEvent;
-							}
-						}
-					}
-					
-					method.invoke(listener, args);
+					if (invocationWrapper != null)
+						invocationWrapper.handleInvocation(new Invocation(listener, method, args));
+					else
+						method.invoke(listener, args);
 					
 					// Stop processing events if there is an event argument that has flagged for the event handling to stop.
 					if (args.length > 0 && args[0] instanceof IEventInterrupter && ((IEventInterrupter)args[0]).isInterrupted())
