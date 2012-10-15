@@ -9,9 +9,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -70,6 +68,8 @@ public class ModLoader {
 			
 			findModsInClassPath();
 			findModsInFolder(new File(".", "btwmods"));
+			
+			StatsAPI.init();
 
 			net.minecraft.server.MinecraftServer.logger.info("BTWMods Initialization Complete.");
 		}

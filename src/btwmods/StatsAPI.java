@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.CommandHandler;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.World;
 import btwmods.events.EventDispatcher;
@@ -17,6 +18,7 @@ import btwmods.events.IAPIListener;
 import btwmods.measure.Average;
 import btwmods.measure.Measurements;
 import btwmods.stats.IStatsListener;
+import btwmods.stats.StatsCommand;
 import btwmods.stats.StatsEvent;
 import btwmods.stats.Tick;
 
@@ -41,6 +43,10 @@ public class StatsAPI {
 	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<QueuedTickStats>();
 	
 	private StatsAPI() {}
+	
+	public static void init() {
+		((CommandHandler)MinecraftServer.getServer().getCommandManager()).registerCommand(new StatsCommand());
+	}
 
 	public static void addListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
