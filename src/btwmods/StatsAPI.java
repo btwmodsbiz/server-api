@@ -1,6 +1,10 @@
 package btwmods;
 
 import java.util.ArrayDeque;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
@@ -143,6 +147,7 @@ public class StatsAPI {
 			public final Average timeSync = new Average();
 			public final Average buildActiveChunkSet = new Average();
 			public final Average checkPlayerLight = new Average();
+			public final Map<ChunkCoordIntPair, Average> chunkTickTimes = new LinkedHashMap<ChunkCoordIntPair, Average>(); 
 		}
 		
 		public StatsProcessor() {
@@ -191,6 +196,18 @@ public class StatsAPI {
 							worldStats[i].timeSync.resetCurrent();
 							worldStats[i].buildActiveChunkSet.resetCurrent();
 							worldStats[i].checkPlayerLight.resetCurrent();
+
+							// Reset the chunk measurement entries to 0.
+							Iterator<Entry<ChunkCoordIntPair, Average>> iterator = worldStats[i].chunkTickTimes.entrySet().iterator();
+							while (iterator.hasNext()) {
+								Entry<ChunkCoordIntPair, Average> chunkEntry = iterator.next();
+								
+								if (chunkEntry.getValue().getAverage() == 0 && chunkEntry.getValue().getTick() > Average.RESOLUTION * 3)
+									// TODO: make sure old chunks are actually being trimmed.
+									iterator.remove();
+								else
+									chunkEntry.getValue().resetCurrent();
+							}
 						}
 						
 						// Add the time taken by each measurement type.
@@ -214,6 +231,17 @@ public class StatsAPI {
 									
 								case blockTick:
 									worldStats[tick.worldIndex].blockTick.incrementCurrent(tick.getTime());
+									
+									// Get the average for this chunk and increment it.
+									ChunkCoordIntPair coords = new ChunkCoordIntPair(tick.blockTick.x, tick.blockTick.z);
+									Average chunkAverage = worldStats[tick.worldIndex].chunkTickTimes.get(coords);
+									if (chunkAverage == null) {
+										worldStats[tick.worldIndex].chunkTickTimes.put(coords, chunkAverage = new Average());
+										chunkAverage.record(tick.getTime());
+									}
+									else {
+										chunkAverage.incrementCurrent(tick.getTime());
+									}
 									break;
 									
 								case entities:
