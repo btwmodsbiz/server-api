@@ -8,6 +8,7 @@ import java.util.Date;
 import btwmods.IMod;
 import btwmods.StatsAPI;
 import btwmods.io.Settings;
+import btwmods.measure.Average;
 import btwmods.network.CustomPacketEvent;
 import btwmods.network.INetworkListener;
 import btwmods.server.IStatsListener;
@@ -23,6 +24,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
     private long reportingDelay = 1000;
 	private long lastStatsTime;
 	private int lastTickCounter = -1;
+	private Average statsActionTime = new Average(10);
 	
 	private int[] ticksPerSecondArray = new int[100];
 	
@@ -59,6 +61,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 	@Override
 	public void statsAction(StatsEvent event) {
 		long currentTime = System.currentTimeMillis();
+		long startNano = System.nanoTime();
 		
 		if (currentTime - lastStatsTime > reportingDelay) {
 			
@@ -71,6 +74,9 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			StringBuilder html = new StringBuilder("<html><head><title>Minecraft Server Stats</title><meta http-equiv=\"refresh\" content=\"2\"></head><body><h1>Minecraft Server Stats</h1><table border=\"0\"><tbody>"); 
 			
 			html.append("<tr><th align=\"right\">Updated:<th><td>").append(BasicFormatter.dateFormat.format(new Date())).append("</td></tr>");
+			html.append("<tr><th align=\"right\">Average StatsAPI Thread Time:<th><td>").append(decimalFormat.format(event.serverStats.statsThreadTime.getAverage() * 1.0E-6D)).append(" ms</td></tr>");
+			html.append("<tr><th align=\"right\">Average StatsAPI Polled:<th><td>").append(event.serverStats.statsThreadQueueCount.getAverage()).append("</td></tr>");
+			html.append("<tr><th align=\"right\">Average Tick Monitor Time:<th><td>").append(decimalFormat.format(statsActionTime.getAverage() * 1.0E-6D)).append("ms </td></tr>");
 			
 			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
 			
@@ -79,6 +85,8 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			html.append("</td></tr>");
 			
 			html.append("<tr><th align=\"right\">Average Full Tick:<th><td>").append(decimalFormat.format(event.serverStats.tickTime.getAverage() * 1.0E-6D)).append(" ms</td></tr>");
+			
+			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
 			
 			double worldsTotal = 0;
 			for (int i = 0; i < event.worldStats.length; i++) {
@@ -93,15 +101,19 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 						+ event.worldStats[i].entities.getAverage()
 						+ event.worldStats[i].timeSync.getAverage();
 				
-				html.append("<tr><th align=\"right\">Average World ").append(i)
-				.append(" Tick:<th><td>").append(decimalFormat.format(event.worldStats[i].worldTickTime.getAverage() * 1.0E-6D) + "ms (" + decimalFormat.format(checkedTotal * 1.0E-6D) + " ms == ")
-				.append("E: ").append(decimalFormat.format(event.worldStats[i].entities.getAverage() * 1.0E-6D)).append("ms")
-				.append("+ M: ").append(decimalFormat.format(event.worldStats[i].mobSpawning.getAverage() * 1.0E-6D)).append("ms")
-				.append(" + B: ").append(decimalFormat.format(event.worldStats[i].blockTick.getAverage() * 1.0E-6D)).append("ms")
-				.append(" + A: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbiance.getAverage() * 1.0E-6D)).append("ms")
-				.append(" + AS: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbianceSuper.getAverage() * 1.0E-6D)).append("ms")
-				.append(" + T: ").append(decimalFormat.format(event.worldStats[i].timeSync.getAverage() * 1.0E-6D)).append("ms")
-				.append(")</td></tr>");
+				html.append("<tr><th align=\"right\">Average World ").append(i).append(" Tick:<th><td>")
+					.append(decimalFormat.format(event.worldStats[i].worldTickTime.getAverage() * 1.0E-6D) + "ms (" + decimalFormat.format(checkedTotal * 1.0E-6D) + " ms == ")
+					.append("E: ").append(decimalFormat.format(event.worldStats[i].entities.getAverage() * 1.0E-6D)).append("ms")
+					.append(" + M: ").append(decimalFormat.format(event.worldStats[i].mobSpawning.getAverage() * 1.0E-6D)).append("ms")
+					.append(" + B: ").append(decimalFormat.format(event.worldStats[i].blockTick.getAverage() * 1.0E-6D)).append("ms")
+					.append(" + A: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbiance.getAverage() * 1.0E-6D)).append("ms")
+					.append(" + AS: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbianceSuper.getAverage() * 1.0E-6D)).append("ms")
+					.append(" + T: ").append(decimalFormat.format(event.worldStats[i].timeSync.getAverage() * 1.0E-6D)).append("ms")
+					.append(")</td></tr>");
+				
+				html.append("<tr><th align=\"right\">&nbsp;<th><td>")
+					.append(event.worldStats[i].chunkTickTimes.size()).append(" chunk averages tracked, ").append(event.worldStats[i].measurementQueue.getAverage()).append(" average measurements polled per StatsAPI round")
+					.append("</td></tr>");
 			}
 
 			html.append("<tr><th align=\"right\">Worlds Total:<th><td>").append(decimalFormat.format(worldsTotal * 1.0E-6D)).append(" ms</td></tr>");
@@ -118,6 +130,8 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			
 			html.append("</tbody></table></body></html>");
 			
+			long startWriteTime = System.currentTimeMillis();
+			
 			try {
 				FileWriter writer = new FileWriter(htmlFile);
 				writer.write(html.toString());
@@ -127,9 +141,13 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				net.minecraft.server.MinecraftServer.logger.warning("Tick Monitor failed to write to " + htmlFile.getPath() + ": " + e.getMessage());
 			}
 			
+			long endNano = System.nanoTime();
+			long endTime = System.currentTimeMillis();
+			
 			if (System.currentTimeMillis() - currentTime > 500)
-				net.minecraft.server.MinecraftServer.logger.warning("Tick Monitor took " + (System.currentTimeMillis() - currentTime) + "ms to process stats. Note: This will *not* slow the main Minecraft server thread.");
+				net.minecraft.server.MinecraftServer.logger.warning("Tick Monitor took " + (endTime - currentTime) + "ms (~" + ((endTime - startWriteTime) * 100 / (endTime - currentTime)) + "% disk IO) to process stats. Note: This will *not* slow the main Minecraft server thread.");
 
+			statsActionTime.record(endNano - startNano);
 			lastTickCounter = event.tickCounter;
 			lastStatsTime = System.currentTimeMillis();
 		}
