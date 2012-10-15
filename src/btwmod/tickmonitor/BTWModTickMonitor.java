@@ -8,6 +8,7 @@ import java.util.Date;
 import btwmods.BasicFormatter;
 import btwmods.IMod;
 import btwmods.ServerAPI;
+import btwmods.io.Settings;
 import btwmods.network.CustomPacketEvent;
 import btwmods.network.INetworkListener;
 import btwmods.server.IStatsListener;
@@ -15,10 +16,10 @@ import btwmods.server.StatsEvent;
 
 public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener {
 
-	private static final File htmlFile = new File(new File("."), "stats.html");
+	private static File htmlFile = new File(new File("."), "stats.html");
     private static final DecimalFormat decimalFormat = new DecimalFormat("########0.000");
 	
-    private boolean isRunning = true;
+    private boolean isRunning = true; // TODO: make this false by default.
     private long reportingDelay = 1000;
 	private long lastStatsTime;
 	private int lastTickCounter = -1;
@@ -31,8 +32,19 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 	}
 
 	@Override
-	public void init() {
+	public void init(Settings settings) {
 		lastStatsTime = System.currentTimeMillis();
+		
+		// Load settings
+		if (settings.hasKey("htmlfile") && !(new File(settings.get("htmlfile")).isDirectory())) {
+			htmlFile = new File(settings.get("htmlfile"));
+		}
+		if (settings.isBoolean("runonstartup")) {
+			isRunning = settings.getBoolean(settings.get("runonstartup"));
+		}
+		if (settings.isInt("reportingdelay")) {
+			reportingDelay = Math.max(50, settings.getInt(settings.get("reportingdelay")));
+		}
 		
 		// Add the listener only if isRunning is true by default.
 		if (isRunning)
