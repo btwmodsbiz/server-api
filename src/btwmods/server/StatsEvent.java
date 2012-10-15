@@ -1,8 +1,8 @@
 package btwmods.server;
 import java.util.EventObject;
 
-import btwmods.ServerAPI.StatsProcessor.ServerStats;
-import btwmods.ServerAPI.StatsProcessor.WorldStats;
+import btwmods.StatsAPI.StatsProcessor.ServerStats;
+import btwmods.StatsAPI.StatsProcessor.WorldStats;
 import net.minecraft.server.MinecraftServer;
 
 public class StatsEvent extends EventObject {

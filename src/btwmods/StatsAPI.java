@@ -16,7 +16,7 @@ import btwmods.server.IStatsListener;
 import btwmods.server.StatsEvent;
 import btwmods.server.Tick;
 
-public class ServerAPI {
+public class StatsAPI {
 
 	private static Measurements measurements = new Measurements<Tick>();
 	
@@ -25,7 +25,7 @@ public class ServerAPI {
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IStatsListener.class });
 	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<QueuedTickStats>();
 	
-	private ServerAPI() {}
+	private StatsAPI() {}
 
 	public static void addListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {

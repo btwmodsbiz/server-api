@@ -341,7 +341,7 @@ public class ModLoader {
 		processFailureQueue();
 		
 		// Remove the listener from all APIs.
-		ServerAPI.removeListener(listener);
+		StatsAPI.removeListener(listener);
 		WorldAPI.removeListener(listener);
 		NetworkAPI.unregisterCustomChannels(listener);
 		PlayerAPI.removeListener(listener);
