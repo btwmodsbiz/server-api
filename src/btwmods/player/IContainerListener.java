@@ -1,6 +1,6 @@
 package btwmods.player;
 
-import btwmods.IAPIListener;
+import btwmods.events.IAPIListener;
 
 public interface IContainerListener extends IAPIListener {
 	public void containerAction(ContainerEvent event);

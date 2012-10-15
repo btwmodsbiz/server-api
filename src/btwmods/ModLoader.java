@@ -18,6 +18,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import btwmods.events.IAPIListener;
+
 public class ModLoader {
 	
 	private ModLoader() {}

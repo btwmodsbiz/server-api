@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import btwmods.events.IAPIListener;
 import btwmods.network.CustomPacketEvent;
 import btwmods.network.INetworkListener;
 

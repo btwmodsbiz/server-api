@@ -1,4 +1,4 @@
-package btwmods;
+package btwmods.events;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import btwmods.ModLoader;
+
 public class EventDispatcherFactory implements InvocationHandler, EventDispatcher {
 
 	public enum QueueAction { ADD, REMOVE };

@@ -1,6 +1,6 @@
 package btwmods.world;
 
-import btwmods.IAPIListener;
+import btwmods.events.IAPIListener;
 
 public interface IBlockListener extends IAPIListener {
 	public void blockAction(BlockEvent event);

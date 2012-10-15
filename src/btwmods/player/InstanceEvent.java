@@ -2,7 +2,7 @@ package btwmods.player;
 
 import java.util.EventObject;
 
-import btwmods.IEventInterrupter;
+import btwmods.events.IEventInterrupter;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.NBTTagCompound;
 

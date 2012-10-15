@@ -1,4 +1,4 @@
-package btwmods;
+package btwmods.events;
 
 public interface EventDispatcher {
 	
