@@ -1,4 +1,4 @@
-package btwmods;
+package btwmods.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
