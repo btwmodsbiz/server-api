@@ -3,16 +3,27 @@ package btwmod.tickmonitor;
 import java.io.File;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.CommandHandler;
 
 import btwmods.IMod;
 import btwmods.StatsAPI;
+import btwmods.StatsAPI.StatsProcessor.ChunkStats;
 import btwmods.io.Settings;
 import btwmods.measure.Average;
 import btwmods.network.CustomPacketEvent;
 import btwmods.network.INetworkListener;
-import btwmods.server.IStatsListener;
-import btwmods.server.StatsEvent;
+import btwmods.stats.ChunkStatsComparator;
+import btwmods.stats.IStatsListener;
+import btwmods.stats.StatsEvent;
+import btwmods.stats.ChunkStatsComparator.Stat;
 import btwmods.util.BasicFormatter;
 
 public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener {
@@ -21,10 +32,12 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
     private static final DecimalFormat decimalFormat = new DecimalFormat("########0.000");
 	
     private boolean isRunning = true; // TODO: make this false by default.
+    private long tooLongWarningTime = 1000;
     private long reportingDelay = 1000;
-	private long lastStatsTime;
+	private long lastStatsTime = 0;
 	private int lastTickCounter = -1;
 	private Average statsActionTime = new Average(10);
+	private Average statsActionIOTime = new Average(10);
 	
 	private int[] ticksPerSecondArray = new int[100];
 	
@@ -42,20 +55,44 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			htmlFile = new File(settings.get("htmlfile"));
 		}
 		if (settings.isBoolean("runonstartup")) {
-			isRunning = settings.getBoolean(settings.get("runonstartup"));
+			isRunning = settings.getBoolean("runonstartup");
 		}
 		if (settings.isInt("reportingdelay")) {
-			reportingDelay = Math.max(50, settings.getInt(settings.get("reportingdelay")));
+			reportingDelay = Math.max(50, settings.getInt("reportingdelay"));
+		}
+		if (settings.isLong("toolongwarningtime")) {
+			tooLongWarningTime = Math.min(500L, settings.getLong("toolongwarningtime"));
 		}
 		
 		// Add the listener only if isRunning is true by default.
 		if (isRunning)
 			StatsAPI.addListener(this);
+		
+		((CommandHandler)MinecraftServer.getServer().getCommandManager()).registerCommand(new MonitorCommand(this));
 	}
 
 	@Override
 	public void unload() {
 		StatsAPI.removeListener(this);
+	}
+	
+	public void setIsRunning(boolean value) {
+		if (isRunning == value)
+			return;
+		
+		lastStatsTime = 0;
+		lastTickCounter = -1;
+		
+		if (isRunning)
+			StatsAPI.removeListener(this);
+		else
+			StatsAPI.addListener(this);
+		
+		isRunning = value;
+	}
+
+	public boolean isRunning() {
+		return isRunning;
 	}
 
 	/**
@@ -66,8 +103,13 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 	public void statsAction(StatsEvent event) {
 		long currentTime = System.currentTimeMillis();
 		long startNano = System.nanoTime();
+		boolean detailedMeasurementsEnabled = StatsAPI.detailedMeasurementsEnabled;
 		
-		if (currentTime - lastStatsTime > reportingDelay) {
+		if (lastStatsTime == 0) {
+			lastStatsTime = System.currentTimeMillis();
+		}
+		
+		else if (currentTime - lastStatsTime > reportingDelay) {
 			
 			long timeElapsed = System.currentTimeMillis() - lastStatsTime;
 			int numTicks = event.tickCounter - lastTickCounter;
@@ -79,8 +121,14 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			
 			html.append("<tr><th align=\"right\">Updated:<th><td>").append(BasicFormatter.dateFormat.format(new Date())).append("</td></tr>");
 			html.append("<tr><th align=\"right\">Average StatsAPI Thread Time:<th><td>").append(decimalFormat.format(event.serverStats.statsThreadTime.getAverage() * 1.0E-6D)).append(" ms</td></tr>");
-			html.append("<tr><th align=\"right\">Average StatsAPI Polled:<th><td>").append(event.serverStats.statsThreadQueueCount.getAverage()).append("</td></tr>");
-			html.append("<tr><th align=\"right\">Average Tick Monitor Time:<th><td>").append(decimalFormat.format(statsActionTime.getAverage() * 1.0E-6D)).append("ms </td></tr>");
+			html.append("<tr><th align=\"right\">Average StatsAPI Polled:<th><td>").append(decimalFormat.format(event.serverStats.statsThreadQueueCount.getAverage())).append("</td></tr>");
+			
+			html.append("<tr><th align=\"right\">Average Tick Monitor Time:<th><td>");
+			if (statsActionTime.getTick() == 0)
+				html.append("...");
+			else
+				html.append(decimalFormat.format(statsActionTime.getAverage() * 1.0E-6D)).append("ms (" + (int)(statsActionIOTime.getAverage() * 100 / statsActionTime.getAverage()) + "% IO)");
+			html.append("</td></tr>");
 			
 			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
 			
@@ -97,27 +145,35 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				
 				worldsTotal += event.worldStats[i].worldTickTime.getAverage();
 				
-				double checkedTotal = 
+				/*double checkedTotal = 
 						event.worldStats[i].mobSpawning.getAverage()
 						+ event.worldStats[i].blockTick.getAverage()
 						+ event.worldStats[i].tickBlocksAndAmbiance.getAverage()
 						+ event.worldStats[i].tickBlocksAndAmbianceSuper.getAverage()
 						+ event.worldStats[i].entities.getAverage()
-						+ event.worldStats[i].timeSync.getAverage();
+						+ event.worldStats[i].timeSync.getAverage();*/
 				
-				html.append("<tr><th align=\"right\">Average World ").append(i).append(" Tick:<th><td>")
-					.append(decimalFormat.format(event.worldStats[i].worldTickTime.getAverage() * 1.0E-6D) + "ms (" + decimalFormat.format(checkedTotal * 1.0E-6D) + " ms == ")
-					.append("E: ").append(decimalFormat.format(event.worldStats[i].entities.getAverage() * 1.0E-6D)).append("ms")
-					.append(" + M: ").append(decimalFormat.format(event.worldStats[i].mobSpawning.getAverage() * 1.0E-6D)).append("ms")
-					.append(" + B: ").append(decimalFormat.format(event.worldStats[i].blockTick.getAverage() * 1.0E-6D)).append("ms")
-					.append(" + A: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbiance.getAverage() * 1.0E-6D)).append("ms")
-					.append(" + AS: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbianceSuper.getAverage() * 1.0E-6D)).append("ms")
-					.append(" + T: ").append(decimalFormat.format(event.worldStats[i].timeSync.getAverage() * 1.0E-6D)).append("ms")
-					.append(")</td></tr>");
+				html.append("<tr><th align=\"right\">World ").append(i).append(" Averages:<th><td>")
+					.append(decimalFormat.format(event.worldStats[i].worldTickTime.getAverage() * 1.0E-6D) + "ms");
 				
-				html.append("<tr><th align=\"right\">&nbsp;<th><td>")
-					.append(event.worldStats[i].chunkTickTimes.size()).append(" chunk averages tracked, ").append(event.worldStats[i].measurementQueue.getAverage()).append(" average measurements polled per StatsAPI round")
-					.append("</td></tr>");
+				if (detailedMeasurementsEnabled)
+					html.append(" (" /*+ decimalFormat.format(checkedTotal * 1.0E-6D) + " ms == "*/)
+						.append("E: ").append(decimalFormat.format(event.worldStats[i].entities.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + M: ").append(decimalFormat.format(event.worldStats[i].mobSpawning.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + B: ").append(decimalFormat.format(event.worldStats[i].blockTick.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + A: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbiance.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + AS: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbianceSuper.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + T: ").append(decimalFormat.format(event.worldStats[i].timeSync.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + CS: ").append(decimalFormat.format(event.worldStats[i].buildActiveChunkSet.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + L: ").append(decimalFormat.format(event.worldStats[i].checkPlayerLight.getAverage() * 1.0E-6D)).append("ms")
+						.append(")");
+				
+				html.append("</td></tr>");
+				
+				if (detailedMeasurementsEnabled)
+					html.append("<tr><th align=\"right\">&nbsp;<th><td>")
+						.append((int)event.worldStats[i].measurementQueue.getAverage()).append(" measurements per tick")
+						.append("</td></tr>");
 			}
 
 			html.append("<tr><th align=\"right\">Worlds Total:<th><td>").append(decimalFormat.format(worldsTotal * 1.0E-6D)).append(" ms (" + (int)(worldsTotal / event.serverStats.tickTime.getAverage() * 100) + "% of full tick)</td></tr>");
@@ -132,9 +188,70 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			html.append("<tr><th align=\"right\">Average Received Packet Size:<th><td>").append((int)event.serverStats.receivedPacketSize.getAverage()).append(" bytes</td></tr>");
 			html.append("<tr><th align=\"right\">Average Sent Packet Size:<th><td>").append((int)event.serverStats.sentPacketSize.getAverage()).append(" bytes</td></tr>");
 			
-			html.append("</tbody></table></body></html>");
+			html.append("</tbody></table>");
 			
+			if (detailedMeasurementsEnabled) {
+			
+				List<Map.Entry<ChunkCoordIntPair, ChunkStats>> chunkEntries = new ArrayList<Map.Entry<ChunkCoordIntPair, ChunkStats>>(event.worldStats[0].chunkStats.entrySet());
+	
+				html.append("<h2>Top 10 Chunks</h2>");
+				
+				html.append("<table border=\"0\"><thead><tr><th>By Tick Time</th><th>By Entity Count</th></tr></thead><tbody><tr><td>");
+	
+				{
+					Collections.sort(chunkEntries, new ChunkStatsComparator<ChunkCoordIntPair>(Stat.TICKTIME, true));
+					html.append("<table border=\"0\"><thead><tr><th>Chunk</th><th>Tick Time</th><th>Entities</th></tr></thead><tbody>");
+					double chunksTotal = 0;
+					int displayed = 0;
+					//html.append("<table border=\"0\"><tbody>");
+					for (int i = 0; i < chunkEntries.size(); i++) {
+						if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= 10) {
+							displayed++;
+							html.append("<tr><td>").append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos)
+									.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+									.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
+									.append("</td></tr>");
+						}
+	
+						chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();
+					}
+	
+					html.append("<tr><td>&nbsp;</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td></tr>");
+					html.append("</tbody></table>");
+				}
+				
+				html.append("</td><td>");
+	
+				{
+					Collections.sort(chunkEntries, new ChunkStatsComparator<ChunkCoordIntPair>(Stat.ENTITIES, true));
+					html.append("<table border=\"0\"><thead><tr><th>Chunk</th><th>Tick Time</th><th>Entities</th></tr></thead><tbody>");
+					double chunksTotal = 0;
+					int displayed = 0;
+					//html.append("<table border=\"0\"><tbody>");
+					for (int i = 0; i < chunkEntries.size(); i++) {
+						if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= 10) {
+							displayed++;
+							html.append("<tr><td>").append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos)
+									.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+									.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
+									.append("</td></tr>");
+						}
+	
+						chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();
+					}
+	
+					html.append("<tr><td>&nbsp;</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td></tr>");
+					html.append("</tbody></table>");
+				}
+	
+				html.append("</td></tr></tbody></table>");
+	
+				html.append("</body></html>");
+			
+			}
+
 			long startWriteTime = System.currentTimeMillis();
+			long startWriteNano = System.nanoTime();
 			
 			try {
 				FileWriter writer = new FileWriter(htmlFile);
@@ -148,10 +265,11 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			long endNano = System.nanoTime();
 			long endTime = System.currentTimeMillis();
 			
-			if (System.currentTimeMillis() - currentTime > 500)
+			if (System.currentTimeMillis() - currentTime > tooLongWarningTime)
 				net.minecraft.server.MinecraftServer.logger.warning("Tick Monitor took " + (endTime - currentTime) + "ms (~" + ((endTime - startWriteTime) * 100 / (endTime - currentTime)) + "% disk IO) to process stats. Note: This will *not* slow the main Minecraft server thread.");
 
 			statsActionTime.record(endNano - startNano);
+			statsActionIOTime.record(endNano - startWriteNano);
 			lastTickCounter = event.tickCounter;
 			lastStatsTime = System.currentTimeMillis();
 		}
