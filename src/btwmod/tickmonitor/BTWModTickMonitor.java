@@ -5,14 +5,14 @@ import java.io.FileWriter;
 import java.text.DecimalFormat;
 import java.util.Date;
 
-import btwmods.BasicFormatter;
 import btwmods.IMod;
-import btwmods.ServerAPI;
+import btwmods.StatsAPI;
 import btwmods.io.Settings;
 import btwmods.network.CustomPacketEvent;
 import btwmods.network.INetworkListener;
 import btwmods.server.IStatsListener;
 import btwmods.server.StatsEvent;
+import btwmods.util.BasicFormatter;
 
 public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener {
 
@@ -48,12 +48,12 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 		
 		// Add the listener only if isRunning is true by default.
 		if (isRunning)
-			ServerAPI.addListener(this);
+			StatsAPI.addListener(this);
 	}
 
 	@Override
 	public void unload() {
-		ServerAPI.removeListener(this);
+		StatsAPI.removeListener(this);
 	}
 
 	@Override
