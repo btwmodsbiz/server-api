@@ -24,6 +24,12 @@ public class StatsAPI {
 
 	private static Measurements measurements = new Measurements<Tick>();
 	
+	/**
+	 * Whether or not we are recording measurements this tick.
+	 * This should only be modified by startTick().
+	 */
+	private static boolean recordingStats = false;
+	
 	private static volatile StatsProcessor statsProcessor = null;
 	
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IStatsListener.class });
@@ -58,55 +64,68 @@ public class StatsAPI {
 	public static void startTick(MinecraftServer server, int tickCounter) {
 		// Process any failures that may be queued from the last tick.
 		ModLoader.processFailureQueue();
+		
+		// Mark if we are recording stats this tick.
+		recordingStats = statsProcessor != null;
 	}
 
 	public static void endTick(MinecraftServer server, int tickCounter) {
-		QueuedTickStats stats = new QueuedTickStats();
-		
-		stats.tickCounter = tickCounter;
-		stats.tickTime = server.tickTimeArray[tickCounter % 100];
-		stats.sentPacketCount = server.sentPacketCountArray[tickCounter % 100];
-		stats.sentPacketSize = server.sentPacketSizeArray[tickCounter % 100];
-		stats.receivedPacketCount = server.receivedPacketCountArray[tickCounter % 100];
-		stats.receivedPacketSize = server.receivedPacketSizeArray[tickCounter % 100];
-		
-		stats.worldTickTimes = new long[server.timeOfLastDimensionTick.length];
-		for (int i = 0; i < stats.worldTickTimes.length; i++) {
-			stats.worldTickTimes[i] = server.timeOfLastDimensionTick[i][tickCounter % 100];
+		if (statsProcessor == null && statsQueue.size() != 0) {
+			statsQueue.clear();
 		}
 		
-		// Save measurements and clear it for the next round.
-		stats.measurements = measurements.startNew();
-		
-		statsQueue.add(stats);
+		else if (statsProcessor != null) {
+			QueuedTickStats stats = new QueuedTickStats();
+			
+			stats.tickCounter = tickCounter;
+			stats.tickTime = server.tickTimeArray[tickCounter % 100];
+			stats.sentPacketCount = server.sentPacketCountArray[tickCounter % 100];
+			stats.sentPacketSize = server.sentPacketSizeArray[tickCounter % 100];
+			stats.receivedPacketCount = server.receivedPacketCountArray[tickCounter % 100];
+			stats.receivedPacketSize = server.receivedPacketSizeArray[tickCounter % 100];
+			
+			stats.worldTickTimes = new long[server.timeOfLastDimensionTick.length];
+			for (int i = 0; i < stats.worldTickTimes.length; i++) {
+				stats.worldTickTimes[i] = server.timeOfLastDimensionTick[i][tickCounter % 100];
+			}
+			
+			// Save measurements and clear it for the next round.
+			stats.measurements = measurements.startNew();
+			
+			statsQueue.add(stats);
+		}
 	}
 	
 	/**
 	 * Begin a measurement.
 	 */
 	public static void begin(Tick.Type type) {
-		measurements.begin(new Tick(type));
+		if (recordingStats)
+			measurements.begin(new Tick(type));
 	}
 	
 	/**
 	 * Begin a measurement for a specific world.
 	 */
 	public static void begin(Tick.Type type, World world) {
-		measurements.begin(new Tick(type, world));
+		if (recordingStats)
+			measurements.begin(new Tick(type, world));
 	}
 
 	/**
 	 * Begin a measurement for a specific entity tick in a world world.
 	 */
 	public static void begin(Tick.Type type, World world, NextTickListEntry entityTick) {
-		measurements.begin(new Tick(type, world, entityTick));
+		if (recordingStats)
+			measurements.begin(new Tick(type, world, entityTick));
 	}
 	
 	/**
 	 * End a measurement.
 	 */
 	public static void end() {
-		measurements.end();
+		if (recordingStats)
+			measurements.end();
 	}
 	
 	private static class QueuedTickStats {
