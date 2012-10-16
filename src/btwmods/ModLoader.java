@@ -298,24 +298,24 @@ public class ModLoader {
 		return new Settings();
 	}
 	
-	private static void outputError(String message) {
+	public static void outputError(String message) {
 		outputError(message, Level.WARNING);
 	}
 	
-	private static void outputError(String message, Level level) {
+	public static void outputError(String message, Level level) {
 		net.minecraft.server.MinecraftServer.logger.log(level, message);
 	}
 	
-	private static void outputError(Throwable throwable, String message) {
+	public static void outputError(Throwable throwable, String message) {
 		outputError(throwable, message, Level.WARNING);
 	}
 	
-	private static void outputError(Throwable throwable, String message, Level level) {
+	public static void outputError(Throwable throwable, String message, Level level) {
 		outputError(message, level);
 		throwable.printStackTrace(new PrintStream(System.out));
 	}
 	
-	private static void outputInfo(String message) {
+	public static void outputInfo(String message) {
 		net.minecraft.server.MinecraftServer.logger.info(message);
 	}
 	
