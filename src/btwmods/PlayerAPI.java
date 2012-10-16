@@ -50,7 +50,7 @@ public class PlayerAPI {
 	 * @param y coordinate of the block
 	 * @param z coordinate of the block
 	 */
-	public static void activatedBlock(EntityPlayer player, Block block, int x, int y, int z) {
+	public static void blockActivated(EntityPlayer player, Block block, int x, int y, int z) {
 		if (!listeners.isEmpty(IBlockListener.class)) {
 			BlockEvent event = BlockEvent.Activated(player, block, x, y, z);
 			((IBlockListener)listeners).blockActivated(event);
