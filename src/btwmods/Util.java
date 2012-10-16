@@ -5,7 +5,7 @@ import java.io.StringWriter;
 
 public class Util {
 	public static String getStackTrace() {
-		return getStackTrace(new new Throwable(""));
+		return getStackTrace(new Throwable(""));
 	}
 	
 	/**
