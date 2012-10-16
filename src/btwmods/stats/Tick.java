@@ -1,6 +1,6 @@
 package btwmods.stats;
 
-import btwmods.ModLoader;
+import btwmods.Util;
 import btwmods.measure.Measurement;
 import net.minecraft.src.Entity;
 import net.minecraft.src.NextTickListEntry;
@@ -24,7 +24,7 @@ public class Tick extends Measurement<Tick.Type> {
 	
 	public Tick(Type identifier, World world) {
 		super(identifier);
-		worldIndex = ModLoader.getWorldIndexFromDimension(world.provider.dimensionId);
+		worldIndex = Util.getWorldIndexFromDimension(world.provider.dimensionId);
 		blockTick = null;
 		entityTick = null;
 		tileEntityTick = null;
@@ -32,7 +32,7 @@ public class Tick extends Measurement<Tick.Type> {
 	
 	public Tick(Type identifier, World world, NextTickListEntry entry) {
 		super(identifier);
-		worldIndex = ModLoader.getWorldIndexFromDimension(world.provider.dimensionId);
+		worldIndex = Util.getWorldIndexFromDimension(world.provider.dimensionId);
 		blockTick = new BlockTick(entry);
 		entityTick = null;
 		tileEntityTick = null;
@@ -40,7 +40,7 @@ public class Tick extends Measurement<Tick.Type> {
 
 	public Tick(Type identifier, World world, Entity entity) {
 		super(identifier);
-		worldIndex = ModLoader.getWorldIndexFromDimension(world.provider.dimensionId);
+		worldIndex = Util.getWorldIndexFromDimension(world.provider.dimensionId);
 		blockTick = null;
 		entityTick = new EntityTick(entity);
 		tileEntityTick = null;
@@ -48,7 +48,7 @@ public class Tick extends Measurement<Tick.Type> {
 
 	public Tick(Type identifier, World world, TileEntity tileEntity) {
 		super(identifier);
-		worldIndex = ModLoader.getWorldIndexFromDimension(world.provider.dimensionId);
+		worldIndex = Util.getWorldIndexFromDimension(world.provider.dimensionId);
 		blockTick = null;
 		entityTick = null;
 		tileEntityTick = new TileEntityTick(tileEntity);
