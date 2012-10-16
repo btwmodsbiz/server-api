@@ -111,12 +111,16 @@ public class Average implements Comparable<Average> {
 		history[tick % resolution] += value;
 	}
 	
-	public static Average[] createInitializedArray(int size) {
+	public static Average[] createInitializedArray(int size, int resolution) {
 		Average[] averages = new Average[size];
 		for (int i = 0; i < size; i++) {
-			averages[i] = new Average();
+			averages[i] = new Average(resolution);
 		}
 		return averages;
+	}
+	
+	public static Average[] createInitializedArray(int size) {
+		return createInitializedArray(size, RESOLUTION);
 	}
 
 	@Override
