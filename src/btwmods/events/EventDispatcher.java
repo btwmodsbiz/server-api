@@ -38,7 +38,7 @@ public interface EventDispatcher {
 	 * Queue a listener to be added before any action that would read or change the listener list.
 	 * Use this if you are adding queues to this EventDispatcher from another thread.
 	 * 
-	 * @see {@link #addListener(IAPIListener)}
+	 * @see #addListener(IAPIListener)
 	 * @throws IllegalArgumentException
 	 */
 	public void queuedAddListener(IAPIListener listener) throws IllegalArgumentException;
@@ -47,7 +47,7 @@ public interface EventDispatcher {
 	 * Queue a listener to be added before any action that would read or change the listener list.
 	 * Use this if you are adding queues to this EventDispatcher from another thread.
 	 * 
-	 * @see {@link #addListener(IAPIListener, Class)}
+	 * @see #addListener(IAPIListener, Class)
 	 * @throws IllegalArgumentException
 	 */
 	public void queuedAddListener(IAPIListener listener, Class listenerClass) throws IllegalArgumentException;
@@ -56,7 +56,7 @@ public interface EventDispatcher {
 	 * Queue a listener to be removed before any action that would read or change the listener list.
 	 * Use this if you are removing queues to this EventDispatcher from another thread.
 	 * 
-	 * @see {@link #addListener(IAPIListener)}
+	 * @see EventDispatcher#addListener(IAPIListener)
 	 * @throws IllegalArgumentException
 	 */
 	public void queuedRemoveListener(IAPIListener listener) throws IllegalArgumentException;
@@ -65,7 +65,7 @@ public interface EventDispatcher {
 	 * Queue a listener to be removed before any action that would read or change the listener list.
 	 * Use this if you are removing queues to this EventDispatcher from another thread.
 	 * 
-	 * @see {@link #addListener(IAPIListener, Class)}
+	 * @see #addListener(IAPIListener, Class)
 	 * @throws IllegalArgumentException
 	 */
 	public void queuedRemoveListener(IAPIListener listener, Class listenerClass) throws IllegalArgumentException;

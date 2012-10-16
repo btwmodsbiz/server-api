@@ -9,8 +9,9 @@ public class Util {
 	}
 	
 	/**
-	 * @link http://stackoverflow.com/a/1069342
+	 * @see <a href="http://stackoverflow.com/a/1069342">Original source</a>
 	 */
+	@SuppressWarnings("javadoc")
 	public static String getStackTrace(Throwable e) {
 		StringWriter sw = new StringWriter();
 		printStackTrace(new PrintWriter(sw));

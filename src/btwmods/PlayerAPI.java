@@ -53,8 +53,6 @@ public class PlayerAPI {
 	 * Handle a successful block activation.
 	 * 
 	 * @see net.minecraft.src.ItemInWorldManager#activateBlockOrUseItem(EntityPlayer, World, ItemStack, int, int, int, int, float, float, float)
-	 * @param world
-	 * @param heldItemStack
 	 * @param block
 	 * @param x coordinate of the block
 	 * @param y coordinate of the block

@@ -45,8 +45,8 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	/**
 	 * Create a new event dispatcher that implements the methods defined in an array of interfaces.
 	 * 
-	 * @param an array of interfaces that will implemented on the returned proxy.
-	 * @return a proxy that implements all the supplied interfaces.
+	 * @param  interfaces An array of interfaces that will implemented on the returned proxy.
+	 * @return A proxy that implements all the supplied interfaces.
 	 */
 	public static EventDispatcher create(Class<IAPIListener>[] interfaces) {
 		return create(interfaces, null);
@@ -56,9 +56,9 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	 * Create a new event dispatcher that implements the methods defined in an array of interfaces.
 	 * EventObject parameters in those methods will be first processed by an event preprocessor.
 	 * 
-	 * @param an array of interfaces that will implemented on the returned proxy.
-	 * @param preprocessor EventObject parameters in the interfaces' methods will be first processed by this.
-	 * @return a proxy that implements all the supplied interfaces.
+	 * @param interfaces An array of interfaces that will implemented on the returned proxy.
+	 * @param invocationWrapper EventObject parameters in the interfaces' methods will be first processed by this.
+	 * @return A proxy that implements all the supplied interfaces.
 	 */
 	public static EventDispatcher create(Class<IAPIListener>[] interfaces, IInvocationWrapper invocationWrapper) {
 		if (interfaces == null || interfaces.length == 0)
@@ -114,7 +114,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 	
 	/**
-	 * @see {@link EventDispatcher#addListener(IAPIListener)}
+	 * @see EventDispatcher#addListener(IAPIListener)
 	 */
 	public void addListener(IAPIListener listener) {
 		isValidArgument(listener);
@@ -127,7 +127,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 
 	/**
-	 * @see {@link EventDispatcher#addListener(IAPIListener, Class)}
+	 * @see EventDispatcher#addListener(IAPIListener, Class)
 	 */
 	public boolean addListener(IAPIListener listener, Class listenerClass) throws IllegalArgumentException {
 		return checkIsSupportedListener(listener, listenerClass) && listenerClass.isAssignableFrom(proxy.getClass())
@@ -139,7 +139,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 	
 	/**
-	 * @see {@link EventDispatcher#queuedAddListener(IAPIListener)}
+	 * @see EventDispatcher#queuedAddListener(IAPIListener)
 	 */
 	public void queuedAddListener(IAPIListener listener) {
 		isValidArgument(listener);
@@ -147,7 +147,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 	
 	/**
-	 * @see {@link EventDispatcher#queuedAddListener(IAPIListener, Class)}
+	 * @see EventDispatcher#queuedAddListener(IAPIListener, Class)
 	 */
 	public void queuedAddListener(IAPIListener listener, Class listenerClass) {
 		if (checkIsSupportedListener(listener, listenerClass)) {
@@ -156,7 +156,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 
 	/**
-	 * @see {@link EventDispatcher#removeListener(IAPIListener)}
+	 * @see EventDispatcher#removeListener(IAPIListener)
 	 */
 	public void removeListener(IAPIListener listener) {
 		isValidArgument(listener);
@@ -169,7 +169,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 
 	/**
-	 * @see {@link EventDispatcher#removeListener(IAPIListener, Class)}
+	 * @see EventDispatcher#removeListener(IAPIListener, Class)
 	 */
 	public boolean removeListener(IAPIListener listener, Class listenerClass) throws IllegalArgumentException {
 		return checkIsSupportedListener(listener, listenerClass) && listenerClass.isAssignableFrom(proxy.getClass())
@@ -181,7 +181,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 
 	/**
-	 * @see {@link EventDispatcher#queuedRemoveListener(IAPIListener)}
+	 * @see EventDispatcher#queuedRemoveListener(IAPIListener)
 	 */
 	public void queuedRemoveListener(IAPIListener listener) {
 		isValidArgument(listener);
@@ -189,7 +189,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 
 	/**
-	 * @see {@link EventDispatcher#queuedRemoveListener(IAPIListener, Class)}
+	 * @see EventDispatcher#queuedRemoveListener(IAPIListener, Class)
 	 */
 	public void queuedRemoveListener(IAPIListener listener, Class listenerClass) {
 		if (checkIsSupportedListener(listener, listenerClass)) {
