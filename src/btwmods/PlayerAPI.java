@@ -52,11 +52,12 @@ public class PlayerAPI {
 	/**
 	 * Handle a successful block activation.
 	 * 
-	 * @see net.minecraft.src.ItemInWorldManager#activateBlockOrUseItem(EntityPlayer, World, ItemStack, int, int, int, int, float, float, float)
-	 * @param block
+	 * @param player The player that activated the block.
+	 * @param block The block that was activated.
 	 * @param x coordinate of the block
 	 * @param y coordinate of the block
 	 * @param z coordinate of the block
+	 * @see net.minecraft.src.ItemInWorldManager#activateBlockOrUseItem(EntityPlayer, World, ItemStack, int, int, int, int, float, float, float)
 	 */
 	public static void blockActivated(EntityPlayer player, Block block, int x, int y, int z) {
 		if (!listeners.isEmpty(IBlockListener.class)) {
@@ -89,8 +90,10 @@ public class PlayerAPI {
 	
 	/**
 	 * Player purposefully drops an item.
-	 * @param itemStack
-	 * @param mouseButton
+	 * 
+	 * @param player The player that dropped the item.
+	 * @param itemStack The items that were dropped.
+	 * @param mouseButton The mouse button that was used: 0 for left, 1 for right.
 	 */
 	public static void itemDropped(EntityPlayer player, ItemStack itemStack, int mouseButton) {
 		if (!listeners.isEmpty(IDropListener.class)) {
@@ -107,7 +110,9 @@ public class PlayerAPI {
 	
 	/**
 	 * An item is dropped from a player's inventory for any reason (purposefully drops an item or closed a crafting window).
-	 * @param items
+	 * 
+	 * @param player The player that ejected the items.
+	 * @param items The items ejected.
 	 */
 	public static void itemEjected(EntityPlayer player, ItemStack items) {
 		if (!listeners.isEmpty(IDropListener.class)) {
@@ -118,6 +123,8 @@ public class PlayerAPI {
 	
 	/**
 	 * All player items are dropped.
+	 * 
+	 * @param player The player that dropped the items.
 	 */
 	public static void itemsDroppedAll(EntityPlayer player) {
 		if (!listeners.isEmpty(IDropListener.class)) {
@@ -169,6 +176,7 @@ public class PlayerAPI {
 	}
 
 	/**
+	 * @param oldPlayerInstance The old instance of {@link EntityPlayer} that is being recreated.
 	 * @return true if the event has been handled and no others (e.g. hardcore spawning handler) should be called.
 	 */
 	public static RespawnPosition handleRespawn(EntityPlayer oldPlayerInstance) {

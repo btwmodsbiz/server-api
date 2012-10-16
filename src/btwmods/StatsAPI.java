@@ -111,6 +111,7 @@ public class StatsAPI {
 	
 	/**
 	 * Begin a measurement.
+	 * @param type The type of measurement to begin.
 	 */
 	public static void begin(Tick.Type type) {
 		if (doingMeasurements)
@@ -119,6 +120,8 @@ public class StatsAPI {
 	
 	/**
 	 * Begin a measurement for a specific world.
+	 * @param type The type of measurement to begin.
+	 * @param world The world the measurement is taking place in.
 	 */
 	public static void begin(Tick.Type type, World world) {
 		if (doingMeasurements)
@@ -127,6 +130,9 @@ public class StatsAPI {
 
 	/**
 	 * Begin a measurement for a specific block tick in a world.
+	 * @param type The type of measurement to begin.
+	 * @param world The world the measurement is taking place in.
+	 * @param entityTick The {@link NextTickListEntry} entry that is being measured.
 	 */
 	public static void begin(Tick.Type type, World world, NextTickListEntry entityTick) {
 		if (doingMeasurements)

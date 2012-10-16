@@ -79,6 +79,8 @@ public class ModLoader {
 	
 	/**
 	 * Return if the current thread is the same one that ModLoader was initialized in.
+	 * 
+	 * @return true if the current thread is the same ModLoader was initialized in; false otherwise.
 	 */
 	public static boolean inInitThread() {
 		return Thread.currentThread() == thread;
