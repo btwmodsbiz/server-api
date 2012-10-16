@@ -224,182 +224,197 @@ public class StatsAPI {
 		@Override
 		public void run() {
 			
-			boolean doingDetailedStats = detailedMeasurementsEnabled;
-			int tickCounter = 0;
-			ServerStats serverStats = new ServerStats();
-			WorldStats[] worldStats = null;
+			// TODO: catch Throwables and mark thread as failed and stopped.
 			
-			while (statsProcessor == this) {
+			try {
+			
+				boolean doingDetailedStats = detailedMeasurementsEnabled;
+				int tickCounter = 0;
+				ServerStats serverStats = new ServerStats();
+				WorldStats[] worldStats = null;
 				
-				// Stop if the thread if there are no listeners.
-				if (listeners.isEmpty(IStatsListener.class)) {
-					statsProcessor = null;
-				}
-				else {
+				while (statsProcessor == this) {
 					
-					// Reset the detailed stats if the setting for that has changed.
-					if (doingDetailedStats != detailedMeasurementsEnabled || worldStats == null) {
-						doingDetailedStats = detailedMeasurementsEnabled;
-						
-						serverStats = new ServerStats();
-						
-						// Initialize per-world stats.
-						worldStats = new WorldStats[MinecraftServer.getServer().worldServers.length];
-						for (int i = 0; i < worldStats.length; i++) {
-							worldStats[i] = new WorldStats();
-						}
+					// Stop if the thread if there are no listeners.
+					if (listeners.isEmpty(IStatsListener.class)) {
+						statsProcessor = null;
 					}
-					
-					long polled = 0;
-					long threadStart = System.nanoTime();
-					
-					// Process all the queued tick stats.
-					QueuedTickStats stats;
-					while ((stats = statsQueue.poll()) != null) {
-						polled++;
-						tickCounter = stats.tickCounter;
+					else {
 						
-						serverStats.tickTime.record(stats.tickTime);
-						serverStats.sentPacketCount.record(stats.sentPacketCount);
-						serverStats.sentPacketSize.record(stats.sentPacketSize);
-						serverStats.receivedPacketCount.record(stats.receivedPacketCount);
-						serverStats.receivedPacketSize.record(stats.receivedPacketSize);
-						
-						for (int i = 0; i < worldStats.length; i++) {
-							worldStats[i].worldTickTime.record(stats.worldTickTimes[i]);
-
-							// Reset the measurement entries to 0.
-							worldStats[i].measurementQueue.resetCurrent();
-							worldStats[i].mobSpawning.resetCurrent();
-							worldStats[i].blockTick.resetCurrent();
-							worldStats[i].tickBlocksAndAmbiance.resetCurrent();
-							worldStats[i].tickBlocksAndAmbianceSuper.resetCurrent();
-							worldStats[i].entities.resetCurrent();
-							worldStats[i].timeSync.resetCurrent();
-							worldStats[i].buildActiveChunkSet.resetCurrent();
-							worldStats[i].checkPlayerLight.resetCurrent();
+						// Reset the detailed stats if the setting for that has changed.
+						if (doingDetailedStats != detailedMeasurementsEnabled || worldStats == null) {
+							doingDetailedStats = detailedMeasurementsEnabled;
 							
-							// Reset the ChunkStats.
-							Iterator<Map.Entry<ChunkCoordIntPair, ChunkStats>> chunkStatsIterator = worldStats[i].chunkStats.entrySet().iterator();
-							while (chunkStatsIterator.hasNext()) {
-								Map.Entry<ChunkCoordIntPair, ChunkStats> entry = chunkStatsIterator.next();
-								
-								if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
-									chunkStatsIterator.remove();
-								}
-								else {
-									entry.getValue().resetCurrent();
-								}
-							}
+							serverStats = new ServerStats();
 							
-							// Reset the EntityStats.
-							Iterator<Map.Entry<Class, EntityStats>> entityStatsIterator = worldStats[i].entityStats.entrySet().iterator();
-							while (entityStatsIterator.hasNext()) {
-								Map.Entry<Class, EntityStats> entry = entityStatsIterator.next();
-								
-								if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
-									entityStatsIterator.remove();
-								}
-								else {
-									entry.getValue().resetCurrent();
-								}
+							// Initialize per-world stats.
+							worldStats = new WorldStats[MinecraftServer.getServer().worldServers.length];
+							for (int i = 0; i < worldStats.length; i++) {
+								worldStats[i] = new WorldStats();
 							}
 						}
 						
-						// Add the time taken by each measurement type.
-						Tick tick;
-						while ((tick = stats.measurements.poll()) != null) {
-							ChunkCoordIntPair coords = null;
+						long polled = 0;
+						long threadStart = System.nanoTime();
+						
+						// Process all the queued tick stats.
+						QueuedTickStats stats;
+						while ((stats = statsQueue.poll()) != null) {
+							polled++;
+							tickCounter = stats.tickCounter;
 							
-							worldStats[tick.worldIndex].measurementQueue.incrementCurrent(1);
+							serverStats.tickTime.record(stats.tickTime);
+							serverStats.sentPacketCount.record(stats.sentPacketCount);
+							serverStats.sentPacketSize.record(stats.sentPacketSize);
+							serverStats.receivedPacketCount.record(stats.receivedPacketCount);
+							serverStats.receivedPacketSize.record(stats.receivedPacketSize);
 							
-							switch (tick.identifier) {
+							for (int i = 0; i < worldStats.length; i++) {
+								worldStats[i].worldTickTime.record(stats.worldTickTimes[i]);
+	
+								// Reset the measurement entries to 0.
+								worldStats[i].measurementQueue.resetCurrent();
+								worldStats[i].mobSpawning.resetCurrent();
+								worldStats[i].blockTick.resetCurrent();
+								worldStats[i].tickBlocksAndAmbiance.resetCurrent();
+								worldStats[i].tickBlocksAndAmbianceSuper.resetCurrent();
+								worldStats[i].entities.resetCurrent();
+								worldStats[i].timeSync.resetCurrent();
+								worldStats[i].buildActiveChunkSet.resetCurrent();
+								worldStats[i].checkPlayerLight.resetCurrent();
 								
-								case mobSpawning:
-									worldStats[tick.worldIndex].mobSpawning.incrementCurrent(tick.getTime());
-									break;
+								// Reset the ChunkStats.
+								Iterator<Map.Entry<ChunkCoordIntPair, ChunkStats>> chunkStatsIterator = worldStats[i].chunkStats.entrySet().iterator();
+								while (chunkStatsIterator.hasNext()) {
+									Map.Entry<ChunkCoordIntPair, ChunkStats> entry = chunkStatsIterator.next();
 									
-								case tickBlocksAndAmbiance:
-									worldStats[tick.worldIndex].tickBlocksAndAmbiance.incrementCurrent(tick.getTime());
-									break;
-									
-								case tickBlocksAndAmbianceSuper:
-									worldStats[tick.worldIndex].tickBlocksAndAmbianceSuper.incrementCurrent(tick.getTime());
-									break;
-									
-								case blockTick:
-									worldStats[tick.worldIndex].blockTick.incrementCurrent(tick.getTime());
-									coords = new ChunkCoordIntPair(tick.blockTick.chunkX, tick.blockTick.chunkZ);
-									break;
-									
-								case entities:
-									worldStats[tick.worldIndex].entities.incrementCurrent(tick.getTime());
-									break;
-									
-								case timeSync:
-									worldStats[tick.worldIndex].timeSync.incrementCurrent(tick.getTime());
-									break;
-									
-								case buildActiveChunkSet:
-									worldStats[tick.worldIndex].buildActiveChunkSet.incrementCurrent(tick.getTime());
-									break;
-									
-								case checkPlayerLight:
-									worldStats[tick.worldIndex].checkPlayerLight.incrementCurrent(tick.getTime());
-									break;
-									
-								case regularentity:
-									coords = new ChunkCoordIntPair(tick.entityTick.chunkX, tick.entityTick.chunkZ);
-									
-
-									EntityStats entityStats = worldStats[tick.worldIndex].entityStats.get(tick.entityTick.entity);
-									if (entityStats == null) {
-										worldStats[tick.worldIndex].entityStats.put(tick.entityTick.entity, entityStats = new EntityStats(tick.entityTick.entity));
-										entityStats.tickTime.record(tick.getTime());
+									if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
+										chunkStatsIterator.remove();
 									}
 									else {
-										entityStats.tickTime.incrementCurrent(tick.getTime());
+										entry.getValue().resetCurrent();
 									}
-									
-									entityStats.entityCount++;
-									
-									break;
-									
-								case tileentity:
-									coords = new ChunkCoordIntPair(tick.tileEntityTick.chunkX, tick.tileEntityTick.chunkZ);
-									break;
-							}
-							
-							// Get the average for this chunk and increment it.
-							if (coords != null) {
-								ChunkStats chunkStats = worldStats[tick.worldIndex].chunkStats.get(coords);
-								if (chunkStats == null) {
-									worldStats[tick.worldIndex].chunkStats.put(coords, chunkStats = new ChunkStats());
-									chunkStats.tickTime.record(tick.getTime());
-								}
-								else {
-									chunkStats.tickTime.incrementCurrent(tick.getTime());
 								}
 								
-								if (tick.identifier == Type.regularentity)
-									chunkStats.entityCount++;
+								// Reset the EntityStats.
+								Iterator<Map.Entry<Class, EntityStats>> entityStatsIterator = worldStats[i].entityStats.entrySet().iterator();
+								while (entityStatsIterator.hasNext()) {
+									Map.Entry<Class, EntityStats> entry = entityStatsIterator.next();
+									
+									if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
+										entityStatsIterator.remove();
+									}
+									else {
+										entry.getValue().resetCurrent();
+									}
+								}
+							}
+							
+							// Add the time taken by each measurement type.
+							Tick tick;
+							while ((tick = stats.measurements.poll()) != null) {
+								ChunkCoordIntPair coords = null;
+								
+								worldStats[tick.worldIndex].measurementQueue.incrementCurrent(1);
+								
+								switch (tick.identifier) {
+									
+									case mobSpawning:
+										worldStats[tick.worldIndex].mobSpawning.incrementCurrent(tick.getTime());
+										break;
+										
+									case tickBlocksAndAmbiance:
+										worldStats[tick.worldIndex].tickBlocksAndAmbiance.incrementCurrent(tick.getTime());
+										break;
+										
+									case tickBlocksAndAmbianceSuper:
+										worldStats[tick.worldIndex].tickBlocksAndAmbianceSuper.incrementCurrent(tick.getTime());
+										break;
+										
+									case blockTick:
+										worldStats[tick.worldIndex].blockTick.incrementCurrent(tick.getTime());
+										coords = new ChunkCoordIntPair(tick.blockTick.chunkX, tick.blockTick.chunkZ);
+										break;
+										
+									case entities:
+										worldStats[tick.worldIndex].entities.incrementCurrent(tick.getTime());
+										break;
+										
+									case timeSync:
+										worldStats[tick.worldIndex].timeSync.incrementCurrent(tick.getTime());
+										break;
+										
+									case buildActiveChunkSet:
+										worldStats[tick.worldIndex].buildActiveChunkSet.incrementCurrent(tick.getTime());
+										break;
+										
+									case checkPlayerLight:
+										worldStats[tick.worldIndex].checkPlayerLight.incrementCurrent(tick.getTime());
+										break;
+										
+									case regularentity:
+										coords = new ChunkCoordIntPair(tick.entityTick.chunkX, tick.entityTick.chunkZ);
+										
+	
+										EntityStats entityStats = worldStats[tick.worldIndex].entityStats.get(tick.entityTick.entity);
+										if (entityStats == null) {
+											worldStats[tick.worldIndex].entityStats.put(tick.entityTick.entity, entityStats = new EntityStats(tick.entityTick.entity));
+											entityStats.tickTime.record(tick.getTime());
+										}
+										else {
+											entityStats.tickTime.incrementCurrent(tick.getTime());
+										}
+										
+										entityStats.entityCount++;
+										
+										break;
+										
+									case tileentity:
+										coords = new ChunkCoordIntPair(tick.tileEntityTick.chunkX, tick.tileEntityTick.chunkZ);
+										break;
+								}
+								
+								// Get the average for this chunk and increment it.
+								if (coords != null) {
+									ChunkStats chunkStats = worldStats[tick.worldIndex].chunkStats.get(coords);
+									if (chunkStats == null) {
+										worldStats[tick.worldIndex].chunkStats.put(coords, chunkStats = new ChunkStats());
+										chunkStats.tickTime.record(tick.getTime());
+									}
+									else {
+										chunkStats.tickTime.incrementCurrent(tick.getTime());
+									}
+									
+									if (tick.identifier == Type.regularentity)
+										chunkStats.entityCount++;
+								}
+							}
+						}
+						
+						serverStats.statsThreadTime.record(System.nanoTime() - threadStart);
+						serverStats.statsThreadQueueCount.record(polled);
+						
+						// Make sure the thread should still should be running.
+						if (statsProcessor == this) {
+							
+							// Run all the listeners.
+							StatsEvent event = new StatsEvent(MinecraftServer.getServer(), tickCounter, serverStats, worldStats);
+							((IStatsListener)listeners).statsAction(event);
+	
+							try {
+								Thread.sleep(40L);
+							} catch (InterruptedException e) {
+								
 							}
 						}
 					}
-					
-					serverStats.statsThreadTime.record(System.nanoTime() - threadStart);
-					serverStats.statsThreadQueueCount.record(polled);
-					
-					// Run all the listeners.
-					StatsEvent event = new StatsEvent(MinecraftServer.getServer(), tickCounter, serverStats, worldStats);
-					((IStatsListener)listeners).statsAction(event);
-
-					try {
-						Thread.sleep(40L);
-					} catch (InterruptedException e) {
-						
-					}
 				}
+			}
+			catch (Throwable e) {
+				ModLoader.outputError(e, "StatsAPI thread failed (" + e.getClass().getSimpleName() + "): " + e.getMessage());
+				
+				if (statsProcessor == this)
+					statsProcessor = null;
 			}
 		}
 	}
