@@ -16,18 +16,24 @@ import net.minecraft.src.CommandHandler;
 import btwmods.IMod;
 import btwmods.StatsAPI;
 import btwmods.StatsAPI.StatsProcessor.ChunkStats;
+import btwmods.StatsAPI.StatsProcessor.EntityStats;
 import btwmods.io.Settings;
 import btwmods.measure.Average;
 import btwmods.network.CustomPacketEvent;
 import btwmods.network.INetworkListener;
+import btwmods.player.IInstanceListener;
+import btwmods.player.InstanceEvent;
 import btwmods.stats.ChunkStatsComparator;
+import btwmods.stats.EntityStatsComparator;
 import btwmods.stats.IStatsListener;
 import btwmods.stats.StatsEvent;
 import btwmods.stats.ChunkStatsComparator.Stat;
 import btwmods.util.BasicFormatter;
 
-public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener {
+public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener, IInstanceListener {
 
+	private static int topNumber = 20;
+	private static String publicLink = null;
 	private static File htmlFile = new File(new File("."), "stats.html");
     private static final DecimalFormat decimalFormat = new DecimalFormat("########0.000");
 	
@@ -51,6 +57,9 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 		lastStatsTime = System.currentTimeMillis();
 		
 		// Load settings
+		if (settings.hasKey("publiclink") && !(new File(settings.get("publiclink")).isDirectory())) {
+			publicLink = settings.get("publiclink");
+		}
 		if (settings.hasKey("htmlfile") && !(new File(settings.get("htmlfile")).isDirectory())) {
 			htmlFile = new File(settings.get("htmlfile"));
 		}
@@ -194,18 +203,18 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			
 				List<Map.Entry<ChunkCoordIntPair, ChunkStats>> chunkEntries = new ArrayList<Map.Entry<ChunkCoordIntPair, ChunkStats>>(event.worldStats[0].chunkStats.entrySet());
 	
-				html.append("<h2>Top 10 Chunks</h2>");
+				html.append("<h2>Top " + topNumber + ":</h2>");
 				
-				html.append("<table border=\"0\"><thead><tr><th>By Tick Time</th><th>By Entity Count</th></tr></thead><tbody><tr><td>");
+				html.append("<table border=\"0\"><thead><tr><th>Chunks By Tick Time</th><th>Chunks By Entity Count</th><th>Entities By Tick Time</th><th>Entities By Count</th></tr></thead><tbody><tr><td valign=\"top\">");
 	
 				{
 					Collections.sort(chunkEntries, new ChunkStatsComparator<ChunkCoordIntPair>(Stat.TICKTIME, true));
 					html.append("<table border=\"0\"><thead><tr><th>Chunk</th><th>Tick Time</th><th>Entities</th></tr></thead><tbody>");
 					double chunksTotal = 0;
+					int entitiesTotal = 0;
 					int displayed = 0;
-					//html.append("<table border=\"0\"><tbody>");
 					for (int i = 0; i < chunkEntries.size(); i++) {
-						if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= 10) {
+						if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
 							displayed++;
 							html.append("<tr><td>").append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos)
 									.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
@@ -214,22 +223,23 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 						}
 	
 						chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();
+						entitiesTotal += chunkEntries.get(i).getValue().entityCount;
 					}
 	
-					html.append("<tr><td>&nbsp;</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td></tr>");
+					html.append("<tr><td>Totals</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
 					html.append("</tbody></table>");
 				}
 				
-				html.append("</td><td>");
+				html.append("</td><td valign=\"top\">");
 	
 				{
 					Collections.sort(chunkEntries, new ChunkStatsComparator<ChunkCoordIntPair>(Stat.ENTITIES, true));
 					html.append("<table border=\"0\"><thead><tr><th>Chunk</th><th>Tick Time</th><th>Entities</th></tr></thead><tbody>");
 					double chunksTotal = 0;
 					int displayed = 0;
-					//html.append("<table border=\"0\"><tbody>");
+					int entitiesTotal = 0;
 					for (int i = 0; i < chunkEntries.size(); i++) {
-						if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= 10) {
+						if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
 							displayed++;
 							html.append("<tr><td>").append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos)
 									.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
@@ -238,9 +248,58 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 						}
 	
 						chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();
+						entitiesTotal += chunkEntries.get(i).getValue().entityCount;
 					}
 	
-					html.append("<tr><td>&nbsp;</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td></tr>");
+					html.append("<tr><td>Totals</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
+					html.append("</tbody></table>");
+				}
+
+				List<Map.Entry<Class, EntityStats>> entityEntries = new ArrayList<Map.Entry<Class, EntityStats>>(event.worldStats[0].entityStats.entrySet());
+				
+				html.append("</td><td valign=\"top\">");
+	
+				{
+					Collections.sort(entityEntries, new EntityStatsComparator<Class>(EntityStatsComparator.Stat.TICKTIME, true));
+					html.append("<table border=\"0\"><thead><tr><th>Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
+					double entitiesTotal = 0;
+					int displayed = 0;
+					for (int i = 0; i < entityEntries.size(); i++) {
+						if (entityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
+							displayed++;
+							html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
+									.append("</td><td>").append(decimalFormat.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+									.append(" ms</td><td>").append(entityEntries.get(i).getValue().entityCount)
+									.append("</td></tr>");
+						}
+	
+						entitiesTotal += entityEntries.get(i).getValue().tickTime.getAverage();
+					}
+	
+					html.append("<tr><td>Totals</td><td colspan=\"2\">").append(decimalFormat.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
+					html.append("</tbody></table>");
+				}
+				
+				html.append("</td><td valign=\"top\">");
+	
+				{
+					Collections.sort(entityEntries, new EntityStatsComparator<Class>(EntityStatsComparator.Stat.ENTITIES, true));
+					html.append("<table border=\"0\"><thead><tr><th>Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
+					double entitiesTotal = 0;
+					int displayed = 0;
+					for (int i = 0; i < entityEntries.size(); i++) {
+						if (entityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
+							displayed++;
+							html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
+									.append("</td><td>").append(decimalFormat.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+									.append(" ms</td><td>").append(entityEntries.get(i).getValue().entityCount)
+									.append("</td></tr>");
+						}
+	
+						entitiesTotal += entityEntries.get(i).getValue().tickTime.getAverage();
+					}
+	
+					html.append("<tr><td>Totals</td><td colspan=\"2\">").append(decimalFormat.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
 					html.append("</tbody></table>");
 				}
 	
@@ -284,5 +343,11 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 	public void customPacketAction(CustomPacketEvent event) {
 		// TODO: remove debug throw
 		throw new IllegalArgumentException();
+	}
+
+	@Override
+	public void instanceAction(InstanceEvent event) {
+		if (publicLink != null && event.getType() == InstanceEvent.TYPE.LOGIN)
+			event.getPlayerInstance().sendChatToPlayer("Tick stats are available at " + publicLink);
 	}
 }
