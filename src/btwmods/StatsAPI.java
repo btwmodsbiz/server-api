@@ -186,6 +186,7 @@ public class StatsAPI {
 			public final Average buildActiveChunkSet = new Average();
 			public final Average checkPlayerLight = new Average();
 			public final Map<ChunkCoordIntPair, ChunkStats> chunkStats = new LinkedHashMap<ChunkCoordIntPair, ChunkStats>();
+			public final Map<Class, EntityStats> entityStats = new LinkedHashMap<Class, EntityStats>();
 		}
 		
 		public static class ChunkStats {
@@ -195,6 +196,23 @@ public class StatsAPI {
 			public ChunkStats() {
 				tickTime = new Average();
 				entityCount = 0;
+			}
+			
+			public void resetCurrent() {
+				tickTime.resetCurrent();
+				entityCount = 0;
+			}
+		}
+		
+		public static class EntityStats {
+			public final Average tickTime;
+			public final Class entity;
+			public int entityCount;
+			
+			public EntityStats(Class entity) {
+				tickTime = new Average();
+				entityCount = 0;
+				this.entity= entity; 
 			}
 			
 			public void resetCurrent() {
@@ -261,16 +279,29 @@ public class StatsAPI {
 							worldStats[i].buildActiveChunkSet.resetCurrent();
 							worldStats[i].checkPlayerLight.resetCurrent();
 							
-							// Reset the tick time by chunk measurements to 0.
-							Iterator<Map.Entry<ChunkCoordIntPair, ChunkStats>> iterator = worldStats[i].chunkStats.entrySet().iterator();
-							while (iterator.hasNext()) {
-								Map.Entry<ChunkCoordIntPair, ChunkStats> chunkEntry = iterator.next();
+							// Reset the ChunkStats.
+							Iterator<Map.Entry<ChunkCoordIntPair, ChunkStats>> chunkStatsIterator = worldStats[i].chunkStats.entrySet().iterator();
+							while (chunkStatsIterator.hasNext()) {
+								Map.Entry<ChunkCoordIntPair, ChunkStats> entry = chunkStatsIterator.next();
 								
-								if (chunkEntry.getValue().tickTime.getAverage() == 0 && chunkEntry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
-									iterator.remove();
+								if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
+									chunkStatsIterator.remove();
 								}
 								else {
-									chunkEntry.getValue().resetCurrent();
+									entry.getValue().resetCurrent();
+								}
+							}
+							
+							// Reset the EntityStats.
+							Iterator<Map.Entry<Class, EntityStats>> entityStatsIterator = worldStats[i].entityStats.entrySet().iterator();
+							while (entityStatsIterator.hasNext()) {
+								Map.Entry<Class, EntityStats> entry = entityStatsIterator.next();
+								
+								if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
+									entityStatsIterator.remove();
+								}
+								else {
+									entry.getValue().resetCurrent();
 								}
 							}
 						}
@@ -319,6 +350,19 @@ public class StatsAPI {
 									
 								case regularentity:
 									coords = new ChunkCoordIntPair(tick.entityTick.chunkX, tick.entityTick.chunkZ);
+									
+
+									EntityStats entityStats = worldStats[tick.worldIndex].entityStats.get(tick.entityTick.entity);
+									if (entityStats == null) {
+										worldStats[tick.worldIndex].entityStats.put(tick.entityTick.entity, entityStats = new EntityStats(tick.entityTick.entity));
+										entityStats.tickTime.record(tick.getTime());
+									}
+									else {
+										entityStats.tickTime.incrementCurrent(tick.getTime());
+									}
+									
+									entityStats.entityCount++;
+									
 									break;
 									
 								case tileentity:

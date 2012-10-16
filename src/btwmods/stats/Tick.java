@@ -86,6 +86,7 @@ public class Tick extends Measurement<Tick.Type> {
 	}
 	
 	public class EntityTick {
+		public final Class entity;
 		public final int x;
 		public final int y;
 		public final int z;
@@ -93,6 +94,7 @@ public class Tick extends Measurement<Tick.Type> {
 		public final int chunkZ;
 
 		private EntityTick(Entity entity) {
+			this.entity = entity.getClass();
 			x = (int)entity.posX;
 			y = (int)entity.posY;
 			z = (int)entity.posZ;
