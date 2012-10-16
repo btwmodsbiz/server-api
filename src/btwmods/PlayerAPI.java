@@ -38,6 +38,16 @@ public class PlayerAPI {
 	public static void removeListener(IAPIListener listener) {
 		listeners.removeListener(listener);
 	}
+
+	public static boolean blockActivationAttempt(EntityPlayer player, Block block, int x, int y, int z) {
+		if (!listeners.isEmpty(IBlockListener.class)) {
+			BlockEvent event = BlockEvent.ActivationAttempt(player, block, x, y, z);
+			((IBlockListener)listeners).blockActivationAttempt(event);
+			return event.isActivationHandled();
+		}
+		
+		return false;
+	}
 	
 	/**
 	 * Handle a successful block activation.
