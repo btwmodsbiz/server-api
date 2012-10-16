@@ -31,10 +31,10 @@ public class MonitorCommand extends CommandBase {
 
 	@Override
 	public void processCommand(ICommandSender sender, String[] args) {
-		if (args.length == 0 || args[0].toLowerCase() == "status") {
+		if (args.length == 0 || args[0].equalsIgnoreCase("status")) {
 			sender.sendChatToPlayer(mod.getName() + " is " + (mod.isRunning() ? "on" : "off") + ".");
 		}
-		else if (args[0].toLowerCase().equals("on")) {
+		else if (args[0].equalsIgnoreCase("on")) {
 			if (mod.isRunning()) {
 				sender.sendChatToPlayer(mod.getName() + " is already on.");
 			}
@@ -43,7 +43,7 @@ public class MonitorCommand extends CommandBase {
 				sender.sendChatToPlayer(mod.getName() + " is now on.");
 			}
 		}
-		else if (args[0].toLowerCase().equals("off")) {
+		else if (args[0].equalsIgnoreCase("off")) {
 			if (mod.isRunning()) {
 				mod.setIsRunning(false);
 				sender.sendChatToPlayer(mod.getName() + " is now off.");

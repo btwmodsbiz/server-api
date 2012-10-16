@@ -47,9 +47,10 @@ public class Settings {
 	}
 	
 	public boolean isBoolean(String key) {
-		if (settings.containsKey(key)) { 
+		if (settings.containsKey(key)) {
 			String setting = settings.get(key).trim().toLowerCase();
-			return setting == "yes" || setting == "no" || setting == "true" || setting == "false" || setting == "1" || setting == "0" || setting == "on" || setting == "off";
+			return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true")|| setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on")
+					 || setting.equalsIgnoreCase("no") || setting.equalsIgnoreCase("false") || setting.equalsIgnoreCase("0") || setting.equalsIgnoreCase("off");
 		}
 		return false;
 	}
@@ -57,7 +58,7 @@ public class Settings {
 	public boolean getBoolean(String key) {
 		if (!isBoolean(key)) throw new IllegalArgumentException("setting is not a valid boolean. check with isBoolean() first");
 		String setting = settings.get(key).trim().toLowerCase();
-		return setting == "yes" || setting == "true" || setting == "1" || setting == "on";
+		return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on");
 	}
 	
 	public boolean isInt(String key) {
