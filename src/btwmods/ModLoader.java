@@ -32,6 +32,7 @@ public class ModLoader {
 	private static Method classLoaderAddURLMethod = null;
 	
 	public static final String VERSION = "1.0 (vMC 1.3.2 BTW 4.21)";
+	public static final String BTWMOD_REGEX = "(?i)^(BTWMod|mod_|BTWMod_).*\\.class$";
 	
 	/**
 	 * Holds failed listeners from other threads.
@@ -213,7 +214,7 @@ public class ModLoader {
 						File[] classNames = modPackages[p].listFiles();
 						if (classNames != null) {
 							for (int c = 0; c < classNames.length; c++) {
-								if (classNames[c].isFile() && classNames[c].getName().startsWith("BTWMod") && classNames[c].getName().endsWith(".class")) {
+								if (classNames[c].isFile() && classNames[c].getName().matches(BTWMOD_REGEX)) {
 									names.add("btwmod." + modPackages[p].getName() + "." + classNames[c].getName().substring(0, classNames[c].getName().length() - ".class".length()));
 								}
 							}
