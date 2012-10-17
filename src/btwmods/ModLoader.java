@@ -40,7 +40,7 @@ public class ModLoader {
 	private static ConcurrentLinkedQueue<SimpleEntry<Throwable, IAPIListener>> failedListenerQueue = new ConcurrentLinkedQueue<SimpleEntry<Throwable, IAPIListener>>();
 	
 	/**
-	 * Initialize the {@link ModLoader} and mods. Should only be called from 
+	 * Initialize the ModLoader and mods. Should only be called from the {@link World} constructor.
 	 */
 	public static void init() {
 		if (!hasInit) {
@@ -48,7 +48,7 @@ public class ModLoader {
 			// Mark the current thread as the main one.
 			thread = Thread.currentThread();
 			
-			net.minecraft.server.MinecraftServer.logger.info("BTWMods " + VERSION + " Initializing...");
+			outputInfo("BTWMods " + VERSION + " Initializing...");
 			
 			// Attempt to get the URLClassLoader and its private addURL() method.
 			if (classLoader == null) {
@@ -72,7 +72,7 @@ public class ModLoader {
 			
 			StatsAPI.init();
 
-			net.minecraft.server.MinecraftServer.logger.info("BTWMods Initialization Complete.");
+			outputInfo("BTWMods Initialization Complete.");
 		}
 		
 		hasInit = true;
@@ -273,7 +273,7 @@ public class ModLoader {
 					outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") while running init for: " + binaryName);
 				}
 				
-				net.minecraft.server.MinecraftServer.logger.info("BTWMod loaded: " + (modName == null ? binaryName : modName + " (" + binaryName + ")"));
+				outputInfo("BTWMod loaded: " + (modName == null ? binaryName : modName + " (" + binaryName + ")"));
 			}
 		} catch (Throwable e) {
 			outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to create an instance of: " + binaryName);
