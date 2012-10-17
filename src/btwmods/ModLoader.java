@@ -287,7 +287,7 @@ public class ModLoader {
 	}
 	
 	private static Settings loadModSettings(String binaryName) {
-		File settingsFile = new File(new File("."), "btwmods/" + binaryName.replaceAll("^btwmod\\.([^.]+)\\..+$", "$1") + ".txt");
+		File settingsFile = new File(new File("."), "btwmods/" + getModPackageName(binaryName) + ".txt");
 		
 		if (settingsFile.isFile()) {
 			try {
@@ -299,6 +299,14 @@ public class ModLoader {
 		}
 		
 		return new Settings();
+	}
+	
+	public static String getModPackageName(IMod mod) {
+		return getModPackageName(mod.getClass().getName());
+	}
+	
+	private static String getModPackageName(String binaryName) {
+		return binaryName.replaceAll("^btwmod\\.([^.]+)\\..+$", "$1");
 	}
 	
 	public static void outputError(String message) {
