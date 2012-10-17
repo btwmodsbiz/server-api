@@ -19,7 +19,7 @@ import btwmods.events.IAPIListener;
 import btwmods.measure.Average;
 import btwmods.measure.Measurements;
 import btwmods.stats.IStatsListener;
-import btwmods.stats.StatsCommand;
+import btwmods.stats.CommandStats;
 import btwmods.stats.StatsEvent;
 import btwmods.stats.Tick;
 import btwmods.stats.Tick.Type;
@@ -47,7 +47,7 @@ public class StatsAPI {
 	private StatsAPI() {}
 	
 	public static void init() {
-		((CommandHandler)MinecraftServer.getServer().getCommandManager()).registerCommand(new StatsCommand());
+		((CommandHandler)MinecraftServer.getServer().getCommandManager()).registerCommand(new CommandStats());
 	}
 
 	public static void addListener(IAPIListener listener) {

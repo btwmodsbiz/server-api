@@ -4,7 +4,7 @@ import btwmods.StatsAPI;
 import net.minecraft.src.CommandBase;
 import net.minecraft.src.ICommandSender;
 
-public class StatsCommand extends CommandBase {
+public class CommandStats extends CommandBase {
 
 	@Override
 	public String getCommandName() {
