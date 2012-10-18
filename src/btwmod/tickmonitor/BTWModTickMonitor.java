@@ -15,8 +15,6 @@ import net.minecraft.src.CommandHandler;
 
 import btwmods.IMod;
 import btwmods.StatsAPI;
-import btwmods.StatsAPI.StatsProcessor.ChunkStats;
-import btwmods.StatsAPI.StatsProcessor.EntityStats;
 import btwmods.io.Settings;
 import btwmods.measure.Average;
 import btwmods.network.CustomPacketEvent;
@@ -28,6 +26,8 @@ import btwmods.stats.EntityStatsComparator;
 import btwmods.stats.IStatsListener;
 import btwmods.stats.StatsEvent;
 import btwmods.stats.ChunkStatsComparator.Stat;
+import btwmods.stats.data.ChunkStats;
+import btwmods.stats.data.EntityStats;
 import btwmods.util.BasicFormatter;
 
 public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener, IInstanceListener {
@@ -170,8 +170,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 						.append("E: ").append(decimalFormat.format(event.worldStats[i].entities.getAverage() * 1.0E-6D)).append("ms")
 						.append(" + M: ").append(decimalFormat.format(event.worldStats[i].mobSpawning.getAverage() * 1.0E-6D)).append("ms")
 						.append(" + B: ").append(decimalFormat.format(event.worldStats[i].blockTick.getAverage() * 1.0E-6D)).append("ms")
-						.append(" + A: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbiance.getAverage() * 1.0E-6D)).append("ms")
-						.append(" + AS: ").append(decimalFormat.format(event.worldStats[i].tickBlocksAndAmbianceSuper.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + W: ").append(decimalFormat.format(event.worldStats[i].weather.getAverage() * 1.0E-6D)).append("ms")
 						.append(" + T: ").append(decimalFormat.format(event.worldStats[i].timeSync.getAverage() * 1.0E-6D)).append("ms")
 						.append(" + CS: ").append(decimalFormat.format(event.worldStats[i].buildActiveChunkSet.getAverage() * 1.0E-6D)).append("ms")
 						.append(" + L: ").append(decimalFormat.format(event.worldStats[i].checkPlayerLight.getAverage() * 1.0E-6D)).append("ms")
