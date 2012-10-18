@@ -18,9 +18,10 @@ public class TranslationsAPI {
 	
 	/**
 	 * Note: This should only be called by {@link ModLoader#init()}.
-	 * @throws Exception If a reflection exception was thrown.
+	 * @throws NoSuchFieldException 
+	 * @throws IllegalAccessException
 	 */
-	public static void init() throws Exception {
+	public static void init() throws NoSuchFieldException, IllegalAccessException {
 		translateTableField = StringTranslate.class.getDeclaredField("translateTable");
 		translateTableField.setAccessible(true);
 		
