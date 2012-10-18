@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.Block;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.CommandHandler;
 import net.minecraft.src.Entity;
@@ -24,8 +25,12 @@ import btwmods.stats.data.EntityStats;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.data.ServerStats;
 import btwmods.stats.data.WorldStats;
-import btwmods.stats.Tick;
-import btwmods.stats.Tick.Type;
+import btwmods.tick.BlockUpdate;
+import btwmods.tick.EntityUpdate;
+import btwmods.tick.TickMeasurement;
+import btwmods.tick.Type;
+import btwmods.tick.TileEntityUpdate;
+import btwmods.tick.WorldMeasurement;
 
 public class StatsAPI {
 	
@@ -38,7 +43,7 @@ public class StatsAPI {
 	/**
 	 * The detailed measurements that have been take this tick. 
 	 */
-	private static Measurements measurements = new Measurements<Tick>();
+	private static Measurements measurements = new Measurements();
 	
 	/**
 	 * Whether or not to skip detailed measurements, starting with the next tick.
@@ -118,7 +123,7 @@ public class StatsAPI {
 		measurements.setEnabled(statsProcessor != null && detailedMeasurementsEnabled);
 	}
 
-	public static void endTick(MinecraftServer server, int tickCounter) {
+	public static void endTick() {
 		if (statsProcessor == null && statsQueue.size() != 0) {
 			statsQueue.clear();
 		}
@@ -144,40 +149,25 @@ public class StatsAPI {
 			statsQueue.add(stats);
 		}
 	}
-	
-	/**
-	 * Begin a measurement.
-	 * @param type The type of measurement to begin.
-	 */
-	public static void begin(Tick.Type type) {
-		measurements.begin(new Tick(type));
+
+	public static void begin(Type type, World world) {
+		measurements.begin(new WorldMeasurement(type, world));
 	}
 	
-	/**
-	 * Begin a measurement for a specific world.
-	 * @param type The type of measurement to begin.
-	 * @param world The world the measurement is taking place in.
-	 */
-	public static void begin(Tick.Type type, World world) {
-		measurements.begin(new Tick(type, world));
+	public static void beginBlockUpdate(World world, Block block, int x, int y, int z) {
+		measurements.begin(new BlockUpdate(world, block, x, y, z));
 	}
 
-	/**
-	 * Begin a measurement for a specific block tick in a world.
-	 * @param type The type of measurement to begin.
-	 * @param world The world the measurement is taking place in.
-	 * @param entityTick The {@link NextTickListEntry} entry that is being measured.
-	 */
-	public static void begin(Tick.Type type, World world, NextTickListEntry entityTick) {
-		measurements.begin(new Tick(type, world, entityTick));
+	public static void beginBlockUpdate(World world, NextTickListEntry blockUpdate) {
+		measurements.begin(new BlockUpdate(world, blockUpdate));
 	}
 
-	public static void begin(Tick.Type type, World world, Entity entity) {
-		measurements.begin(new Tick(type, world, entity));
+	public static void beginEntityUpdate(World world, Entity entity) {
+		measurements.begin(new EntityUpdate(world, entity));
 	}
 
-	public static void begin(Tick.Type type, World world, TileEntity tileEntity) {
-		measurements.begin(new Tick(type, world, tileEntity));
+	public static void beginTileEntityUpdate(World world, TileEntity tileEntity) {
+		measurements.begin(new TileEntityUpdate(world, tileEntity));
 	}
 	
 	/**
@@ -187,7 +177,7 @@ public class StatsAPI {
 		measurements.end();
 	}
 	
-	public static class StatsProcessor implements Runnable {
+	private static class StatsProcessor implements Runnable {
 		
 		@Override
 		public void run() {
@@ -240,8 +230,7 @@ public class StatsAPI {
 								worldStats[i].measurementQueue.resetCurrent();
 								worldStats[i].mobSpawning.resetCurrent();
 								worldStats[i].blockTick.resetCurrent();
-								worldStats[i].tickBlocksAndAmbiance.resetCurrent();
-								worldStats[i].tickBlocksAndAmbianceSuper.resetCurrent();
+								worldStats[i].weather.resetCurrent();
 								worldStats[i].entities.resetCurrent();
 								worldStats[i].timeSync.resetCurrent();
 								worldStats[i].buildActiveChunkSet.resetCurrent();
@@ -275,82 +264,84 @@ public class StatsAPI {
 							}
 							
 							// Add the time taken by each measurement type.
-							Tick tick;
-							while ((tick = stats.measurements.poll()) != null) {
+							TickMeasurement measurement;
+							while ((measurement = stats.measurements.poll()) != null) {
 								ChunkCoordIntPair coords = null;
 								
-								worldStats[tick.worldIndex].measurementQueue.incrementCurrent(1);
+								if (measurement instanceof WorldMeasurement) {
+									WorldMeasurement worldMeasurement = (WorldMeasurement)measurement;
 								
-								switch (tick.identifier) {
+									worldStats[worldMeasurement.worldIndex].measurementQueue.incrementCurrent(1);
+								
+									switch (measurement.identifier) {
+										
+										case MOB_SPAWNING:
+											worldStats[worldMeasurement.worldIndex].mobSpawning.incrementCurrent(measurement.getTime());
+											break;
+											
+										case WEATHER:
+											worldStats[worldMeasurement.worldIndex].weather.incrementCurrent(measurement.getTime());
+											break;
+											
+										case BLOCK_UPDATE:
+											BlockUpdate blockUpdate = (BlockUpdate)worldMeasurement;
+											worldStats[worldMeasurement.worldIndex].blockTick.incrementCurrent(measurement.getTime());
+											coords = new ChunkCoordIntPair(blockUpdate.chunkX, blockUpdate.chunkZ);
+											break;
+											
+										case ENTITIES_SECTION:
+											worldStats[worldMeasurement.worldIndex].entities.incrementCurrent(measurement.getTime());
+											break;
+											
+										case TIME_SYNC:
+											worldStats[worldMeasurement.worldIndex].timeSync.incrementCurrent(measurement.getTime());
+											break;
+											
+										case BUILD_ACTIVE_CHUNKSET:
+											worldStats[worldMeasurement.worldIndex].buildActiveChunkSet.incrementCurrent(measurement.getTime());
+											break;
+											
+										case CHECK_PLAYER_LIGHT:
+											worldStats[worldMeasurement.worldIndex].checkPlayerLight.incrementCurrent(measurement.getTime());
+											break;
+											
+										case ENTITY_UPDATE:
+											EntityUpdate entityUpdate = (EntityUpdate)worldMeasurement;
+											coords = new ChunkCoordIntPair(entityUpdate.chunkX, entityUpdate.chunkZ);
+											
+											EntityStats entityStats = worldStats[worldMeasurement.worldIndex].entityStats.get(entityUpdate.entity);
+											if (entityStats == null) {
+												worldStats[worldMeasurement.worldIndex].entityStats.put(entityUpdate.entity, entityStats = new EntityStats(entityUpdate.entity));
+												entityStats.tickTime.record(measurement.getTime());
+											}
+											else {
+												entityStats.tickTime.incrementCurrent(measurement.getTime());
+											}
+											
+											entityStats.entityCount++;
+											
+											break;
+											
+										case TILE_ENTITY_UPDATE:
+											TileEntityUpdate tileEntityUpdate = (TileEntityUpdate)worldMeasurement;
+											coords = new ChunkCoordIntPair(tileEntityUpdate.chunkX, tileEntityUpdate.chunkZ);
+											break;
+									}
 									
-									case mobSpawning:
-										worldStats[tick.worldIndex].mobSpawning.incrementCurrent(tick.getTime());
-										break;
-										
-									case tickBlocksAndAmbiance:
-										worldStats[tick.worldIndex].tickBlocksAndAmbiance.incrementCurrent(tick.getTime());
-										break;
-										
-									case tickBlocksAndAmbianceSuper:
-										worldStats[tick.worldIndex].tickBlocksAndAmbianceSuper.incrementCurrent(tick.getTime());
-										break;
-										
-									case blockTick:
-										worldStats[tick.worldIndex].blockTick.incrementCurrent(tick.getTime());
-										coords = new ChunkCoordIntPair(tick.blockTick.chunkX, tick.blockTick.chunkZ);
-										break;
-										
-									case entities:
-										worldStats[tick.worldIndex].entities.incrementCurrent(tick.getTime());
-										break;
-										
-									case timeSync:
-										worldStats[tick.worldIndex].timeSync.incrementCurrent(tick.getTime());
-										break;
-										
-									case buildActiveChunkSet:
-										worldStats[tick.worldIndex].buildActiveChunkSet.incrementCurrent(tick.getTime());
-										break;
-										
-									case checkPlayerLight:
-										worldStats[tick.worldIndex].checkPlayerLight.incrementCurrent(tick.getTime());
-										break;
-										
-									case regularentity:
-										coords = new ChunkCoordIntPair(tick.entityTick.chunkX, tick.entityTick.chunkZ);
-										
-	
-										EntityStats entityStats = worldStats[tick.worldIndex].entityStats.get(tick.entityTick.entity);
-										if (entityStats == null) {
-											worldStats[tick.worldIndex].entityStats.put(tick.entityTick.entity, entityStats = new EntityStats(tick.entityTick.entity));
-											entityStats.tickTime.record(tick.getTime());
+									// Get the average for this chunk and increment it.
+									if (coords != null) {
+										ChunkStats chunkStats = worldStats[worldMeasurement.worldIndex].chunkStats.get(coords);
+										if (chunkStats == null) {
+											worldStats[worldMeasurement.worldIndex].chunkStats.put(coords, chunkStats = new ChunkStats());
+											chunkStats.tickTime.record(measurement.getTime());
 										}
 										else {
-											entityStats.tickTime.incrementCurrent(tick.getTime());
+											chunkStats.tickTime.incrementCurrent(measurement.getTime());
 										}
 										
-										entityStats.entityCount++;
-										
-										break;
-										
-									case tileentity:
-										coords = new ChunkCoordIntPair(tick.tileEntityTick.chunkX, tick.tileEntityTick.chunkZ);
-										break;
-								}
-								
-								// Get the average for this chunk and increment it.
-								if (coords != null) {
-									ChunkStats chunkStats = worldStats[tick.worldIndex].chunkStats.get(coords);
-									if (chunkStats == null) {
-										worldStats[tick.worldIndex].chunkStats.put(coords, chunkStats = new ChunkStats());
-										chunkStats.tickTime.record(tick.getTime());
+										if (measurement.identifier == Type.ENTITY_UPDATE)
+											chunkStats.entityCount++;
 									}
-									else {
-										chunkStats.tickTime.incrementCurrent(tick.getTime());
-									}
-									
-									if (tick.identifier == Type.regularentity)
-										chunkStats.entityCount++;
 								}
 							}
 						}
