@@ -29,18 +29,16 @@ import btwmods.stats.Tick.Type;
 
 public class StatsAPI {
 	
+	private StatsAPI() {}
+	
+	private static MinecraftServer server;
+	
 	private static volatile int tickCounter = -1;
 	
 	/**
 	 * The detailed measurements that have been take this tick. 
 	 */
 	private static Measurements measurements = new Measurements<Tick>();
-	
-	/**
-	 * Whether or not we are recording measurements this tick.
-	 * This should only be modified by startTick().
-	 */
-	private static boolean doingMeasurements = false;
 	
 	/**
 	 * Whether or not to skip detailed measurements, starting with the next tick.
@@ -59,13 +57,12 @@ public class StatsAPI {
 	 */
 	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<QueuedTickStats>();
 	
-	private StatsAPI() {}
-	
 	/**
 	 * Should only be called by ModLoader.
 	 */
 	public static void init() {
-		((CommandHandler)MinecraftServer.getServer().getCommandManager()).registerCommand(new CommandStats());
+		server = MinecraftServer.getServer();
+		((CommandHandler)server.getCommandManager()).registerCommand(new CommandStats());
 	}
 	
 	/**
@@ -117,8 +114,8 @@ public class StatsAPI {
 		// Process any failures that may be queued from the last tick.
 		ModLoader.processFailureQueue();
 		
-		// Mark if we are recording stats this tick.
-		doingMeasurements = statsProcessor != null && detailedMeasurementsEnabled;
+		// Set if we are recording measurements this tick.
+		measurements.setEnabled(statsProcessor != null && detailedMeasurementsEnabled);
 	}
 
 	public static void endTick(MinecraftServer server, int tickCounter) {
@@ -153,8 +150,7 @@ public class StatsAPI {
 	 * @param type The type of measurement to begin.
 	 */
 	public static void begin(Tick.Type type) {
-		if (doingMeasurements)
-			measurements.begin(new Tick(type));
+		measurements.begin(new Tick(type));
 	}
 	
 	/**
@@ -163,8 +159,7 @@ public class StatsAPI {
 	 * @param world The world the measurement is taking place in.
 	 */
 	public static void begin(Tick.Type type, World world) {
-		if (doingMeasurements)
-			measurements.begin(new Tick(type, world));
+		measurements.begin(new Tick(type, world));
 	}
 
 	/**
@@ -174,26 +169,22 @@ public class StatsAPI {
 	 * @param entityTick The {@link NextTickListEntry} entry that is being measured.
 	 */
 	public static void begin(Tick.Type type, World world, NextTickListEntry entityTick) {
-		if (doingMeasurements)
-			measurements.begin(new Tick(type, world, entityTick));
+		measurements.begin(new Tick(type, world, entityTick));
 	}
 
 	public static void begin(Tick.Type type, World world, Entity entity) {
-		if (doingMeasurements)
-			measurements.begin(new Tick(type, world, entity));
+		measurements.begin(new Tick(type, world, entity));
 	}
 
 	public static void begin(Tick.Type type, World world, TileEntity tileEntity) {
-		if (doingMeasurements)
-			measurements.begin(new Tick(type, world, tileEntity));
+		measurements.begin(new Tick(type, world, tileEntity));
 	}
 	
 	/**
 	 * End a measurement.
 	 */
 	public static void end() {
-		if (doingMeasurements)
-			measurements.end();
+		measurements.end();
 	}
 	
 	public static class StatsProcessor implements Runnable {
