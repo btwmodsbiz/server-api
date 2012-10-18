@@ -3,6 +3,7 @@ package btwmods.stats;
 import btwmods.StatsAPI;
 import net.minecraft.src.CommandBase;
 import net.minecraft.src.ICommandSender;
+import net.minecraft.src.WrongUsageException;
 
 public class CommandStats extends CommandBase {
 
@@ -38,6 +39,9 @@ public class CommandStats extends CommandBase {
 			else {
 				sender.sendChatToPlayer("StatsAPI detailed measurements are already off.");
 			}
+		}
+		else {
+			throw new WrongUsageException(getCommandUsage(sender), new Object[0]);
 		}
 	}
 
