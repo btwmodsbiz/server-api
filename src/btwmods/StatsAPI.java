@@ -20,17 +20,17 @@ import btwmods.measure.Measurements;
 import btwmods.stats.IStatsListener;
 import btwmods.stats.CommandStats;
 import btwmods.stats.StatsEvent;
+import btwmods.stats.Type;
 import btwmods.stats.data.ChunkStats;
 import btwmods.stats.data.EntityStats;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.data.ServerStats;
 import btwmods.stats.data.WorldStats;
-import btwmods.tick.BlockUpdate;
-import btwmods.tick.EntityUpdate;
-import btwmods.tick.TickMeasurement;
-import btwmods.tick.Type;
-import btwmods.tick.TileEntityUpdate;
-import btwmods.tick.WorldMeasurement;
+import btwmods.stats.measurements.BlockUpdate;
+import btwmods.stats.measurements.EntityUpdate;
+import btwmods.stats.measurements.TickMeasurement;
+import btwmods.stats.measurements.TileEntityUpdate;
+import btwmods.stats.measurements.WorldMeasurement;
 
 public class StatsAPI {
 	

@@ -1,4 +1,4 @@
-package btwmods.tick;
+package btwmods.stats;
 
 public enum Type {
 	MOB_SPAWNING,

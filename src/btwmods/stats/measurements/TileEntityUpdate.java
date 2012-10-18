@@ -1,5 +1,6 @@
-package btwmods.tick;
+package btwmods.stats.measurements;
 
+import btwmods.stats.Type;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 
@@ -19,5 +20,4 @@ public class TileEntityUpdate extends WorldMeasurement {
 		chunkX = x >> 4;
 		chunkZ = z >> 4;
 	}
-
 }

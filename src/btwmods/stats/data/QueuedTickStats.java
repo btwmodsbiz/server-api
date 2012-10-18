@@ -2,7 +2,7 @@ package btwmods.stats.data;
 
 import java.util.ArrayDeque;
 
-import btwmods.tick.TickMeasurement;
+import btwmods.stats.measurements.TickMeasurement;
 
 public class QueuedTickStats {
 	public int tickCounter;

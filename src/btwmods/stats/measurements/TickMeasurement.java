@@ -1,6 +1,7 @@
-package btwmods.tick;
+package btwmods.stats.measurements;
 
 import btwmods.measure.Measurement;
+import btwmods.stats.Type;
 
 public class TickMeasurement extends Measurement<Type> {
 	public TickMeasurement(Type identifier) {

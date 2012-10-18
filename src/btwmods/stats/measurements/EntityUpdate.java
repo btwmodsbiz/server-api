@@ -1,5 +1,6 @@
-package btwmods.tick;
+package btwmods.stats.measurements;
 
+import btwmods.stats.Type;
 import net.minecraft.src.Entity;
 import net.minecraft.src.World;
 
