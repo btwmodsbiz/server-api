@@ -73,10 +73,19 @@ public class ModLoader {
 				// TODO: Can we use our own URLClassLoader instead?
 			}
 			
+			StatsAPI.init();
+			
+			try {
+				TranslationsAPI.init();
+			}
+			catch (Exception e) {
+				outputError(e, "BTWMods's TranslationsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
+				outputError("BTWMods initialization aborted.", Level.SEVERE);
+				return;
+			}
+			
 			findModsInClassPath();
 			findModsInFolder(new File(".", "btwmods"));
-			
-			StatsAPI.init();
 
 			outputInfo("BTWMods Initialization Complete.");
 		}
