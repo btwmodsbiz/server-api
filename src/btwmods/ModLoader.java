@@ -29,15 +29,51 @@ public class ModLoader {
 	
 	private ModLoader() {}
 
+	/**
+	 * Settings used by ModLoader.
+	 */
 	private static Settings settings = null;
+	
+	/**
+	 * The thread that ModLoader was initialized in.
+	 */
 	private static Thread thread = null;
+	
+	/**
+	 * Whether or not init() has been called.
+	 */
 	private static boolean hasInit = false;
+	
+	/**
+	 * The class loader used by ModLoader. May be a {@link URLClassLoader}.
+	 */
 	private static ClassLoader classLoader = null;
+	
+	/**
+	 * The URLs that were originally in the {@link URLClassLoader}, and ones added to load mods.
+	 * This is empty if {@link #classLoader} is not a URLClassLoader.
+	 */
 	private static Set<URL> classLoaderUrls = new HashSet<URL>();
+	
+	/**
+	 * The protected method {@link URLClassLoader#addUrl(URL)}, set to be public.
+	 * This is <code>null</code> if {@link #classLoader} is not a URLClassLoader.
+	 */
 	private static Method classLoaderAddURLMethod = null;
 	
+	/**
+	 * Version label for BTWMods
+	 */
 	public static final String VERSION = "1.0 (vMC 1.3.2 BTW 4.21)";
+	
+	/**
+	 * Pattern that IMod class files must match.
+	 */
 	public static final String BTWMOD_REGEX = "(?i)^(BTWMod|mod_|BTWMod_).*\\.class$";
+	
+	/**
+	 * Prefixed to the output of {@link #outputInfo} and {@link #outputError} calls.
+	 */
 	private static final String LOGPREFIX = "BTWMods: ";
 	
 	/**
