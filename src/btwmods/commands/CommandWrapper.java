@@ -4,7 +4,6 @@ import java.util.List;
 
 import btwmods.IMod;
 import btwmods.ModLoader;
-import btwmods.TranslationsAPI;
 
 import net.minecraft.src.CommandBase;
 import net.minecraft.src.CommandException;
@@ -91,13 +90,7 @@ public class CommandWrapper extends CommandBase {
 	}
 	
 	private RuntimeException handleException(RuntimeException e, ICommandSender sender) {
-		if (sender != null && e instanceof CommandException) {
-			// Make sure the translation exists.
-			if (TranslationsAPI.getTranslation(e.getMessage(), sender) == null) {
-				TranslationsAPI.setTranslation(sender, e.getMessage(), command.getCommandUsage(sender));
-			}
-		}
-		else {
+		if (sender == null || !(e instanceof CommandException)) {
 			ModLoader.reportCommandFailure(e, command, mod);
 		}
 		
