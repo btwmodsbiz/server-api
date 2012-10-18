@@ -72,7 +72,15 @@ public class ModLoader {
 				// TODO: Can we use our own URLClassLoader instead?
 			}
 			
-			StatsAPI.init();
+			try {
+				StatsAPI.init();
+			}
+			catch (Exception e) {
+				outputError(e, "StatsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
+				outputError("Initialization aborted.", Level.SEVERE);
+				hasInit = true;
+				return;
+			}
 			
 			try {
 				TranslationsAPI.init();
