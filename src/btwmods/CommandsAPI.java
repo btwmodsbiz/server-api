@@ -25,10 +25,16 @@ public class CommandsAPI {
 	}
 	
 	public static void registerCommand(CommandBase command, IMod mod) {
+		if (commandMap == null || commandSet == null)
+			return;
+		
 		((CommandHandler)MinecraftServer.getServer().getCommandManager()).registerCommand(new CommandWrapper(command, mod));
 	}
 	
 	public static void unregisterCommand(CommandBase command) {
+		if (commandMap == null || commandSet == null)
+			return;
+			
 		if (command instanceof CommandWrapper)
 			commandMap.remove(((CommandWrapper)command).getReigsteredCommandName());
 		else
