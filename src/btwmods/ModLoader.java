@@ -18,8 +18,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.CommandBase;
+import net.minecraft.src.CommandHandler;
+import net.minecraft.src.World;
+
 import btwmods.events.IAPIListener;
 import btwmods.io.Settings;
+import btwmods.loader.CommandWrapper;
 
 public class ModLoader {
 	
@@ -314,7 +320,7 @@ public class ModLoader {
 	}
 	
 	public static void outputError(String message, Level level) {
-		net.minecraft.server.MinecraftServer.logger.log(level, message);
+		MinecraftServer.logger.log(level, message);
 	}
 	
 	public static void outputError(Throwable throwable, String message) {
@@ -327,7 +333,7 @@ public class ModLoader {
 	}
 	
 	public static void outputInfo(String message) {
-		net.minecraft.server.MinecraftServer.logger.info(message);
+		MinecraftServer.logger.info(message);
 	}
 	
 	/**
@@ -382,6 +388,9 @@ public class ModLoader {
 			outputError("BTWMod " + name + " has been unloaded successfully.", Level.INFO);
 		else
 			outputError("BTWMod " + name + " has been unloaded disabled as much as possible.", Level.SEVERE);
-			
+	}
+	
+	public static void registerCommand(CommandBase command, IMod mod) {
+		((CommandHandler)MinecraftServer.getServer().getCommandManager()).registerCommand(new CommandWrapper(command, mod));
 	}
 }
