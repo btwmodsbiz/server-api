@@ -25,6 +25,8 @@ import btwmods.stats.Tick;
 import btwmods.stats.Tick.Type;
 
 public class StatsAPI {
+	
+	private static volatile int tickCounter = -1;
 
 	private static Measurements measurements = new Measurements<Tick>();
 	
@@ -48,6 +50,10 @@ public class StatsAPI {
 	
 	public static void init() {
 		((CommandHandler)MinecraftServer.getServer().getCommandManager()).registerCommand(new CommandStats());
+	}
+	
+	public static int getTickCounter() {
+		return tickCounter;
 	}
 
 	public static void addListener(IAPIListener listener) {
@@ -74,7 +80,9 @@ public class StatsAPI {
 		}
 	}
 
-	public static void startTick(MinecraftServer server, int tickCounter) {
+	public static void startTick(int tickCounter) {
+		StatsAPI.tickCounter = tickCounter;
+		
 		// Process any failures that may be queued from the last tick.
 		ModLoader.processFailureQueue();
 		
