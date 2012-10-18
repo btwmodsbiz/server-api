@@ -20,12 +20,10 @@ import java.util.zip.ZipFile;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.CommandBase;
-import net.minecraft.src.CommandHandler;
 import net.minecraft.src.World;
 
 import btwmods.events.IAPIListener;
 import btwmods.io.Settings;
-import btwmods.loader.CommandWrapper;
 
 public class ModLoader {
 	
@@ -80,6 +78,15 @@ public class ModLoader {
 			}
 			catch (Exception e) {
 				outputError(e, "BTWMods's TranslationsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
+				outputError("BTWMods initialization aborted.", Level.SEVERE);
+				return;
+			}
+			
+			try {
+				CommandsAPI.init();
+			}
+			catch (Exception e) {
+				outputError(e, "BTWMods's CommandsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
 				outputError("BTWMods initialization aborted.", Level.SEVERE);
 				return;
 			}
@@ -398,8 +405,18 @@ public class ModLoader {
 		else
 			outputError("BTWMod " + name + " has been unloaded disabled as much as possible.", Level.SEVERE);
 	}
-	
-	public static void registerCommand(CommandBase command, IMod mod) {
-		((CommandHandler)MinecraftServer.getServer().getCommandManager()).registerCommand(new CommandWrapper(command, mod));
+
+	public static void reportCommandFailure(RuntimeException e, CommandBase command, IMod mod) {
+
+		String name = command.getClass().getName();
+		try {
+			name = mod.getName() + " (" + name + ")";
+		}
+		catch (Throwable ex) { }
+		
+		// Unregister the command so it does not run again.
+		CommandsAPI.unregisterCommand(command);
+		
+		outputError(e, "BTWMod " + name + " threw a " + e.getClass().getSimpleName() + (e.getMessage() == null ? "." : ": " + e.getMessage()), Level.SEVERE);
 	}
 }

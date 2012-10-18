@@ -1,13 +1,10 @@
 package btwmods.commands;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import btwmods.IMod;
 import btwmods.ModLoader;
 import btwmods.TranslationsAPI;
-import btwmods.events.IAPIListener;
 
 import net.minecraft.src.CommandBase;
 import net.minecraft.src.CommandException;
@@ -15,23 +12,50 @@ import net.minecraft.src.ICommandSender;
 
 public class CommandWrapper extends CommandBase {
 	
-	private CommandBase command;
-	private boolean addedTranslation = false;
-	private IMod mod;
+	private String registeredCommandName = null;
+	public final CommandBase command;
+	public final IMod mod;
 	
 	public CommandWrapper(CommandBase command, IMod mod) {
+		if (command == null || mod == null)
+			throw new NullPointerException();
+		
 		this.command = command;
 		this.mod = mod;
 	}
 	
+	public String getReigsteredCommandName() {
+		return registeredCommandName;
+	}
+	
 	@Override
 	public String getCommandName() {
-		return command.getCommandName();
+		try {
+			if (registeredCommandName == null) {
+				// Cache the command name the first time it's called, as this is what it will be registered as in the ICommandManager.
+				return this.registeredCommandName = command.getCommandName();
+			}
+			else {
+				return command.getCommandName();
+			}
+		}
+		catch (RuntimeException e) {
+			handleException(e, null);
+			
+			// Return the original command name when registering with the ICommandManager.
+			return registeredCommandName;
+		}
 	}
 
 	@Override
 	public String getCommandUsage(ICommandSender sender) {
-		return command.getCommandUsage(sender);
+		try {
+			return command.getCommandUsage(sender);
+		}
+		catch (RuntimeException e) {
+			handleException(e, null);
+			return super.getCommandUsage(sender);
+		}
 	}
 
 	@Override
@@ -40,13 +64,20 @@ public class CommandWrapper extends CommandBase {
 			return command.canCommandSenderUseCommand(sender);
 		}
 		catch (RuntimeException e) {
-			throw handleException(e, sender);
+			handleException(e, null);
+			return false;
 		}
 	}
 
 	@Override
 	public List addTabCompletionOptions(ICommandSender sender, String[] args) {
-		return command.addTabCompletionOptions(sender, args);
+		try {
+			return command.addTabCompletionOptions(sender, args);
+		}
+		catch (RuntimeException e) {
+			handleException(e, null);
+			return super.addTabCompletionOptions(sender, args);
+		}
 	}
 
 	@Override
@@ -60,14 +91,14 @@ public class CommandWrapper extends CommandBase {
 	}
 	
 	private RuntimeException handleException(RuntimeException e, ICommandSender sender) {
-		if (e instanceof CommandException) {
+		if (sender != null && e instanceof CommandException) {
 			// Make sure the translation exists.
 			if (TranslationsAPI.getTranslation(e.getMessage(), sender) == null) {
 				TranslationsAPI.setTranslation(sender, e.getMessage(), command.getCommandUsage(sender));
 			}
 		}
 		else {
-			ModLoader.reportModFailure(e, mod);
+			ModLoader.reportCommandFailure(e, command, mod);
 		}
 		
 		return e;
