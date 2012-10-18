@@ -29,6 +29,7 @@ public class ModLoader {
 	
 	private ModLoader() {}
 
+	private static Settings settings = null;
 	private static Thread thread = null;
 	private static boolean hasInit = false;
 	private static ClassLoader classLoader = null;
@@ -43,6 +44,24 @@ public class ModLoader {
 	 * Holds failed listeners from other threads.
 	 */
 	private static ConcurrentLinkedQueue<SimpleEntry<Throwable, IAPIListener>> failedListenerQueue = new ConcurrentLinkedQueue<SimpleEntry<Throwable, IAPIListener>>();
+	
+	/**
+	 * File or folder names that will be ignored from the btwmods directory.
+	 */
+	private static Set<String> ignoredMods = new HashSet<String>();
+	
+	/**
+	 * Mod class names that will be ignored.
+	 * 
+	 * May be one of the following formats:
+	 *   - btwmod.{modpackage}.{classname}
+	 *   - {modpackage}.{classname}
+	 *   - btwmod.{modpackage}
+	 *   - {modpackage}
+	 * 
+	 * The last two formats will ignore all mods in that mod package.
+	 */
+	private static Set<String> ignoredModClasses = new HashSet<String>();
 	
 	/**
 	 * Initialize the ModLoader and mods. Should only be called from the {@link World} constructor.
@@ -100,6 +119,17 @@ public class ModLoader {
 				outputError("Initialization aborted.", Level.SEVERE);
 				hasInit = true;
 				return;
+			}
+			
+			// Load settings.
+			settings = loadSettings("ModLoader");
+			
+			if (settings.hasKey("ignoredmodclasses")) {
+				ignoredModClasses.addAll(Arrays.asList(settings.get("ignoredmodclasses").split("[^A-Za-z0-9_\\.\\$]+")));
+			}
+			
+			if (settings.hasKey("ignoredmods")) {
+				ignoredMods.addAll(Arrays.asList(settings.get("ignoredmods").split("[\\s;,]+")));
 			}
 			
 			findModsInClassPath();
@@ -180,19 +210,21 @@ public class ModLoader {
 					try {
 						String name = file[i].getName();
 						
-						// Load mod from a regular directory.
-						if (file[i].isDirectory()) {
-							String[] binaryNames = getModBinaryNamesFromDirectory(file[i]);
-							if (binaryNames.length > 0 && addClassLoaderURL(file[i].toURI().toURL())) {
-								loadMods(binaryNames);
+						if (!ignoredMods.contains(name)) {
+							// Load mod from a regular directory.
+							if (file[i].isDirectory()) {
+								String[] binaryNames = getModBinaryNamesFromDirectory(file[i]);
+								if (binaryNames.length > 0 && addClassLoaderURL(file[i].toURI().toURL())) {
+									loadMods(binaryNames);
+								}
 							}
-						}
-						
-						// Load mod from a zip or jar.
-						else if (file[i].isFile() && (name.endsWith(".jar") || name.endsWith(".zip"))) {
-							String[] binaryNames = getModBinaryNamesFromZip(file[i]);
-							if (binaryNames.length > 0 && addClassLoaderURL(file[i].toURI().toURL())) {
-								loadMods(binaryNames);
+							
+							// Load mod from a zip or jar.
+							else if (file[i].isFile() && (name.endsWith(".jar") || name.endsWith(".zip"))) {
+								String[] binaryNames = getModBinaryNamesFromZip(file[i]);
+								if (binaryNames.length > 0 && addClassLoaderURL(file[i].toURI().toURL())) {
+									loadMods(binaryNames);
+								}
 							}
 						}
 					} catch (Throwable e) {
@@ -293,6 +325,10 @@ public class ModLoader {
 	}
 	
 	private static void loadMod(String binaryName) {
+		if (ignoredModClasses.contains(binaryName) || ignoredModClasses.contains(binaryName.substring("btwmod.".length()))
+				|| ignoredModClasses.contains("btwmod." + getModPackageName(binaryName)) || ignoredModClasses.contains(getModPackageName(binaryName)))
+			return;
+		
 		try {
 			Class mod = classLoader.loadClass(binaryName);
 			if (IMod.class.isAssignableFrom(mod)) {
