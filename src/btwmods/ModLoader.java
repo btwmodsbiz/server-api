@@ -73,7 +73,7 @@ public class ModLoader {
 			}
 			
 			try {
-				StatsAPI.init();
+				StatsAPI.init(loadSettings("StatsAPI"));
 			}
 			catch (Exception e) {
 				outputError(e, "StatsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
@@ -319,19 +319,23 @@ public class ModLoader {
 		}
 	}
 	
-	private static Settings loadModSettings(String binaryName) {
-		File settingsFile = new File(new File("."), "btwmods/" + getModPackageName(binaryName) + ".txt");
+	private static Settings loadSettings(String name) {
+		File settingsFile = new File(new File("."), "btwmods/" + name + ".txt");
 		
 		if (settingsFile.isFile()) {
 			try {
 				return Settings.readSettings(settingsFile);
 			}
 			catch (IOException e) {
-				outputError(e, "Failed (" + e.getClass().getSimpleName() + ") to read the settings file for " + binaryName);
+				outputError(e, "Failed (" + e.getClass().getSimpleName() + ") to read the settings file from " + settingsFile.getPath());
 			}
 		}
 		
 		return new Settings();
+	}
+	
+	private static Settings loadModSettings(String binaryName) {
+		return loadSettings(getModPackageName(binaryName));
 	}
 	
 	public static String getModPackageName(IMod mod) {

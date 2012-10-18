@@ -15,6 +15,7 @@ import net.minecraft.src.World;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
+import btwmods.io.Settings;
 import btwmods.measure.Average;
 import btwmods.measure.Measurements;
 import btwmods.stats.IStatsListener;
@@ -64,10 +65,17 @@ public class StatsAPI {
 	
 	/**
 	 * Should only be called by ModLoader.
+	 * 
+	 * @param settings 
 	 */
-	public static void init() {
+	public static void init(Settings settings) {
 		server = MinecraftServer.getServer();
 		((CommandHandler)server.getCommandManager()).registerCommand(new CommandStats());
+
+		// Load settings
+		if (settings.isBoolean("detailedmeasurements")) {
+			detailedMeasurementsEnabled = settings.getBoolean("detailedmeasurements");
+		}
 	}
 	
 	/**
