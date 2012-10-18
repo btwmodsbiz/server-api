@@ -39,14 +39,14 @@ public class PlayerAPI {
 		listeners.removeListener(listener);
 	}
 
-	public static boolean blockActivationAttempt(EntityPlayer player, Block block, int x, int y, int z) {
+	public static boolean blockActivationAttempt(int blockId, World world, int x, int y, int z, EntityPlayer player, int par7, float par8, float par9, float par10) {
 		if (!listeners.isEmpty(IBlockListener.class)) {
-			BlockEvent event = BlockEvent.ActivationAttempt(player, block, x, y, z);
+			BlockEvent event = BlockEvent.ActivationAttempt(player, Block.blocksList[blockId], x, y, z);
 			((IBlockListener)listeners).blockActivationAttempt(event);
 			return event.isActivationHandled();
 		}
 		
-		return false;
+		return Block.blocksList[blockId].onBlockActivated(world, x, y, z, player, par7, par8, par9, par10);
 	}
 	
 	/**
