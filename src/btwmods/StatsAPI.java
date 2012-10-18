@@ -1,8 +1,6 @@
 package btwmods;
 
-import java.util.ArrayDeque;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -21,6 +19,11 @@ import btwmods.measure.Measurements;
 import btwmods.stats.IStatsListener;
 import btwmods.stats.CommandStats;
 import btwmods.stats.StatsEvent;
+import btwmods.stats.data.ChunkStats;
+import btwmods.stats.data.EntityStats;
+import btwmods.stats.data.QueuedTickStats;
+import btwmods.stats.data.ServerStats;
+import btwmods.stats.data.WorldStats;
 import btwmods.stats.Tick;
 import btwmods.stats.Tick.Type;
 
@@ -193,76 +196,8 @@ public class StatsAPI {
 			measurements.end();
 	}
 	
-	private static class QueuedTickStats {
-		public int tickCounter;
-		public long tickTime;
-		public long sentPacketCount;
-		public long sentPacketSize;
-		public long receivedPacketCount;
-		public long receivedPacketSize;
-		public long[] worldTickTimes;
-		ArrayDeque<Tick> measurements;
-	}
-
 	public static class StatsProcessor implements Runnable {
 		
-		public static class ServerStats {
-			public final Average tickTime = new Average();
-			public final Average sentPacketCount = new Average();
-			public final Average sentPacketSize = new Average();
-			public final Average receivedPacketCount = new Average();
-			public final Average receivedPacketSize = new Average();
-			public final Average statsThreadTime = new Average();
-			public final Average statsThreadQueueCount = new Average();
-		}
-		
-		public static class WorldStats {
-			public final Average measurementQueue = new Average();
-			public final Average worldTickTime = new Average();
-			public final Average mobSpawning = new Average();
-			public final Average blockTick = new Average();
-			public final Average tickBlocksAndAmbiance = new Average();
-			public final Average tickBlocksAndAmbianceSuper = new Average();
-			public final Average entities = new Average();
-			public final Average timeSync = new Average();
-			public final Average buildActiveChunkSet = new Average();
-			public final Average checkPlayerLight = new Average();
-			public final Map<ChunkCoordIntPair, ChunkStats> chunkStats = new LinkedHashMap<ChunkCoordIntPair, ChunkStats>();
-			public final Map<Class, EntityStats> entityStats = new LinkedHashMap<Class, EntityStats>();
-		}
-		
-		public static class ChunkStats {
-			public final Average tickTime;
-			public int entityCount;
-
-			public ChunkStats() {
-				tickTime = new Average();
-				entityCount = 0;
-			}
-			
-			public void resetCurrent() {
-				tickTime.resetCurrent();
-				entityCount = 0;
-			}
-		}
-		
-		public static class EntityStats {
-			public final Average tickTime;
-			public final Class entity;
-			public int entityCount;
-			
-			public EntityStats(Class entity) {
-				tickTime = new Average();
-				entityCount = 0;
-				this.entity= entity; 
-			}
-			
-			public void resetCurrent() {
-				tickTime.resetCurrent();
-				entityCount = 0;
-			}
-		}
-
 		@Override
 		public void run() {
 			try {

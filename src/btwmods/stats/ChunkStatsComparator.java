@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import btwmods.StatsAPI.StatsProcessor.ChunkStats;
+import btwmods.stats.data.ChunkStats;
 
 public class ChunkStatsComparator<T> implements Comparator<Map.Entry<T, ChunkStats>> {
 	

@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import btwmods.StatsAPI.StatsProcessor.EntityStats;
+import btwmods.stats.data.EntityStats;
 
 public class EntityStatsComparator<T> implements Comparator<Map.Entry<T, EntityStats>> {
 	
