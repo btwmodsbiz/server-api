@@ -80,6 +80,7 @@ public class ModLoader {
 			catch (Exception e) {
 				outputError(e, "TranslationsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
 				outputError("Initialization aborted.", Level.SEVERE);
+				hasInit = true;
 				return;
 			}
 			
@@ -89,6 +90,7 @@ public class ModLoader {
 			catch (Exception e) {
 				outputError(e, "CommandsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
 				outputError("Initialization aborted.", Level.SEVERE);
+				hasInit = true;
 				return;
 			}
 			
