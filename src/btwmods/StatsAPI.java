@@ -27,7 +27,10 @@ import btwmods.stats.Tick.Type;
 public class StatsAPI {
 	
 	private static volatile int tickCounter = -1;
-
+	
+	/**
+	 * The detailed measurements that have been take this tick. 
+	 */
 	private static Measurements measurements = new Measurements<Tick>();
 	
 	/**
@@ -37,25 +40,45 @@ public class StatsAPI {
 	private static boolean doingMeasurements = false;
 	
 	/**
-	 * Whether or not to skip detailed measurements or just simple ones.
+	 * Whether or not to skip detailed measurements, starting with the next tick.
 	 */
 	public static volatile boolean detailedMeasurementsEnabled = false;
 	
+	/**
+	 * The thread that is processing stats.
+	 */
 	private static volatile StatsProcessor statsProcessor = null;
 	
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IStatsListener.class });
+	
+	/**
+	 * A thread-safe queue where tick stats are stored for the StatsProcessor to pick retrieve.
+	 */
 	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<QueuedTickStats>();
 	
 	private StatsAPI() {}
 	
+	/**
+	 * Should only be called by ModLoader.
+	 */
 	public static void init() {
 		((CommandHandler)MinecraftServer.getServer().getCommandManager()).registerCommand(new CommandStats());
 	}
 	
+	/**
+	 * Get the current tick counter.
+	 * 
+	 * @return The tick counter value.
+	 */
 	public static int getTickCounter() {
 		return tickCounter;
 	}
 
+	/**
+	 * Add a listener supported by this API.
+	 * 
+	 * @param listener The listener to add.
+	 */
 	public static void addListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
 			listeners.queuedAddListener(listener, IStatsListener.class);
@@ -71,6 +94,11 @@ public class StatsAPI {
 		}
 	}
 
+	/**
+	 * Remove a listener that has been added to this API.
+	 * 
+	 * @param listener The listener to remove.
+	 */
 	public static void removeListener(IAPIListener listener) {
 		if (listener instanceof IStatsListener) {
 			listeners.queuedRemoveListener(listener, IStatsListener.class);
@@ -237,11 +265,7 @@ public class StatsAPI {
 
 		@Override
 		public void run() {
-			
-			// TODO: catch Throwables and mark thread as failed and stopped.
-			
 			try {
-			
 				boolean doingDetailedStats = detailedMeasurementsEnabled;
 				int tickCounter = 0;
 				ServerStats serverStats = new ServerStats();
@@ -255,7 +279,7 @@ public class StatsAPI {
 					}
 					else {
 						
-						// Reset the detailed stats if the setting for that has changed.
+						// Reset the detailed stats if the detailed measurements setting has changed.
 						if (doingDetailedStats != detailedMeasurementsEnabled || worldStats == null) {
 							doingDetailedStats = detailedMeasurementsEnabled;
 							
