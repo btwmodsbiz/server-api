@@ -78,6 +78,18 @@ public class PlayerAPI {
 		}
 	}
 	
+	public static boolean blockPlaceAttempt(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
+		if (!listeners.isEmpty(IBlockListener.class)) {
+			BlockEvent event = BlockEvent.PlaceAttempt(player, itemStack, x, y, z, direction, xOffset, yOffset, zOffset);
+			((IBlockListener)listeners).blockAction(event);
+			
+			if (event.isHandled())
+				return event.isAllowed();
+		}
+		
+		return itemStack.tryPlaceItemIntoWorld(player, world, x, y, z, direction, xOffset, yOffset, zOffset);
+	}
+	
 	public static void blockRemoved(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
 		if (block instanceof BlockContainer && !listeners.isEmpty(IContainerListener.class)) {
 			ContainerEvent event = ContainerEvent.Removed(player, block, metadata, x, y, z);
