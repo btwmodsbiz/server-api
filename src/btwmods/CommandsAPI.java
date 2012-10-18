@@ -15,7 +15,7 @@ public class CommandsAPI {
 	private static Set commandSet;
 	
 	public static void init() throws NoSuchFieldException, IllegalAccessException {
-		Field commandMapField = CommandHandler.class.getField("commandMap");
+		Field commandMapField = CommandHandler.class.getDeclaredField("commandMap");
 		commandMapField.setAccessible(true);
 		commandMap = (Map)commandMapField.get(MinecraftServer.getServer().getCommandManager());
 		
