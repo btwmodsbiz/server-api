@@ -22,7 +22,7 @@ public class WorldAPI {
 		listeners.addListener(listener);
 	}
 	
-	public static void blockBroken(World world, Chunk chunk, Block block, int x, int y, int z, int blockID, int blockMetadata) {
+	public static void blockBroken(World world, Chunk chunk, Block block, int x, int y, int z, @SuppressWarnings("unused") int blockID, int blockMetadata) {
 		BlockEvent event = BlockEvent.Broken(world, chunk, block, blockMetadata, x, y, z);
 		((IBlockListener)listeners).blockAction(event);
 	}

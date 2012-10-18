@@ -11,7 +11,6 @@ public class Average implements Comparable<Average> {
 	private int tick = -1;
 	private long[] history;
 	private long total = 0;
-	private double average = 0;
 	
 	public Average() {
 		this(RESOLUTION);

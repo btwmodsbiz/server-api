@@ -77,6 +77,7 @@ public class PlayerAPI {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public static void containerPlaced(EntityPlayer player, Container container, World world, int x, int y, int z) {
 		//TODO: this.items.containerPlaced(player, container, world, x, y, z);
 	}

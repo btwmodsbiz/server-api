@@ -3,7 +3,6 @@ package btwmods.player;
 import net.minecraft.src.Block;
 import net.minecraft.src.Container;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.TileEntity;
 
 public class ContainerEvent extends AbstractBlockEvent {
 	
@@ -11,9 +10,6 @@ public class ContainerEvent extends AbstractBlockEvent {
 
 	private TYPE type;
 	private Container container = null;
-	
-	private boolean checkedTileEntity = false;
-	private TileEntity tileEntity = null;
 	
 	public TYPE getType() {
 		return type;
