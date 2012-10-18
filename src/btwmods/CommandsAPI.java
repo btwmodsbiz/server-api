@@ -19,7 +19,7 @@ public class CommandsAPI {
 		commandMapField.setAccessible(true);
 		commandMap = (Map)commandMapField.get(MinecraftServer.getServer().getCommandManager());
 		
-		Field commandSetField = CommandHandler.class.getField("commandSet");
+		Field commandSetField = CommandHandler.class.getDeclaredField("commandSet");
 		commandSetField.setAccessible(true);
 		commandSet = (Set)commandSetField.get(MinecraftServer.getServer().getCommandManager());
 	}

@@ -21,10 +21,10 @@ public class TranslationsAPI {
 	 * @throws Exception If a reflection exception was thrown.
 	 */
 	public static void init() throws Exception {
-		translateTableField = StringTranslate.class.getField("translateTable");
+		translateTableField = StringTranslate.class.getDeclaredField("translateTable");
 		translateTableField.setAccessible(true);
 		
-		playerTranslatorField = EntityPlayerMP.class.getField("translator");
+		playerTranslatorField = EntityPlayerMP.class.getDeclaredField("translator");
 		playerTranslatorField.setAccessible(true);
 		
 		serverTranslationTable = getTranslationTable(StringTranslate.getInstance());
