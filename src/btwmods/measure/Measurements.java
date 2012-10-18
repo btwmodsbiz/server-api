@@ -5,8 +5,8 @@ import java.util.ArrayDeque;
 public class Measurements<T extends Measurement> {
 	
 	private boolean enabled = true;
-	private ArrayDeque<T> measurements;
-	private ArrayDeque<T> dataStack;
+	private ArrayDeque<T> measurements = new ArrayDeque<T>();
+	private ArrayDeque<T> dataStack = new ArrayDeque<T>();
 	
 	public boolean isEnabled() {
 		return enabled;
@@ -15,36 +15,30 @@ public class Measurements<T extends Measurement> {
 	public void setEnabled(boolean value) {
 		enabled = value;
 		if (!enabled) {
-			dataStack = null;
-			measurements = null;
+			startNew();
 		}
-	}
-	
-	public Measurements() {
-		startNew();
 	}
 	
 	public ArrayDeque<T> startNew() {
-		if (enabled) {
-			ArrayDeque<T> old = measurements;
+		ArrayDeque<T> old = measurements;
+		
+		if ((enabled && measurements.size() > 0) || measurements.size() != 0) {
 			measurements = new ArrayDeque<T>();
 			dataStack = new ArrayDeque<T>();
-			return old;
 		}
-		else {
-			return null;
-		}
+		
+		return old;
 	}
 	
 	public void begin(T data) {
-		if (enabled && measurements != null) {
+		if (enabled) {
 			dataStack.push(data);
 			data.start();
 		}
 	}
 	
 	public void end() {
-		if (enabled && measurements != null)
+		if (enabled)
 			measurements.push((T)dataStack.pop().end());
 	}
 }
