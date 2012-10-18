@@ -1,5 +1,6 @@
 package btwmods;
 
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -14,7 +15,7 @@ public class Util {
 	@SuppressWarnings("javadoc")
 	public static String getStackTrace(Throwable e) {
 		StringWriter sw = new StringWriter();
-		printStackTrace(new PrintWriter(sw));
+		e.printStackTrace(new PrintWriter(sw));
 		return sw.toString();
 	}
 	
@@ -24,6 +25,14 @@ public class Util {
 	
 	public static void printStackTrace(PrintWriter writer, Throwable e) {
 		e.printStackTrace(writer);
+	}
+
+	public static void printStackTrace(PrintStream out) {
+		printStackTrace(out, new Throwable(""));
+	}
+	
+	public static void printStackTrace(PrintStream out, Throwable e) {
+		printStackTrace(new PrintWriter(out), e);
 	}
 
 	public static int getWorldIndexFromDimension(int dimension) {
