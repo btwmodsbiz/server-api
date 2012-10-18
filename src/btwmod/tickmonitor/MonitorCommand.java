@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.src.CommandBase;
 import net.minecraft.src.ICommandSender;
+import net.minecraft.src.WrongUsageException;
 
 public class MonitorCommand extends CommandBase {
 	
@@ -51,6 +52,9 @@ public class MonitorCommand extends CommandBase {
 			else {
 				sender.sendChatToPlayer(mod.getName() + " is already off.");
 			}
+		}
+		else {
+			throw new WrongUsageException(getCommandUsage(sender), new Object[0]);
 		}
 	}
 }
