@@ -39,14 +39,22 @@ public class PlayerAPI {
 		listeners.removeListener(listener);
 	}
 
-	public static boolean blockActivationAttempt(int blockId, World world, int x, int y, int z, EntityPlayer player, int par7, float par8, float par9, float par10) {
+	public static boolean blockActivationAttempt(int blockId, World world, int x, int y, int z, EntityPlayer player, int direction, float xOffset, float yOffset, float zOffset) {
+		boolean activated;
+		
 		if (!listeners.isEmpty(IBlockListener.class)) {
-			BlockEvent event = BlockEvent.ActivationAttempt(player, Block.blocksList[blockId], x, y, z);
-			((IBlockListener)listeners).blockActivationAttempt(event);
-			return event.isActivationHandled();
+			BlockEvent event = BlockEvent.ActivationAttempt(player, Block.blocksList[blockId], x, y, z, direction, xOffset, yOffset, zOffset);
+			((IBlockListener)listeners).blockAction(event);
+			activated = event.isHandled();
 		}
 		
-		return Block.blocksList[blockId].onBlockActivated(world, x, y, z, player, par7, par8, par9, par10);
+		activated = Block.blocksList[blockId].onBlockActivated(world, x, y, z, player, direction, xOffset, yOffset, zOffset);
+		
+		if (activated) {
+			blockActivated(player, Block.blocksList[blockId], x, y, z);
+		}
+		
+		return activated;
 	}
 	
 	/**
@@ -62,7 +70,7 @@ public class PlayerAPI {
 	public static void blockActivated(EntityPlayer player, Block block, int x, int y, int z) {
 		if (!listeners.isEmpty(IBlockListener.class)) {
 			BlockEvent event = BlockEvent.Activated(player, block, x, y, z);
-			((IBlockListener)listeners).blockActivated(event);
+			((IBlockListener)listeners).blockAction(event);
 		}
 
 		if (block instanceof BlockContainer) {
