@@ -3,6 +3,7 @@ package btwmods.stats.data;
 import btwmods.measure.Average;
 
 public class ServerStats {
+	public long lastTickEnd = -1;
 	public final Average tickTime = new Average();
 	public final Average sentPacketCount = new Average();
 	public final Average sentPacketSize = new Average();

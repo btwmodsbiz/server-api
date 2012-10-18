@@ -131,6 +131,7 @@ public class StatsAPI {
 		else if (statsProcessor != null) {
 			QueuedTickStats stats = new QueuedTickStats();
 			
+			stats.tickEnd = System.currentTimeMillis();
 			stats.tickCounter = tickCounter;
 			stats.tickTime = server.tickTimeArray[tickCounter % 100];
 			stats.sentPacketCount = server.sentPacketCountArray[tickCounter % 100];
@@ -217,6 +218,7 @@ public class StatsAPI {
 							polled++;
 							tickCounter = stats.tickCounter;
 							
+							serverStats.lastTickEnd = Math.max(serverStats.lastTickEnd, stats.tickEnd);
 							serverStats.tickTime.record(stats.tickTime);
 							serverStats.sentPacketCount.record(stats.sentPacketCount);
 							serverStats.sentPacketSize.record(stats.sentPacketSize);
@@ -344,6 +346,9 @@ public class StatsAPI {
 									}
 								}
 							}
+							
+							// Clean up the measurements just in case.
+							stats.measurements.clear();
 						}
 						
 						serverStats.statsThreadTime.record(System.nanoTime() - threadStart);

@@ -5,6 +5,7 @@ import java.util.ArrayDeque;
 import btwmods.stats.measurements.TickMeasurement;
 
 public class QueuedTickStats {
+	public long tickEnd;
 	public int tickCounter;
 	public long tickTime;
 	public long sentPacketCount;
