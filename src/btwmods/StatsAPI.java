@@ -54,7 +54,7 @@ public class StatsAPI {
 	 * 
 	 * @param settings 
 	 */
-	public static void init(Settings settings) {
+	static void init(Settings settings) {
 		server = MinecraftServer.getServer();
 		((CommandHandler)server.getCommandManager()).registerCommand(new CommandStats());
 

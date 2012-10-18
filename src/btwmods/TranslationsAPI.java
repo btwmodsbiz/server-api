@@ -21,7 +21,7 @@ public class TranslationsAPI {
 	 * @throws NoSuchFieldException 
 	 * @throws IllegalAccessException
 	 */
-	public static void init() throws NoSuchFieldException, IllegalAccessException {
+	static void init() throws NoSuchFieldException, IllegalAccessException {
 		translateTableField = StringTranslate.class.getDeclaredField("translateTable");
 		translateTableField.setAccessible(true);
 		
