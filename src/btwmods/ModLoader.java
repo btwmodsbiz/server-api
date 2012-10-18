@@ -37,6 +37,7 @@ public class ModLoader {
 	
 	public static final String VERSION = "1.0 (vMC 1.3.2 BTW 4.21)";
 	public static final String BTWMOD_REGEX = "(?i)^(BTWMod|mod_|BTWMod_).*\\.class$";
+	private static final String LOGPREFIX = "BTWMods: ";
 	
 	/**
 	 * Holds failed listeners from other threads.
@@ -52,7 +53,7 @@ public class ModLoader {
 			// Mark the current thread as the main one.
 			thread = Thread.currentThread();
 			
-			outputInfo("BTWMods " + VERSION + " Initializing...");
+			outputInfo("Version " + VERSION + " initializing...");
 			
 			// Attempt to get the URLClassLoader and its private addURL() method.
 			if (classLoader == null) {
@@ -64,7 +65,7 @@ public class ModLoader {
 						classLoaderAddURLMethod = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
 						classLoaderAddURLMethod.setAccessible(true);
 					} catch (Throwable e) {
-						outputError(e, "BTWMods could not load mods from the class path (i.e. any mods directly in your minecraft_server.jar).");
+						outputError(e, "Could not load mods from the class path (i.e. any mods directly in your minecraft_server.jar).");
 					}
 				}
 				
@@ -77,8 +78,8 @@ public class ModLoader {
 				TranslationsAPI.init();
 			}
 			catch (Exception e) {
-				outputError(e, "BTWMods's TranslationsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
-				outputError("BTWMods initialization aborted.", Level.SEVERE);
+				outputError(e, "TranslationsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
+				outputError("Initialization aborted.", Level.SEVERE);
 				return;
 			}
 			
@@ -86,15 +87,15 @@ public class ModLoader {
 				CommandsAPI.init();
 			}
 			catch (Exception e) {
-				outputError(e, "BTWMods's CommandsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
-				outputError("BTWMods initialization aborted.", Level.SEVERE);
+				outputError(e, "CommandsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
+				outputError("Initialization aborted.", Level.SEVERE);
 				return;
 			}
 			
 			findModsInClassPath();
 			findModsInFolder(new File(".", "btwmods"));
 
-			outputInfo("BTWMods Initialization Complete.");
+			outputInfo("Initialization complete.");
 		}
 		
 		hasInit = true;
@@ -148,7 +149,7 @@ public class ModLoader {
 				classLoaderAddURLMethod.invoke((URLClassLoader)classLoader, new Object[] { url });
 				return true;
 			} catch (Throwable e) {
-				outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to add the following mod path: " + url.toString());
+				outputError(e, "Failed (" + e.getClass().getSimpleName() + ") to add the following mod path: " + url.toString());
 			}
 		}
 		
@@ -185,7 +186,7 @@ public class ModLoader {
 							}
 						}
 					} catch (Throwable e) {
-						outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to load mods from: " + file[i].getPath());
+						outputError(e, "Failed (" + e.getClass().getSimpleName() + ") to load mods from: " + file[i].getPath());
 					}
 				}
 			}
@@ -208,7 +209,7 @@ public class ModLoader {
 					loadMods(getModBinaryNamesFromZip(path));
 				}
 			} catch (Throwable e) {
-				outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to search the following classpath for mods: " + url.toString());
+				outputError(e, "Failed (" + e.getClass().getSimpleName() + ") to search the following classpath for mods: " + url.toString());
 			}
 		}
 	}
@@ -292,13 +293,13 @@ public class ModLoader {
 					modInstance.init(loadModSettings(binaryName));
 				}
 				catch (Throwable e) {
-					outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") while running init for: " + binaryName);
+					outputError(e, "Failed (" + e.getClass().getSimpleName() + ") while running init for: " + binaryName);
 				}
 				
-				outputInfo("BTWMod loaded: " + (modName == null ? binaryName : modName + " (" + binaryName + ")"));
+				outputInfo("Loaded: " + (modName == null ? binaryName : modName + " (" + binaryName + ")"));
 			}
 		} catch (Throwable e) {
-			outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to create an instance of: " + binaryName);
+			outputError(e, "Failed (" + e.getClass().getSimpleName() + ") to create an instance of: " + binaryName);
 		}
 	}
 	
@@ -316,7 +317,7 @@ public class ModLoader {
 				return Settings.readSettings(settingsFile);
 			}
 			catch (IOException e) {
-				outputError(e, "BTWMods failed (" + e.getClass().getSimpleName() + ") to read the settings file for " + binaryName);
+				outputError(e, "Failed (" + e.getClass().getSimpleName() + ") to read the settings file for " + binaryName);
 			}
 		}
 		
@@ -336,7 +337,7 @@ public class ModLoader {
 	}
 	
 	public static void outputError(String message, Level level) {
-		MinecraftServer.logger.log(level, message);
+		MinecraftServer.logger.log(level, LOGPREFIX + message);
 	}
 	
 	public static void outputError(Throwable throwable, String message) {
@@ -349,7 +350,7 @@ public class ModLoader {
 	}
 	
 	public static void outputInfo(String message) {
-		MinecraftServer.logger.info(message);
+		MinecraftServer.logger.info(LOGPREFIX + message);
 	}
 	
 	/**
@@ -398,12 +399,12 @@ public class ModLoader {
 		catch (Throwable e) { }
 		
 		// TODO: alert server admins to failed mods.
-		outputError(t, "BTWMod " + name + " threw a " + t.getClass().getSimpleName() + (t.getMessage() == null ? "." : ": " + t.getMessage()), Level.SEVERE);
+		outputError(t, name + " threw a " + t.getClass().getSimpleName() + (t.getMessage() == null ? "." : ": " + t.getMessage()), Level.SEVERE);
 		
 		if (unloadSuccess)
-			outputError("BTWMod " + name + " has been unloaded successfully.", Level.INFO);
+			outputError(name + " has been unloaded successfully.", Level.INFO);
 		else
-			outputError("BTWMod " + name + " has been unloaded disabled as much as possible.", Level.SEVERE);
+			outputError(name + " has been unloaded disabled as much as possible.", Level.SEVERE);
 	}
 
 	public static void reportCommandFailure(RuntimeException e, CommandBase command, IMod mod) {
@@ -417,6 +418,6 @@ public class ModLoader {
 		// Unregister the command so it does not run again.
 		CommandsAPI.unregisterCommand(command);
 		
-		outputError(e, "BTWMod " + name + " threw a " + e.getClass().getSimpleName() + (e.getMessage() == null ? "." : ": " + e.getMessage()), Level.SEVERE);
+		outputError(e, name + " threw a " + e.getClass().getSimpleName() + (e.getMessage() == null ? "." : ": " + e.getMessage()), Level.SEVERE);
 	}
 }
