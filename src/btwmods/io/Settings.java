@@ -13,7 +13,7 @@ public class Settings {
 	
 	public static Settings readSettings(File file) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(file));
-		Map settings = new LinkedHashMap<String, String>();
+		Map<String, String> settings = new LinkedHashMap<String, String>();
 
 		String section = "";
 		String line;
