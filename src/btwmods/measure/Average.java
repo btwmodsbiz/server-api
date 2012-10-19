@@ -70,7 +70,7 @@ public class Average implements Comparable<Average> {
 	 * @return The average.
 	 */
 	public double getAverage() {
-		return (double)total / (double)Math.min(tick + 1, resolution);
+		return (double)total / (double)Math.max(1, Math.min(tick + 1, resolution));
 	}
 	
 	/**
