@@ -5,10 +5,11 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
-import btwmods.BasicFormatter;
 import btwmods.IMod;
 import btwmods.PlayerAPI;
 import btwmods.WorldAPI;
+import btwmods.io.Settings;
+import btwmods.util.BasicFormatter;
 
 public class BTWModItemLogger implements IMod {
 	
@@ -23,7 +24,12 @@ public class BTWModItemLogger implements IMod {
 	}
 
 	@Override
-	public void init() {
+	public void init(Settings settings) {
+		// TODO: remove debug
+		if (logger == null) {
+			logger = net.minecraft.server.MinecraftServer.logger;
+		}
+		
 		if (logger == null) {
 			logger = Logger.getLogger("btwmod.itemlogger");
 			
