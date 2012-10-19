@@ -47,6 +47,8 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 	
 	private int[] ticksPerSecondArray = new int[100];
 	
+	public volatile boolean hideChunkCoords = true;
+    
 	@Override
 	public String getName() {
 		return "Tick Monitor";
@@ -71,6 +73,9 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 		}
 		if (settings.isLong("toolongwarningtime")) {
 			tooLongWarningTime = Math.min(500L, settings.getLong("toolongwarningtime"));
+		}
+		if (settings.isBoolean("hidechunkcoords")) {
+			hideChunkCoords = settings.getBoolean("hidechunkcoords");
 		}
 		
 		// Add the listener only if isRunning is true by default.
@@ -126,7 +131,9 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			// Debugging loop to ramp up CPU usage by the thread.
 			//for (int i = 0; i < 20000; i++) new String(new char[10000]).replace('\0', 'a');
 			
-			StringBuilder html = new StringBuilder("<html><head><title>Minecraft Server Stats</title><meta http-equiv=\"refresh\" content=\"2\"></head><body><h1>Minecraft Server Stats</h1><table border=\"0\"><tbody>"); 
+			StringBuilder html = new StringBuilder("<html><head><title>Minecraft Server Stats</title><meta http-equiv=\"refresh\" content=\"2\"></head><body><h1>Minecraft Server Stats</h1>");
+			
+			html.append("<table border=\"0\"><tbody>"); 
 			
 			html.append("<tr><th align=\"right\">Updated:<th><td>").append(BasicFormatter.dateFormat.format(new Date())).append("</td></tr>");
 			
@@ -160,19 +167,11 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				
 				worldsTotal += event.worldStats[i].worldTickTime.getAverage();
 				
-				/*double checkedTotal = 
-						event.worldStats[i].mobSpawning.getAverage()
-						+ event.worldStats[i].blockTick.getAverage()
-						+ event.worldStats[i].tickBlocksAndAmbiance.getAverage()
-						+ event.worldStats[i].tickBlocksAndAmbianceSuper.getAverage()
-						+ event.worldStats[i].entities.getAverage()
-						+ event.worldStats[i].timeSync.getAverage();*/
-				
 				html.append("<tr><th align=\"right\">World ").append(i).append(" Averages:<th><td>")
 					.append(decimalFormat.format(event.worldStats[i].worldTickTime.getAverage() * 1.0E-6D) + "ms");
 				
 				if (detailedMeasurementsEnabled)
-					html.append(" (" /*+ decimalFormat.format(checkedTotal * 1.0E-6D) + " ms == "*/)
+					html.append(" (")
 						.append("E: ").append(decimalFormat.format(event.worldStats[i].entities.getAverage() * 1.0E-6D)).append("ms")
 						.append(" + M: ").append(decimalFormat.format(event.worldStats[i].mobSpawning.getAverage() * 1.0E-6D)).append("ms")
 						.append(" + B: ").append(decimalFormat.format(event.worldStats[i].blockTick.getAverage() * 1.0E-6D)).append("ms")
@@ -221,10 +220,16 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 					for (int i = 0; i < chunkEntries.size(); i++) {
 						if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
 							displayed++;
-							html.append("<tr><td>").append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos)
-									.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
-									.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
-									.append("</td></tr>");
+							html.append("<tr><td>");
+							
+							if (hideChunkCoords)
+								html.append("(hidden)");
+							else
+								html.append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos);
+							
+							html.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+								.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
+								.append("</td></tr>");
 						}
 	
 						chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();
@@ -246,10 +251,16 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 					for (int i = 0; i < chunkEntries.size(); i++) {
 						if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
 							displayed++;
-							html.append("<tr><td>").append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos)
-									.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
-									.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
-									.append("</td></tr>");
+							html.append("<tr><td>");
+							
+							if (hideChunkCoords)
+								html.append("(hidden)");
+							else
+								html.append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos);
+							
+							html.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+								.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
+								.append("</td></tr>");
 						}
 	
 						chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();

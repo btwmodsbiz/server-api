@@ -22,7 +22,7 @@ public class MonitorCommand extends CommandBase {
 	
 	public String getCommandUsage(ICommandSender sender)
     {
-        return "/" + getCommandName() + " [<on|off|status>]";
+        return "/" + getCommandName() + " [<on|off|status|hidecoords|showcoords>]";
     }
 
 	@Override
@@ -51,6 +51,24 @@ public class MonitorCommand extends CommandBase {
 			}
 			else {
 				sender.sendChatToPlayer(mod.getName() + " is already off.");
+			}
+		}
+		else if (args[0].equalsIgnoreCase("hidecoords")) {
+			if (mod.hideChunkCoords) {
+				sender.sendChatToPlayer(mod.getName() + " is already hiding coords.");
+			}
+			else {
+				mod.hideChunkCoords = true;
+				sender.sendChatToPlayer(mod.getName() + " is now hiding coords.");
+			}
+		}
+		else if (args[0].equalsIgnoreCase("showcoords")) {
+			if (!mod.hideChunkCoords) {
+				sender.sendChatToPlayer(mod.getName() + " is already showing coords.");
+			}
+			else {
+				mod.hideChunkCoords = false;
+				sender.sendChatToPlayer(mod.getName() + " is now showing coords.");
 			}
 		}
 		else {
