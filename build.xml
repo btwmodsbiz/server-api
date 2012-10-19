@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Sever Jar + Mod Zips" default="jarbuild" basedir="../../">
+	<target name="setup">
+		<delete dir="temp/jarbuild" failonerror="true" />
+		<mkdir dir="temp/jarbuild" />
+		<mkdir dir="temp/jarbuild/src" />
+		<mkdir dir="temp/jarbuild/bin" />
+	</target>
+
+	<target name="combine" depends="setup">
+		<!-- Copy dependencies to the bin -->
+		<unjar src="bin/javalib/gson-2.2.2.jar" dest="temp/jarbuild/bin" />
+
+		<!-- Get non-class files from original minecraft_server.jar -->
+		<unjar src="archives/mojang/minecraft_server.jar" dest="temp/jarbuild/bin">
+			<patternset excludes="**/**.class" />
+		</unjar>
+
+        <!-- Copy non-source files to bin -->
+        <copy todir="temp/jarbuild/bin" failonerror="true">
+            <fileset dir="workspace/server-api/src" excludes="**/**.java" />
+            <fileset dir="workspace/server-src/src" excludes="**/**.java" />
+        </copy>
+
+		<!-- Copy source files -->
+		<copy todir="temp/jarbuild/src" failonerror="true">
+			<fileset dir="workspace/server-api/src" includes="**/**.java" />
+			<fileset dir="workspace/server-src/src" includes="**/**.java" />
+		</copy>
+	</target>
+
+	<target name="compile" depends="combine">
+		<javac srcdir="temp/jarbuild/src" compiler="javac1.6" classpath="temp/jarbuild/bin" destdir="temp/jarbuild/bin" failonerror="true" includeantruntime="false"/>
+	</target>
+
+	<target name="jarbuild" depends="compile">
+		<echo message="minecraft_server.jar" />
+		<delete file="builds/minecraft_server.jar" failonerror="true" />
+		<jar jarfile="builds/minecraft_server.jar" basedir="temp/jarbuild/bin" includes="**/**" excludes="btwmod/**" whenmanifestonly="fail" manifest="temp/jarbuild/bin/META-INF/MANIFEST.MF" />
+
+		<antcall target="modjar">
+			<param name="modname" value="itemlogger" />
+		</antcall>
+
+		<antcall target="modjar">
+			<param name="modname" value="tickmonitor" />
+		</antcall>
+
+		<antcall target="modjar">
+			<param name="modname" value="spawnbeds" />
+		</antcall>
+	</target>
+
+	<target name="modjar">
+		<echo message="${modname}"/>
+		<delete file="builds/${modname}.zip" failonerror="true" />
+		<zip destfile="builds/${modname}.zip" basedir="temp/jarbuild/bin" includes="btwmod/${modname}/**" />
+	</target>
+</project>
