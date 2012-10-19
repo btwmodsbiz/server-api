@@ -20,6 +20,11 @@
 			<type>2</type>
 			<locationURI>MCP_LOC/jars</locationURI>
 		</link>
+		<link>
+			<name>lib</name>
+			<type>2</type>
+			<locationURI>DEV_ENVIRONMENT/bin/javalib</locationURI>
+		</link>
 	</linkedResources>
 	<filteredResources>
 		<filter>
@@ -34,8 +39,12 @@
 	</filteredResources>
 	<variableList>
 		<variable>
+			<name>DEV_ENVIRONMENT</name>
+			<value>$%7BPARENT-1-WORKSPACE_LOC%7D</value>
+		</variable>
+		<variable>
 			<name>MCP_LOC</name>
-			<value>$%7BPARENT-1-WORKSPACE_LOC%7D/mcp</value>
+			<value>$%7BDEV_ENVIRONMENT%7D/mcp</value>
 		</variable>
 	</variableList>
 </projectDescription>
