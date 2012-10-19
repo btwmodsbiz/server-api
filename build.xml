@@ -5,6 +5,9 @@
 		<mkdir dir="temp/jarbuild" />
 		<mkdir dir="temp/jarbuild/src" />
 		<mkdir dir="temp/jarbuild/bin" />
+
+        <mkdir dir="build" />
+        <mkdir dir="build/btwmods" />
 	</target>
 
 	<target name="combine" depends="setup">
@@ -35,8 +38,8 @@
 
 	<target name="jarbuild" depends="compile">
 		<echo message="minecraft_server.jar" />
-		<delete file="builds/minecraft_server.jar" failonerror="true" />
-		<jar jarfile="builds/minecraft_server.jar" basedir="temp/jarbuild/bin" includes="**/**" excludes="btwmod/**" whenmanifestonly="fail" manifest="temp/jarbuild/bin/META-INF/MANIFEST.MF" />
+		<delete file="build/minecraft_server.jar" failonerror="true" />
+		<jar jarfile="build/minecraft_server.jar" basedir="temp/jarbuild/bin" includes="**/**" excludes="btwmod/**" whenmanifestonly="fail" manifest="temp/jarbuild/bin/META-INF/MANIFEST.MF" />
 
 		<antcall target="modjar">
 			<param name="modname" value="itemlogger" />
@@ -53,7 +56,7 @@
 
 	<target name="modjar">
 		<echo message="${modname}"/>
-		<delete file="builds/${modname}.zip" failonerror="true" />
-		<zip destfile="builds/${modname}.zip" basedir="temp/jarbuild/bin" includes="btwmod/${modname}/**" />
+		<delete file="build/${modname}.zip" failonerror="true" />
+		<zip destfile="build/btwmods/${modname}.zip" basedir="temp/jarbuild/bin" includes="btwmod/${modname}/**" />
 	</target>
 </project>
