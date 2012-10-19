@@ -129,6 +129,12 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			StringBuilder html = new StringBuilder("<html><head><title>Minecraft Server Stats</title><meta http-equiv=\"refresh\" content=\"2\"></head><body><h1>Minecraft Server Stats</h1><table border=\"0\"><tbody>"); 
 			
 			html.append("<tr><th align=\"right\">Updated:<th><td>").append(BasicFormatter.dateFormat.format(new Date())).append("</td></tr>");
+			
+			if (event.serverStats.lastTickEnd >= 0) {
+				long timeSinceLastTick = System.currentTimeMillis() - event.serverStats.lastTickEnd;
+				html.append("<tr><th align=\"right\">Last Tick:<th><td>").append(timeSinceLastTick >= 1000 ? "Over " + (timeSinceLastTick / 1000) + " seconds" : timeSinceLastTick + "ms").append(" ago.</td></tr>");
+			}
+			
 			html.append("<tr><th align=\"right\">Average StatsAPI Thread Time:<th><td>").append(decimalFormat.format(event.serverStats.statsThreadTime.getAverage() * 1.0E-6D)).append(" ms</td></tr>");
 			html.append("<tr><th align=\"right\">Average StatsAPI Polled:<th><td>").append(decimalFormat.format(event.serverStats.statsThreadQueueCount.getAverage())).append("</td></tr>");
 			
