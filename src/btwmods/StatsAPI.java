@@ -168,7 +168,7 @@ public class StatsAPI {
 	/**
 	 * End a measurement.
 	 */
-	public static void end() {
+	public static void end(Type type) {
 		measurements.end();
 	}
 }
