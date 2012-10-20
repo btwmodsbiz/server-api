@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -266,10 +267,12 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 			ModLoader.processFailureQueue();
 			
 			// Get the listeners for method's declaring class.
-			Set<IAPIListener> listeners = getListeners(method.getDeclaringClass());
+			Iterator<IAPIListener> listeners = getListeners(method.getDeclaringClass()).iterator();
 			
 			// Execute all the listeners.
-			for (IAPIListener listener : listeners) {
+			while (listeners.hasNext()) {
+				IAPIListener listener = listeners.next();
+				
 				try {
 					if (invocationWrapper != null)
 						invocationWrapper.handleInvocation(new Invocation(listener, method, args));
