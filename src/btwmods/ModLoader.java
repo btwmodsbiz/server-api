@@ -187,6 +187,15 @@ public class ModLoader {
 	}
 	
 	/**
+	 * Return the thread that ModLoader was initialized in.
+	 * 
+	 * @return the {@link Thread} instance
+	 */
+	public static Thread getInitThread() {
+		return thread;
+	}
+	
+	/**
 	 * Returns if {@link URLClassLoader} was successfully set.
 	 * 
 	 * @return <code>true</code> if it was set; <code>false</code> otherwise.
