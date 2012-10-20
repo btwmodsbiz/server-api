@@ -284,9 +284,11 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 						break;
 				}
 				catch (InvocationTargetException e) {
+					listeners.remove();
 					removeListener(listener);
 					handleListenerFailure(e.getCause(), listener);
 				} catch (Throwable e) {
+					listeners.remove();
 					removeListener(listener);
 					handleListenerFailure(e.getCause(), listener);
 				}
