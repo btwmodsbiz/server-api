@@ -40,4 +40,16 @@ public class Util {
 		else if (dimension == 1) return 2;
 		return 0;
 	}
+	
+	public static String convertStackTrace(StackTraceElement[] elements) {
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(stringWriter);
+
+		for (int i = 0; i < elements.length; i++)
+			printWriter.println("\tat " + elements[i]);
+
+		printWriter.flush();
+		printWriter.close();
+		return stringWriter.toString();
+	}
 }
