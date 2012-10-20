@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.ChunkCoordIntPair;
+import net.minecraft.src.Item;
 import btwmods.ModLoader;
 import btwmods.StatsAPI;
 import btwmods.events.EventDispatcher;
@@ -212,9 +213,11 @@ public class StatsProcessor implements Runnable {
 							EntityUpdate entityUpdate = (EntityUpdate)worldMeasurement;
 							coords = new ChunkCoordIntPair(entityUpdate.chunkX, entityUpdate.chunkZ);
 							
-							EntityStats entityStats = worldStats[worldMeasurement.worldIndex].entityStats.get(entityUpdate.entity);
+							Class entityKey = entityUpdate.itemId >= 0 ? Item.itemsList[entityUpdate.itemId].getClass() : entityUpdate.entity;
+							
+							EntityStats entityStats = worldStats[worldMeasurement.worldIndex].entityStats.get(entityKey);
 							if (entityStats == null) {
-								worldStats[worldMeasurement.worldIndex].entityStats.put(entityUpdate.entity, entityStats = new EntityStats(entityUpdate.entity));
+								worldStats[worldMeasurement.worldIndex].entityStats.put(entityKey, entityStats = new EntityStats(entityKey));
 								entityStats.tickTime.record(measurement.getTime());
 							}
 							else {
