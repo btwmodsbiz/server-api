@@ -183,10 +183,16 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				
 				html.append("</td></tr>");
 				
+				html.append("<tr><th align=\"right\">&nbsp;<th><td>")
+					.append("Chunks: ")
+					.append((int)event.worldStats[i].loadedChunks.getAverage()).append(" loaded, ")
+					.append(event.worldStats[i].id2ChunkMap).append(" cached, ")
+					.append((int)event.worldStats[i].droppedChunksSet.getAverage()).append(" dropped");
+				
 				if (detailedMeasurementsEnabled)
-					html.append("<tr><th align=\"right\">&nbsp;<th><td>")
-						.append((int)event.worldStats[i].measurementQueue.getAverage()).append(" measurements per tick")
-						.append("</td></tr>");
+					html.append(" | ").append((int)event.worldStats[i].measurementQueue.getAverage()).append(" measurements per tick");
+				
+				html.append("</td></tr>");
 			}
 
 			html.append("<tr><th align=\"right\">Worlds Total:<th><td>").append(decimalFormat.format(worldsTotal * 1.0E-6D)).append(" ms (" + (int)(worldsTotal / event.serverStats.tickTime.getAverage() * 100) + "% of full tick)</td></tr>");
