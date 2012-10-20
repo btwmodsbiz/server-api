@@ -185,7 +185,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				
 				html.append("<tr><th align=\"right\">&nbsp;<th><td>")
 					.append("Chunks: ")
-					.append((int)event.worldStats[i].loadedChunks.getAverage()).append(" loaded, ")
+					.append((int)event.worldStats[i].loadedChunks.getLatest()).append(" loaded, ")
 					.append(event.worldStats[i].id2ChunkMap).append(" cached, ")
 					.append((int)event.worldStats[i].droppedChunksSet.getAverage()).append(" dropped");
 				
@@ -248,7 +248,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 
 		html.append("<h2>World ").append(world).append(" Top " + topNumber + ":</h2>");
 		
-		html.append("<table border=\"0\"><thead><tr><th>Chunks By Tick Time</th><th>Chunks By Entity Count</th><th>Entities By Tick Time</th><th>Entities By Count</th></tr></thead><tbody><tr><td valign=\"top\">");
+		html.append("<table border=\"0\"><thead><tr><th>Chunks By Tick Time</th><th>Chunks By Entity Count</th><th>Entities By Tick Time</th><th>Entities By Count</th><th>TileEntities By Tick Time</th></tr></thead><tbody><tr><td valign=\"top\">");
 
 		{
 			Collections.sort(chunkEntries, new ChunkStatsComparator<ChunkCoordIntPair>(Stat.TICKTIME, true));
@@ -352,6 +352,31 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				}
 
 				entitiesTotal += entityEntries.get(i).getValue().tickTime.getAverage();
+			}
+
+			html.append("<tr><td>Totals</td><td colspan=\"2\">").append(decimalFormat.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
+			html.append("</tbody></table>");
+		}
+
+		List<Map.Entry<Class, TileEntityStats>> tileEntityEntries = new ArrayList<Map.Entry<Class, TileEntityStats>>(event.worldStats[world].tileEntityStats.entrySet());
+		
+		html.append("</td><td valign=\"top\">");
+
+		{
+			Collections.sort(tileEntityEntries, new TileEntityStatsComparator<Class>(TileEntityStatsComparator.Stat.TICKTIME, true));
+			html.append("<table border=\"0\"><thead><tr><th>Tile Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
+			double entitiesTotal = 0;
+			int displayed = 0;
+			for (int i = 0; i < tileEntityEntries.size(); i++) {
+				if (tileEntityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
+					displayed++;
+					html.append("<tr><td>").append(tileEntityEntries.get(i).getKey().getSimpleName())
+							.append("</td><td>").append(decimalFormat.format(tileEntityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+							.append(" ms</td><td>").append(tileEntityEntries.get(i).getValue().tileEntityCount)
+							.append("</td></tr>");
+				}
+
+				entitiesTotal += tileEntityEntries.get(i).getValue().tickTime.getAverage();
 			}
 
 			html.append("<tr><td>Totals</td><td colspan=\"2\">").append(decimalFormat.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
