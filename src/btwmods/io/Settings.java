@@ -27,7 +27,7 @@ public class Settings {
 					section = line.trim();
 				}
 				else if ((equalsIndex = line.indexOf('=')) >= 0) {
-					settings.put(section + line.substring(0, equalsIndex).toLowerCase(), line.substring(equalsIndex + 1));
+					settings.put(section.toLowerCase() + line.substring(0, equalsIndex).toLowerCase(), line.substring(equalsIndex + 1));
 				}
 			}
 		}

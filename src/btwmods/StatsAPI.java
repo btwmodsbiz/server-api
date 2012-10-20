@@ -71,8 +71,8 @@ public class StatsAPI {
 		server = MinecraftServer.getServer();
 
 		// Load settings
-		if (settings.isBoolean("detailedmeasurements")) {
-			detailedMeasurementsEnabled = settings.getBoolean("detailedmeasurements");
+		if (settings.isBoolean("[statsapi]detailedmeasurements")) {
+			detailedMeasurementsEnabled = settings.getBoolean("[statsapi]detailedmeasurements");
 		}
 
 		Field loadedChunksField = ChunkProviderServer.class.getDeclaredField("loadedChunks");

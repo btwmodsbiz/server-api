@@ -131,8 +131,11 @@ public class ModLoader {
 				// TODO: Can we use our own URLClassLoader instead?
 			}
 			
+			// Load settings.
+			settings = loadSettings("BTWMods");
+			
 			try {
-				StatsAPI.init(loadSettings("StatsAPI"));
+				StatsAPI.init(settings);
 			}
 			catch (Exception e) {
 				outputError(e, "StatsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
@@ -160,9 +163,6 @@ public class ModLoader {
 				hasInit = true;
 				return;
 			}
-			
-			// Load settings.
-			settings = loadSettings("ModLoader");
 			
 			if (settings.hasKey("ignoredmodclasses")) {
 				ignoredModClasses.addAll(Arrays.asList(settings.get("ignoredmodclasses").split("[^A-Za-z0-9_\\.\\$]+")));
