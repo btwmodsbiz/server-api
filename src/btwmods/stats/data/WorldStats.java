@@ -16,6 +16,9 @@ public class WorldStats {
 	public final Average timeSync = new Average();
 	public final Average buildActiveChunkSet = new Average();
 	public final Average checkPlayerLight = new Average();
+	public final Average loadedChunks = new Average(); // TODO: make this longer?
+	public int id2ChunkMap = -1;
+	public final Average droppedChunksSet = new Average();
 	public final Map<ChunkCoordIntPair, ChunkStats> chunkStats = new LinkedHashMap<ChunkCoordIntPair, ChunkStats>();
 	public final Map<Class, EntityStats> entityStats = new LinkedHashMap<Class, EntityStats>();
 }

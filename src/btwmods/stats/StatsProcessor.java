@@ -129,6 +129,9 @@ public class StatsProcessor implements Runnable {
 			
 			for (int i = 0; i < worldStats.length; i++) {
 				worldStats[i].worldTickTime.record(stats.worldTickTimes[i]);
+				worldStats[i].loadedChunks.record(stats.loadedChunks[i]);
+				worldStats[i].id2ChunkMap = stats.id2ChunkMap[i];
+				worldStats[i].droppedChunksSet.record(stats.droppedChunksSet[i]);
 
 				// Reset the measurement entries to 0.
 				worldStats[i].measurementQueue.resetCurrent();

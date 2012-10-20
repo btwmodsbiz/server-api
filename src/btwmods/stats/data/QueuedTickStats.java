@@ -13,5 +13,8 @@ public class QueuedTickStats {
 	public long receivedPacketCount;
 	public long receivedPacketSize;
 	public long[] worldTickTimes;
+	public int[] loadedChunks;
+	public int[] id2ChunkMap;
+	public int[] droppedChunksSet;
 	public ArrayDeque<TickMeasurement> measurements;
 }

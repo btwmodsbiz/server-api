@@ -1,11 +1,16 @@
 package btwmods;
 
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
+import net.minecraft.src.ChunkProviderServer;
 import net.minecraft.src.CommandHandler;
 import net.minecraft.src.Entity;
+import net.minecraft.src.LongHashMap;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
@@ -51,17 +56,43 @@ public class StatsAPI {
 	 */
 	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<QueuedTickStats>();
 	
+	private static List[] loadedChunks;
+	private static LongHashMap[] id2ChunkMap;
+	private static Set[] droppedChunksSet;
+	
 	/**
 	 * Should only be called by ModLoader.
 	 * 
 	 * @param settings 
+	 * @throws NoSuchFieldException 
+	 * @throws IllegalAccessException 
 	 */
-	static void init(Settings settings) {
+	static void init(Settings settings) throws NoSuchFieldException, IllegalAccessException {
 		server = MinecraftServer.getServer();
 
 		// Load settings
 		if (settings.isBoolean("detailedmeasurements")) {
 			detailedMeasurementsEnabled = settings.getBoolean("detailedmeasurements");
+		}
+
+		Field loadedChunksField = ChunkProviderServer.class.getDeclaredField("loadedChunks");
+		loadedChunksField.setAccessible(true);
+		
+		Field id2ChunkMapField = ChunkProviderServer.class.getDeclaredField("id2ChunkMap");
+		id2ChunkMapField.setAccessible(true);
+		
+		Field droppedChunksSetField = ChunkProviderServer.class.getDeclaredField("droppedChunksSet");
+		droppedChunksSetField.setAccessible(true);
+		
+		loadedChunks = new List[server.worldServers.length];
+		id2ChunkMap = new LongHashMap[server.worldServers.length];
+		droppedChunksSet = new Set[server.worldServers.length];
+		
+		for (int i = 0; i < server.worldServers.length; i++) {
+			ChunkProviderServer provider = (ChunkProviderServer)server.worldServers[i].getChunkProvider();
+			loadedChunks[i] = (List)loadedChunksField.get(provider);
+			id2ChunkMap[i] = (LongHashMap)id2ChunkMapField.get(provider);
+			droppedChunksSet[i] = (Set)droppedChunksSetField.get(provider);
 		}
 		
 		((CommandHandler)server.getCommandManager()).registerCommand(new CommandStats());
@@ -145,8 +176,14 @@ public class StatsAPI {
 			stats.receivedPacketSize = server.receivedPacketSizeArray[tickCounter % 100];
 			
 			stats.worldTickTimes = new long[server.timeOfLastDimensionTick.length];
+			stats.loadedChunks = new int[stats.worldTickTimes.length];
+			stats.id2ChunkMap = new int[stats.worldTickTimes.length];
+			stats.droppedChunksSet = new int[stats.worldTickTimes.length];
 			for (int i = 0; i < stats.worldTickTimes.length; i++) {
 				stats.worldTickTimes[i] = server.timeOfLastDimensionTick[i][tickCounter % 100];
+				stats.loadedChunks[i] = loadedChunks[i].size();
+				stats.id2ChunkMap[i] = id2ChunkMap[i].getNumHashElements();
+				stats.droppedChunksSet[i] = droppedChunksSet[i].size();
 			}
 			
 			// Save measurements and clear it for the next round.
