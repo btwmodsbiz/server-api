@@ -99,6 +99,10 @@ public class ModLoader {
 	 */
 	private static Set<String> ignoredModClasses = new HashSet<String>();
 	
+	private static boolean allowUnloadSpawnChunks = true;
+	
+	private static boolean preloadSpawnChunks = false;
+	
 	/**
 	 * Initialize the ModLoader and mods. Should only be called from the {@link World} constructor.
 	 */
@@ -166,6 +170,14 @@ public class ModLoader {
 			
 			if (settings.hasKey("ignoredmods")) {
 				ignoredMods.addAll(Arrays.asList(settings.get("ignoredmods").split("[\\s;,]+")));
+			}
+			
+			if (settings.isBoolean("allowunloadspawnchunks")) {
+				allowUnloadSpawnChunks = settings.getBoolean("allowunloadspawnchunks");
+			}
+			
+			if (settings.isBoolean("preloadspawnchunks")) {
+				preloadSpawnChunks = settings.getBoolean("preloadspawnchunks");
 			}
 			
 			findModsInClassPath();
@@ -514,5 +526,13 @@ public class ModLoader {
 		CommandsAPI.unregisterCommand(command);
 		
 		outputError(e, name + " threw a " + e.getClass().getSimpleName() + (e.getMessage() == null ? "." : ": " + e.getMessage()), Level.SEVERE);
+	}
+
+	public static boolean doInitialChunkLoad() {
+		return preloadSpawnChunks;
+	}
+
+	public static boolean doUnloadSpawnChunks() {
+		return allowUnloadSpawnChunks;
 	}
 }
