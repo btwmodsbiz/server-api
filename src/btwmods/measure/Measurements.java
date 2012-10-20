@@ -4,9 +4,17 @@ import java.util.ArrayDeque;
 
 public class Measurements<T extends Measurement> {
 	
-	private boolean enabled = true;
+	private boolean enabled;
 	private ArrayDeque<T> measurements = new ArrayDeque<T>();
 	private ArrayDeque<T> dataStack = new ArrayDeque<T>();
+	
+	public Measurements() {
+		this(true);
+	}
+	
+	public Measurements(boolean isEnabled) {
+		enabled = isEnabled;
+	}
 	
 	public boolean isEnabled() {
 		return enabled;
