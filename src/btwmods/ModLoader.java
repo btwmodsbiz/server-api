@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -292,10 +291,7 @@ public class ModLoader {
 	}
 	
 	private static void findModsInClassPath() {
-		Iterator<URL> urls = classLoaderUrls.iterator();
-		
-		while (urls.hasNext()) {
-			URL url = urls.next();
+		for (URL url : classLoaderUrls) {
 			try {
 				File path = new File(url.toURI());
 				String name = path.getName();

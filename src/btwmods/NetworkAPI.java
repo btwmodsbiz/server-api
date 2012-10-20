@@ -2,7 +2,6 @@ package btwmods;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -65,9 +64,8 @@ public class NetworkAPI {
 		// Remove the listener from the normal lookup.
 		Set<String> channels = channelListeners.get(listener);
 		if (channels != null) {
-			Iterator<String> channelIterator = channelListeners.get(listener).iterator();
-			while (channelIterator.hasNext()) {
-				networkListeners.remove(channelIterator.next());
+			for (String channelExtension : channelListeners.get(listener)) {
+				networkListeners.remove(channelExtension);
 			}
 		}
 		
