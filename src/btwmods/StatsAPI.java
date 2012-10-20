@@ -28,6 +28,8 @@ public class StatsAPI {
 	
 	private StatsAPI() {}
 	
+	private static boolean isInitialized = false;
+	
 	private static MinecraftServer server;
 	
 	private static volatile int tickCounter = -1;
@@ -35,7 +37,7 @@ public class StatsAPI {
 	/**
 	 * The detailed measurements that have been take this tick. 
 	 */
-	private static Measurements measurements = new Measurements();
+	private static Measurements measurements = new Measurements(false);
 	
 	/**
 	 * Whether or not to skip detailed measurements, starting with the next tick.
@@ -56,12 +58,15 @@ public class StatsAPI {
 	 */
 	static void init(Settings settings) {
 		server = MinecraftServer.getServer();
-		((CommandHandler)server.getCommandManager()).registerCommand(new CommandStats());
 
 		// Load settings
 		if (settings.isBoolean("detailedmeasurements")) {
 			detailedMeasurementsEnabled = settings.getBoolean("detailedmeasurements");
 		}
+		
+		((CommandHandler)server.getCommandManager()).registerCommand(new CommandStats());
+		
+		isInitialized = true;
 	}
 	
 	/**
@@ -108,6 +113,9 @@ public class StatsAPI {
 	}
 
 	public static void startTick(int tickCounter) {
+		if (!isInitialized)
+			return;
+		
 		StatsAPI.tickCounter = tickCounter;
 		
 		// Process any failures that may be queued from the last tick.
@@ -118,6 +126,9 @@ public class StatsAPI {
 	}
 
 	public static void endTick() {
+		if (!isInitialized)
+			return;
+		
 		if (!StatsProcessor.isRunning()) {
 			statsQueue.clear();
 		}
