@@ -74,6 +74,15 @@ public class Average implements Comparable<Average> {
 	}
 	
 	/**
+	 * Get the latest value recorded.
+	 * 
+	 * @return the latest value.
+	 */
+	public long getLatest() {
+		return tick < 0 ? 0 : history[tick % resolution];
+	}
+	
+	/**
 	 * Move to the next history entry and set its value to 0.
 	 * This is used with {@link #incrementCurrent(long)}.
 	 */
