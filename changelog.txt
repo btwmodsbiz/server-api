@@ -7,6 +7,8 @@ Version 1.1
 
 - Added support for StatAPI changes to Tick Monitor.
 
+- Added detailed output for all worlds to Tick Monitor.
+
 - Changed EntityItem entries in the entity stats to store as the Item class instead.
 
 - Changed (improved) StatsAPI failure handling.

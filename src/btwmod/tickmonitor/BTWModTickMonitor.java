@@ -210,126 +210,12 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			html.append("</tbody></table>");
 			
 			if (detailedMeasurementsEnabled) {
-			
-				List<Map.Entry<ChunkCoordIntPair, ChunkStats>> chunkEntries = new ArrayList<Map.Entry<ChunkCoordIntPair, ChunkStats>>(event.worldStats[0].chunkStats.entrySet());
-	
-				html.append("<h2>Top " + topNumber + ":</h2>");
-				
-				html.append("<table border=\"0\"><thead><tr><th>Chunks By Tick Time</th><th>Chunks By Entity Count</th><th>Entities By Tick Time</th><th>Entities By Count</th></tr></thead><tbody><tr><td valign=\"top\">");
-	
-				{
-					Collections.sort(chunkEntries, new ChunkStatsComparator<ChunkCoordIntPair>(Stat.TICKTIME, true));
-					html.append("<table border=\"0\"><thead><tr><th>Chunk</th><th>Tick Time</th><th>Entities</th></tr></thead><tbody>");
-					double chunksTotal = 0;
-					int entitiesTotal = 0;
-					int displayed = 0;
-					for (int i = 0; i < chunkEntries.size(); i++) {
-						if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
-							displayed++;
-							html.append("<tr><td>");
-							
-							if (hideChunkCoords)
-								html.append("(hidden)");
-							else
-								html.append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos);
-							
-							html.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
-								.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
-								.append("</td></tr>");
-						}
-	
-						chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();
-						entitiesTotal += chunkEntries.get(i).getValue().entityCount;
-					}
-	
-					html.append("<tr><td>Totals</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
-					html.append("</tbody></table>");
+				for (int i = 0; i < event.worldStats.length; i++) {
+					outputWorldDetails(event, html, i);
 				}
-				
-				html.append("</td><td valign=\"top\">");
-	
-				{
-					Collections.sort(chunkEntries, new ChunkStatsComparator<ChunkCoordIntPair>(Stat.ENTITIES, true));
-					html.append("<table border=\"0\"><thead><tr><th>Chunk</th><th>Tick Time</th><th>Entities</th></tr></thead><tbody>");
-					double chunksTotal = 0;
-					int displayed = 0;
-					int entitiesTotal = 0;
-					for (int i = 0; i < chunkEntries.size(); i++) {
-						if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
-							displayed++;
-							html.append("<tr><td>");
-							
-							if (hideChunkCoords)
-								html.append("(hidden)");
-							else
-								html.append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos);
-							
-							html.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
-								.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
-								.append("</td></tr>");
-						}
-	
-						chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();
-						entitiesTotal += chunkEntries.get(i).getValue().entityCount;
-					}
-	
-					html.append("<tr><td>Totals</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
-					html.append("</tbody></table>");
-				}
-
-				List<Map.Entry<Class, EntityStats>> entityEntries = new ArrayList<Map.Entry<Class, EntityStats>>(event.worldStats[0].entityStats.entrySet());
-				
-				html.append("</td><td valign=\"top\">");
-	
-				{
-					Collections.sort(entityEntries, new EntityStatsComparator<Class>(EntityStatsComparator.Stat.TICKTIME, true));
-					html.append("<table border=\"0\"><thead><tr><th>Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
-					double entitiesTotal = 0;
-					int displayed = 0;
-					for (int i = 0; i < entityEntries.size(); i++) {
-						if (entityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
-							displayed++;
-							html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
-									.append("</td><td>").append(decimalFormat.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
-									.append(" ms</td><td>").append(entityEntries.get(i).getValue().entityCount)
-									.append("</td></tr>");
-						}
-	
-						entitiesTotal += entityEntries.get(i).getValue().tickTime.getAverage();
-					}
-	
-					html.append("<tr><td>Totals</td><td colspan=\"2\">").append(decimalFormat.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
-					html.append("</tbody></table>");
-				}
-				
-				html.append("</td><td valign=\"top\">");
-	
-				{
-					Collections.sort(entityEntries, new EntityStatsComparator<Class>(EntityStatsComparator.Stat.ENTITIES, true));
-					html.append("<table border=\"0\"><thead><tr><th>Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
-					double entitiesTotal = 0;
-					int displayed = 0;
-					for (int i = 0; i < entityEntries.size(); i++) {
-						if (entityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
-							displayed++;
-							html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
-									.append("</td><td>").append(decimalFormat.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
-									.append(" ms</td><td>").append(entityEntries.get(i).getValue().entityCount)
-									.append("</td></tr>");
-						}
-	
-						entitiesTotal += entityEntries.get(i).getValue().tickTime.getAverage();
-					}
-	
-					html.append("<tr><td>Totals</td><td colspan=\"2\">").append(decimalFormat.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
-					html.append("</tbody></table>");
-				}
-	
-				html.append("</td></tr></tbody></table>");
-	
-				html.append("</body></html>");
-			
 			}
+	
+			html.append("</body></html>");
 
 			long startWriteTime = System.currentTimeMillis();
 			long startWriteNano = System.nanoTime();
@@ -354,6 +240,125 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			lastTickCounter = event.tickCounter;
 			lastStatsTime = System.currentTimeMillis();
 		}
+	}
+	
+	private void outputWorldDetails(StatsEvent event, StringBuilder html, int world) {
+		
+		List<Map.Entry<ChunkCoordIntPair, ChunkStats>> chunkEntries = new ArrayList<Map.Entry<ChunkCoordIntPair, ChunkStats>>(event.worldStats[world].chunkStats.entrySet());
+
+		html.append("<h2>World ").append(world).append(" Top " + topNumber + ":</h2>");
+		
+		html.append("<table border=\"0\"><thead><tr><th>Chunks By Tick Time</th><th>Chunks By Entity Count</th><th>Entities By Tick Time</th><th>Entities By Count</th></tr></thead><tbody><tr><td valign=\"top\">");
+
+		{
+			Collections.sort(chunkEntries, new ChunkStatsComparator<ChunkCoordIntPair>(Stat.TICKTIME, true));
+			html.append("<table border=\"0\"><thead><tr><th>Chunk</th><th>Tick Time</th><th>Entities</th></tr></thead><tbody>");
+			double chunksTotal = 0;
+			int entitiesTotal = 0;
+			int displayed = 0;
+			for (int i = 0; i < chunkEntries.size(); i++) {
+				if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
+					displayed++;
+					html.append("<tr><td>");
+					
+					if (hideChunkCoords)
+						html.append("(hidden)");
+					else
+						html.append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos);
+					
+					html.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+						.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
+						.append("</td></tr>");
+				}
+
+				chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();
+				entitiesTotal += chunkEntries.get(i).getValue().entityCount;
+			}
+
+			html.append("<tr><td>Totals</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
+			html.append("</tbody></table>");
+		}
+		
+		html.append("</td><td valign=\"top\">");
+
+		{
+			Collections.sort(chunkEntries, new ChunkStatsComparator<ChunkCoordIntPair>(Stat.ENTITIES, true));
+			html.append("<table border=\"0\"><thead><tr><th>Chunk</th><th>Tick Time</th><th>Entities</th></tr></thead><tbody>");
+			double chunksTotal = 0;
+			int displayed = 0;
+			int entitiesTotal = 0;
+			for (int i = 0; i < chunkEntries.size(); i++) {
+				if (chunkEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
+					displayed++;
+					html.append("<tr><td>");
+					
+					if (hideChunkCoords)
+						html.append("(hidden)");
+					else
+						html.append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos);
+					
+					html.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+						.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
+						.append("</td></tr>");
+				}
+
+				chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();
+				entitiesTotal += chunkEntries.get(i).getValue().entityCount;
+			}
+
+			html.append("<tr><td>Totals</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
+			html.append("</tbody></table>");
+		}
+
+		List<Map.Entry<Class, EntityStats>> entityEntries = new ArrayList<Map.Entry<Class, EntityStats>>(event.worldStats[world].entityStats.entrySet());
+		
+		html.append("</td><td valign=\"top\">");
+
+		{
+			Collections.sort(entityEntries, new EntityStatsComparator<Class>(EntityStatsComparator.Stat.TICKTIME, true));
+			html.append("<table border=\"0\"><thead><tr><th>Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
+			double entitiesTotal = 0;
+			int displayed = 0;
+			for (int i = 0; i < entityEntries.size(); i++) {
+				if (entityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
+					displayed++;
+					html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
+							.append("</td><td>").append(decimalFormat.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+							.append(" ms</td><td>").append(entityEntries.get(i).getValue().entityCount)
+							.append("</td></tr>");
+				}
+
+				entitiesTotal += entityEntries.get(i).getValue().tickTime.getAverage();
+			}
+
+			html.append("<tr><td>Totals</td><td colspan=\"2\">").append(decimalFormat.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
+			html.append("</tbody></table>");
+		}
+		
+		html.append("</td><td valign=\"top\">");
+
+		{
+			Collections.sort(entityEntries, new EntityStatsComparator<Class>(EntityStatsComparator.Stat.ENTITIES, true));
+			html.append("<table border=\"0\"><thead><tr><th>Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
+			double entitiesTotal = 0;
+			int displayed = 0;
+			for (int i = 0; i < entityEntries.size(); i++) {
+				if (entityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
+					displayed++;
+					html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
+							.append("</td><td>").append(decimalFormat.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+							.append(" ms</td><td>").append(entityEntries.get(i).getValue().entityCount)
+							.append("</td></tr>");
+				}
+
+				entitiesTotal += entityEntries.get(i).getValue().tickTime.getAverage();
+			}
+
+			html.append("<tr><td>Totals</td><td colspan=\"2\">").append(decimalFormat.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
+			html.append("</tbody></table>");
+		}
+
+		html.append("</td></tr></tbody></table>");
 	}
 
 	@Override
