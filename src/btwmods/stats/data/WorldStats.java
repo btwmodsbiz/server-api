@@ -21,4 +21,5 @@ public class WorldStats {
 	public final Average droppedChunksSet = new Average();
 	public final Map<ChunkCoordIntPair, ChunkStats> chunkStats = new LinkedHashMap<ChunkCoordIntPair, ChunkStats>();
 	public final Map<Class, EntityStats> entityStats = new LinkedHashMap<Class, EntityStats>();
+	public final Map<Class, TileEntityStats> tileEntityStats = new LinkedHashMap<Class, TileEntityStats>();
 }

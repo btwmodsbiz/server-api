@@ -15,6 +15,7 @@ import btwmods.stats.data.ChunkStats;
 import btwmods.stats.data.EntityStats;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.data.ServerStats;
+import btwmods.stats.data.TileEntityStats;
 import btwmods.stats.data.WorldStats;
 import btwmods.stats.measurements.BlockUpdate;
 import btwmods.stats.measurements.EntityUpdate;
@@ -168,6 +169,20 @@ public class StatsProcessor implements Runnable {
 						entry.getValue().resetCurrent();
 					}
 				}
+				
+				
+				// Reset the TileEntityStats.
+				Iterator<Map.Entry<Class, TileEntityStats>> tileEntityStatsIterator = worldStats[i].tileEntityStats.entrySet().iterator();
+				while (tileEntityStatsIterator.hasNext()) {
+					Map.Entry<Class, TileEntityStats> entry = tileEntityStatsIterator.next();
+					
+					if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
+						tileEntityStatsIterator.remove();
+					}
+					else {
+						entry.getValue().resetCurrent();
+					}
+				}
 			}
 			
 			// Add the time taken by each measurement type.
@@ -234,6 +249,18 @@ public class StatsProcessor implements Runnable {
 						case TILE_ENTITY_UPDATE:
 							TileEntityUpdate tileEntityUpdate = (TileEntityUpdate)worldMeasurement;
 							coords = new ChunkCoordIntPair(tileEntityUpdate.chunkX, tileEntityUpdate.chunkZ);
+							
+							TileEntityStats tileEntityStats = worldStats[worldMeasurement.worldIndex].tileEntityStats.get(tileEntityUpdate.tileEntity);
+							if (tileEntityStats == null) {
+								worldStats[worldMeasurement.worldIndex].tileEntityStats.put(tileEntityUpdate.tileEntity, tileEntityStats = new TileEntityStats(tileEntityUpdate.tileEntity));
+								tileEntityStats.tickTime.record(measurement.getTime());
+							}
+							else {
+								tileEntityStats.tickTime.incrementCurrent(measurement.getTime());
+							}
+							
+							tileEntityStats.tileEntityCount++;
+							
 							break;
 					}
 					

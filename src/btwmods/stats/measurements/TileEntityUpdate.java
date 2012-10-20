@@ -5,7 +5,8 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 
 public class TileEntityUpdate extends WorldMeasurement {
-	
+
+	public final Class tileEntity;
 	public final int x;
 	public final int y;
 	public final int z;
@@ -14,6 +15,7 @@ public class TileEntityUpdate extends WorldMeasurement {
 
 	public TileEntityUpdate(World world, TileEntity tileEntity) {
 		super(Type.TILE_ENTITY_UPDATE, world);
+		this.tileEntity = tileEntity.getClass();
 		x = tileEntity.xCoord;
 		y = tileEntity.yCoord;
 		z = tileEntity.zCoord;
