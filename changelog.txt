@@ -1,3 +1,16 @@
+Version 1.1
+
+- Added toggle for initial chunk loading and allowing spawning chunks to unload.
+  In btwmods/ModLoader.txt use allowunloadspawnchunks=true/false and preloadspawnchunks=true/false
+  
+- Added stats for loaded chunks, cached chunks and dropped chunks to StatsAPI.
+
+- Added support for StatAPI changes to Tick Monitor.
+
+- Changed EntityItem entries in the entity stats to store as the Item class instead.
+
+- Changed (improved) StatsAPI failure handling.
+
 Version 1.0
 
 - Initial release
