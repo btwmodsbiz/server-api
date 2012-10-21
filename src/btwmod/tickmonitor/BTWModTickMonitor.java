@@ -9,11 +9,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.CommandHandler;
 
 import btwmods.IMod;
+import btwmods.ModLoader;
 import btwmods.StatsAPI;
 import btwmods.io.Settings;
 import btwmods.measure.Average;
@@ -26,8 +31,10 @@ import btwmods.stats.EntityStatsComparator;
 import btwmods.stats.IStatsListener;
 import btwmods.stats.StatsEvent;
 import btwmods.stats.ChunkStatsComparator.Stat;
+import btwmods.stats.TileEntityStatsComparator;
 import btwmods.stats.data.ChunkStats;
 import btwmods.stats.data.EntityStats;
+import btwmods.stats.data.TileEntityStats;
 import btwmods.util.BasicFormatter;
 
 public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener, IInstanceListener {
@@ -35,6 +42,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 	private static int topNumber = 20;
 	private static String publicLink = null;
 	private static File htmlFile = new File(new File("."), "stats.html");
+	private static File jsonFile = new File(new File("."), "stats.txt");
     private static final DecimalFormat decimalFormat = new DecimalFormat("########0.000");
 	
     private boolean isRunning = true; // TODO: make this false by default.
@@ -44,8 +52,9 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 	private int lastTickCounter = -1;
 	private Average statsActionTime = new Average(10);
 	private Average statsActionIOTime = new Average(10);
+	private Average ticksPerSecond = new Average(10);
 	
-	private int[] ticksPerSecondArray = new int[100];
+	private Gson gson;
 	
 	public volatile boolean hideChunkCoords = true;
     
@@ -58,12 +67,23 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 	public void init(Settings settings) {
 		lastStatsTime = System.currentTimeMillis();
 		
+		gson = new GsonBuilder()
+			.registerTypeAdapter(Class.class, new TypeAdapters.ClassAdapter())
+			.registerTypeAdapter(ChunkCoordIntPair.class, new TypeAdapters.ChunkCoordIntPairAdapter())
+			.registerTypeAdapter(Average.class, new TypeAdapters.AverageTypeAdapter())
+			.setPrettyPrinting()
+			.enableComplexMapKeySerialization()
+			.create();
+		
 		// Load settings
 		if (settings.hasKey("publiclink") && !(new File(settings.get("publiclink")).isDirectory())) {
 			publicLink = settings.get("publiclink");
 		}
 		if (settings.hasKey("htmlfile") && !(new File(settings.get("htmlfile")).isDirectory())) {
 			htmlFile = new File(settings.get("htmlfile"));
+		}
+		if (settings.hasKey("jsonfile") && !(new File(settings.get("jsonfile")).isDirectory())) {
+			jsonFile = new File(settings.get("jsonfile"));
 		}
 		if (settings.isBoolean("runonstartup")) {
 			isRunning = settings.getBoolean("runonstartup");
@@ -124,9 +144,25 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 		}
 		
 		else if (currentTime - lastStatsTime > reportingDelay) {
-			
-			long timeElapsed = System.currentTimeMillis() - lastStatsTime;
 			int numTicks = event.tickCounter - lastTickCounter;
+			
+			long timeElapsed = currentTime - lastStatsTime;
+			long timeSinceLastTick = currentTime - event.serverStats.lastTickEnd;
+			ticksPerSecond.record((int)((double)numTicks / (double)timeElapsed * 100000D));
+
+			long jsonTime = System.nanoTime();
+			JsonObject jsonObj = new JsonObject();
+			jsonObj.addProperty("timeElapsed", timeElapsed);
+			jsonObj.addProperty("timeSinceLastTick", timeSinceLastTick);
+			jsonObj.addProperty("numTicks", numTicks);
+			jsonObj.addProperty("time", BasicFormatter.dateFormat.format(new Date(currentTime)));
+			jsonObj.add("statsActionTime", gson.toJsonTree(statsActionTime));
+			jsonObj.add("statsActionIOTime", gson.toJsonTree(statsActionIOTime));
+			jsonObj.add("ticksPerSecondArray", gson.toJsonTree(ticksPerSecond));
+			
+			jsonObj.addProperty("jsonTime", "_____JSONTIME_____");
+			jsonObj.add("statsEvent", gson.toJsonTree(event));
+			String json = gson.toJson(jsonObj).replace("_____JSONTIME_____", decimalFormat.format((jsonTime = System.nanoTime() - jsonTime) * 1.0E-6D) + "ms");
 			
 			// Debugging loop to ramp up CPU usage by the thread.
 			//for (int i = 0; i < 20000; i++) new String(new char[10000]).replace('\0', 'a');
@@ -138,7 +174,6 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			html.append("<tr><th align=\"right\">Updated:<th><td>").append(BasicFormatter.dateFormat.format(new Date())).append("</td></tr>");
 			
 			if (event.serverStats.lastTickEnd >= 0) {
-				long timeSinceLastTick = System.currentTimeMillis() - event.serverStats.lastTickEnd;
 				html.append("<tr><th align=\"right\">Last Tick:<th><td>").append(timeSinceLastTick >= 1000 ? "Over " + (timeSinceLastTick / 1000) + " seconds" : timeSinceLastTick + "ms").append(" ago.</td></tr>");
 			}
 			
@@ -155,7 +190,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
 			
 			html.append("<tr><th align=\"right\">Tick Num:<th><td>").append(event.tickCounter);
-			if (lastTickCounter >= 0) html.append(" (~").append(decimalFormat.format((double)numTicks / (double)timeElapsed * 1000D)).append("/sec)");
+			if (lastTickCounter >= 0) html.append(" (~").append(decimalFormat.format(ticksPerSecond.getAverage() / 100D)).append("/sec)");
 			html.append("</td></tr>");
 			
 			html.append("<tr><th align=\"right\">Average Full Tick:<th><td>").append(decimalFormat.format(event.serverStats.tickTime.getAverage() * 1.0E-6D)).append(" ms</td></tr>");
@@ -221,19 +256,28 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			long startWriteNano = System.nanoTime();
 			
 			try {
-				FileWriter writer = new FileWriter(htmlFile);
-				writer.write(html.toString());
-				writer.close();
+				FileWriter htmlWriter = new FileWriter(htmlFile);
+				htmlWriter.write(html.toString());
+				htmlWriter.close();
 			}
 			catch (Throwable e) {
-				net.minecraft.server.MinecraftServer.logger.warning("Tick Monitor failed to write to " + htmlFile.getPath() + ": " + e.getMessage());
+				ModLoader.outputError(getName() + " failed to write to " + htmlFile.getPath() + ": " + e.getMessage());
+			}
+			
+			try {
+				FileWriter jsonWriter = new FileWriter(jsonFile);
+				jsonWriter.write(json);
+				jsonWriter.close();
+			}
+			catch (Throwable e) {
+				ModLoader.outputError(getName() + " failed to write to " + jsonFile.getPath() + ": " + e.getMessage());
 			}
 			
 			long endNano = System.nanoTime();
 			long endTime = System.currentTimeMillis();
 			
 			if (System.currentTimeMillis() - currentTime > tooLongWarningTime)
-				net.minecraft.server.MinecraftServer.logger.warning("Tick Monitor took " + (endTime - currentTime) + "ms (~" + ((endTime - startWriteTime) * 100 / (endTime - currentTime)) + "% disk IO) to process stats. Note: This will *not* slow the main Minecraft server thread.");
+				ModLoader.outputError(getName() + " took " + (endTime - currentTime) + "ms (~" + ((endTime - startWriteTime) * 100 / (endTime - currentTime)) + "% disk IO) to process stats. Note: This will *not* slow the main Minecraft server thread.");
 
 			statsActionTime.record(endNano - startNano);
 			statsActionIOTime.record(endNano - startWriteNano);
