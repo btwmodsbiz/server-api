@@ -35,6 +35,12 @@ public class TypeAdapters {
 	}
 	
 	public static class AverageTypeAdapter extends TypeAdapter<Average> {
+		
+		private final BTWModTickMonitor monitor;
+		
+		public AverageTypeAdapter(BTWModTickMonitor monitor) {
+			this.monitor = monitor;
+		}
 
 		@Override
 		public void write(JsonWriter out, Average average) throws IOException {
@@ -43,22 +49,24 @@ public class TypeAdapters {
 			out.name("average");
 			out.value(Util.DECIMAL_FORMAT_3.format(average.getAverage()));
 			
-			out.name("resolution");
-			out.value(average.getResolution());
-			
 			out.name("latest");
 			out.value(average.getLatest());
 			
-			out.name("history");
-			out.beginArray();
-			if (average.getTotal() > 0 && average.getTick() >= 0) {
-				long[] history = average.getHistory();
-				int backIndex = average.getTick() - average.getResolution();
-				for (int i = average.getTick(); i >= 0 && i > backIndex; i--) {
-					out.value(history[i % average.getResolution()]);
+			if (monitor.isIncludingHistory()) {
+				out.name("resolution");
+				out.value(average.getResolution());
+				
+				out.name("history");
+				out.beginArray();
+				if (average.getTotal() > 0 && average.getTick() >= 0) {
+					long[] history = average.getHistory();
+					int backIndex = average.getTick() - average.getResolution();
+					for (int i = average.getTick(); i >= 0 && i > backIndex; i--) {
+						out.value(history[i % average.getResolution()]);
+					}
 				}
+				out.endArray();
 			}
-			out.endArray();
 			
 			out.endObject();
 		}

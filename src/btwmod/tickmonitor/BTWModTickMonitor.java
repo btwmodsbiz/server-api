@@ -52,6 +52,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 	private Average statsActionTime = new Average(10);
 	private Average statsActionIOTime = new Average(10);
 	private Average ticksPerSecond = new Average(10);
+	private boolean includeHistory = false;
 	
 	private Gson gson;
 	
@@ -69,7 +70,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 		gson = new GsonBuilder()
 			.registerTypeAdapter(Class.class, new TypeAdapters.ClassAdapter())
 			.registerTypeAdapter(ChunkCoordIntPair.class, new TypeAdapters.ChunkCoordIntPairAdapter())
-			.registerTypeAdapter(Average.class, new TypeAdapters.AverageTypeAdapter())
+			.registerTypeAdapter(Average.class, new TypeAdapters.AverageTypeAdapter(this))
 			.setPrettyPrinting()
 			.enableComplexMapKeySerialization()
 			.create();
@@ -95,6 +96,9 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 		}
 		if (settings.isBoolean("hidechunkcoords")) {
 			hideChunkCoords = settings.getBoolean("hidechunkcoords");
+		}
+		if (settings.isBoolean("includehistory")) {
+			includeHistory = settings.getBoolean("includehistory");
 		}
 		
 		// Add the listener only if isRunning is true by default.
@@ -126,6 +130,10 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 
 	public boolean isRunning() {
 		return isRunning;
+	}
+	
+	public boolean isIncludingHistory() {
+		return includeHistory;
 	}
 
 	/**
@@ -161,7 +169,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			
 			jsonObj.addProperty("jsonTime", "_____JSONTIME_____");
 			jsonObj.add("statsEvent", gson.toJsonTree(event));
-			String json = gson.toJson(jsonObj).replace("_____JSONTIME_____", Util.DECIMAL_FORMAT_3.format((jsonTime = System.nanoTime() - jsonTime) * 1.0E-6D) + "ms");
+			String json = gson.toJson(jsonObj).replace("_____JSONTIME_____", Util.DECIMAL_FORMAT_3.format((jsonTime = System.nanoTime() - jsonTime) * 1.0E-6D));
 			
 			// Debugging loop to ramp up CPU usage by the thread.
 			//for (int i = 0; i < 20000; i++) new String(new char[10000]).replace('\0', 'a');
