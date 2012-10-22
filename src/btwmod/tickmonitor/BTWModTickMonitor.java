@@ -36,6 +36,7 @@ import btwmods.stats.data.ChunkStats;
 import btwmods.stats.data.EntityStats;
 import btwmods.stats.data.TileEntityStats;
 import btwmods.util.BasicFormatter;
+import btwmods.Util;
 
 public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener, IInstanceListener {
 
@@ -43,7 +44,6 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 	private static String publicLink = null;
 	private static File htmlFile = new File(new File("."), "stats.html");
 	private static File jsonFile = new File(new File("."), "stats.txt");
-    private static final DecimalFormat decimalFormat = new DecimalFormat("########0.000");
 	
     private boolean isRunning = true; // TODO: make this false by default.
     private long tooLongWarningTime = 1000;
@@ -162,7 +162,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			
 			jsonObj.addProperty("jsonTime", "_____JSONTIME_____");
 			jsonObj.add("statsEvent", gson.toJsonTree(event));
-			String json = gson.toJson(jsonObj).replace("_____JSONTIME_____", decimalFormat.format((jsonTime = System.nanoTime() - jsonTime) * 1.0E-6D) + "ms");
+			String json = gson.toJson(jsonObj).replace("_____JSONTIME_____", Util.DECIMAL_FORMAT_3.format((jsonTime = System.nanoTime() - jsonTime) * 1.0E-6D) + "ms");
 			
 			// Debugging loop to ramp up CPU usage by the thread.
 			//for (int i = 0; i < 20000; i++) new String(new char[10000]).replace('\0', 'a');
@@ -177,23 +177,23 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				html.append("<tr><th align=\"right\">Last Tick:<th><td>").append(timeSinceLastTick >= 1000 ? "Over " + (timeSinceLastTick / 1000) + " seconds" : timeSinceLastTick + "ms").append(" ago.</td></tr>");
 			}
 			
-			html.append("<tr><th align=\"right\">Average StatsAPI Thread Time:<th><td>").append(decimalFormat.format(event.serverStats.statsThreadTime.getAverage() * 1.0E-6D)).append(" ms</td></tr>");
-			html.append("<tr><th align=\"right\">Average StatsAPI Polled:<th><td>").append(decimalFormat.format(event.serverStats.statsThreadQueueCount.getAverage())).append("</td></tr>");
+			html.append("<tr><th align=\"right\">Average StatsAPI Thread Time:<th><td>").append(Util.DECIMAL_FORMAT_3.format(event.serverStats.statsThreadTime.getAverage() * 1.0E-6D)).append(" ms</td></tr>");
+			html.append("<tr><th align=\"right\">Average StatsAPI Polled:<th><td>").append(Util.DECIMAL_FORMAT_3.format(event.serverStats.statsThreadQueueCount.getAverage())).append("</td></tr>");
 			
 			html.append("<tr><th align=\"right\">Average Tick Monitor Time:<th><td>");
 			if (statsActionTime.getTick() == 0)
 				html.append("...");
 			else
-				html.append(decimalFormat.format(statsActionTime.getAverage() * 1.0E-6D)).append("ms (" + (int)(statsActionIOTime.getAverage() * 100 / statsActionTime.getAverage()) + "% IO)");
+				html.append(Util.DECIMAL_FORMAT_3.format(statsActionTime.getAverage() * 1.0E-6D)).append("ms (" + (int)(statsActionIOTime.getAverage() * 100 / statsActionTime.getAverage()) + "% IO)");
 			html.append("</td></tr>");
 			
 			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
 			
 			html.append("<tr><th align=\"right\">Tick Num:<th><td>").append(event.tickCounter);
-			if (lastTickCounter >= 0) html.append(" (~").append(decimalFormat.format(ticksPerSecond.getAverage() / 100D)).append("/sec)");
+			if (lastTickCounter >= 0) html.append(" (~").append(Util.DECIMAL_FORMAT_3.format(ticksPerSecond.getAverage() / 100D)).append("/sec)");
 			html.append("</td></tr>");
 			
-			html.append("<tr><th align=\"right\">Average Full Tick:<th><td>").append(decimalFormat.format(event.serverStats.tickTime.getAverage() * 1.0E-6D)).append(" ms</td></tr>");
+			html.append("<tr><th align=\"right\">Average Full Tick:<th><td>").append(Util.DECIMAL_FORMAT_3.format(event.serverStats.tickTime.getAverage() * 1.0E-6D)).append(" ms</td></tr>");
 			
 			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
 			
@@ -203,17 +203,17 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				worldsTotal += event.worldStats[i].worldTickTime.getAverage();
 				
 				html.append("<tr><th align=\"right\">World ").append(i).append(" Averages:<th><td>")
-					.append(decimalFormat.format(event.worldStats[i].worldTickTime.getAverage() * 1.0E-6D) + "ms");
+					.append(Util.DECIMAL_FORMAT_3.format(event.worldStats[i].worldTickTime.getAverage() * 1.0E-6D) + "ms");
 				
 				if (detailedMeasurementsEnabled)
 					html.append(" (")
-						.append("E: ").append(decimalFormat.format(event.worldStats[i].entities.getAverage() * 1.0E-6D)).append("ms")
-						.append(" + M: ").append(decimalFormat.format(event.worldStats[i].mobSpawning.getAverage() * 1.0E-6D)).append("ms")
-						.append(" + B: ").append(decimalFormat.format(event.worldStats[i].blockTick.getAverage() * 1.0E-6D)).append("ms")
-						.append(" + W: ").append(decimalFormat.format(event.worldStats[i].weather.getAverage() * 1.0E-6D)).append("ms")
-						.append(" + T: ").append(decimalFormat.format(event.worldStats[i].timeSync.getAverage() * 1.0E-6D)).append("ms")
-						.append(" + CS: ").append(decimalFormat.format(event.worldStats[i].buildActiveChunkSet.getAverage() * 1.0E-6D)).append("ms")
-						.append(" + L: ").append(decimalFormat.format(event.worldStats[i].checkPlayerLight.getAverage() * 1.0E-6D)).append("ms")
+						.append("E: ").append(Util.DECIMAL_FORMAT_3.format(event.worldStats[i].entities.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + M: ").append(Util.DECIMAL_FORMAT_3.format(event.worldStats[i].mobSpawning.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + B: ").append(Util.DECIMAL_FORMAT_3.format(event.worldStats[i].blockTick.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + W: ").append(Util.DECIMAL_FORMAT_3.format(event.worldStats[i].weather.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + T: ").append(Util.DECIMAL_FORMAT_3.format(event.worldStats[i].timeSync.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + CS: ").append(Util.DECIMAL_FORMAT_3.format(event.worldStats[i].buildActiveChunkSet.getAverage() * 1.0E-6D)).append("ms")
+						.append(" + L: ").append(Util.DECIMAL_FORMAT_3.format(event.worldStats[i].checkPlayerLight.getAverage() * 1.0E-6D)).append("ms")
 						.append(")");
 				
 				html.append("</td></tr>");
@@ -230,12 +230,12 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				html.append("</td></tr>");
 			}
 
-			html.append("<tr><th align=\"right\">Worlds Total:<th><td>").append(decimalFormat.format(worldsTotal * 1.0E-6D)).append(" ms (" + (int)(worldsTotal / event.serverStats.tickTime.getAverage() * 100) + "% of full tick)</td></tr>");
+			html.append("<tr><th align=\"right\">Worlds Total:<th><td>").append(Util.DECIMAL_FORMAT_3.format(worldsTotal * 1.0E-6D)).append(" ms (" + (int)(worldsTotal / event.serverStats.tickTime.getAverage() * 100) + "% of full tick)</td></tr>");
 			
 			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
 			
-			html.append("<tr><th align=\"right\">Average Received Packet Count:<th><td>").append(decimalFormat.format(event.serverStats.receivedPacketCount.getAverage())).append("</td></tr>");
-			html.append("<tr><th align=\"right\">Average Sent Packet Count:<th><td>").append(decimalFormat.format(event.serverStats.sentPacketCount.getAverage())).append("</td></tr>");
+			html.append("<tr><th align=\"right\">Average Received Packet Count:<th><td>").append(Util.DECIMAL_FORMAT_3.format(event.serverStats.receivedPacketCount.getAverage())).append("</td></tr>");
+			html.append("<tr><th align=\"right\">Average Sent Packet Count:<th><td>").append(Util.DECIMAL_FORMAT_3.format(event.serverStats.sentPacketCount.getAverage())).append("</td></tr>");
 			
 			html.append("<tr><td colspan=\"2\" style=\"height: 16px\"></td></tr>");
 
@@ -310,7 +310,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 					else
 						html.append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos);
 					
-					html.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+					html.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
 						.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
 						.append("</td></tr>");
 				}
@@ -319,7 +319,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				entitiesTotal += chunkEntries.get(i).getValue().entityCount;
 			}
 
-			html.append("<tr><td>Totals</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
+			html.append("<tr><td>Totals</td><td>").append(Util.DECIMAL_FORMAT_3.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
 			html.append("</tbody></table>");
 		}
 		
@@ -341,7 +341,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 					else
 						html.append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos);
 					
-					html.append("</td><td>").append(decimalFormat.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+					html.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
 						.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
 						.append("</td></tr>");
 				}
@@ -350,7 +350,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				entitiesTotal += chunkEntries.get(i).getValue().entityCount;
 			}
 
-			html.append("<tr><td>Totals</td><td>").append(decimalFormat.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
+			html.append("<tr><td>Totals</td><td>").append(Util.DECIMAL_FORMAT_3.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
 			html.append("</tbody></table>");
 		}
 
@@ -367,7 +367,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				if (entityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
 					displayed++;
 					html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
-							.append("</td><td>").append(decimalFormat.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+							.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
 							.append(" ms</td><td>").append(entityEntries.get(i).getValue().entityCount)
 							.append("</td></tr>");
 				}
@@ -375,7 +375,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				entitiesTotal += entityEntries.get(i).getValue().tickTime.getAverage();
 			}
 
-			html.append("<tr><td>Totals</td><td colspan=\"2\">").append(decimalFormat.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
+			html.append("<tr><td>Totals</td><td colspan=\"2\">").append(Util.DECIMAL_FORMAT_3.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
 			html.append("</tbody></table>");
 		}
 		
@@ -390,7 +390,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				if (entityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
 					displayed++;
 					html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
-							.append("</td><td>").append(decimalFormat.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+							.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
 							.append(" ms</td><td>").append(entityEntries.get(i).getValue().entityCount)
 							.append("</td></tr>");
 				}
@@ -398,7 +398,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				entitiesTotal += entityEntries.get(i).getValue().tickTime.getAverage();
 			}
 
-			html.append("<tr><td>Totals</td><td colspan=\"2\">").append(decimalFormat.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
+			html.append("<tr><td>Totals</td><td colspan=\"2\">").append(Util.DECIMAL_FORMAT_3.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
 			html.append("</tbody></table>");
 		}
 
@@ -415,7 +415,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				if (tileEntityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
 					displayed++;
 					html.append("<tr><td>").append(tileEntityEntries.get(i).getKey().getSimpleName())
-							.append("</td><td>").append(decimalFormat.format(tileEntityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
+							.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(tileEntityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
 							.append(" ms</td><td>").append(tileEntityEntries.get(i).getValue().tileEntityCount)
 							.append("</td></tr>");
 				}
@@ -423,7 +423,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 				entitiesTotal += tileEntityEntries.get(i).getValue().tickTime.getAverage();
 			}
 
-			html.append("<tr><td>Totals</td><td colspan=\"2\">").append(decimalFormat.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
+			html.append("<tr><td>Totals</td><td colspan=\"2\">").append(Util.DECIMAL_FORMAT_3.format(entitiesTotal * 1.0E-6D)).append("ms</td></tr>");
 			html.append("</tbody></table>");
 		}
 
