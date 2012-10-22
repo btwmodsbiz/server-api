@@ -156,13 +156,13 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			
 			long timeElapsed = currentTime - lastStatsTime;
 			long timeSinceLastTick = currentTime - event.serverStats.lastTickEnd;
-			ticksPerSecond.record((int)((double)numTicks / (double)timeElapsed * 100000D));
+			ticksPerSecond.record((long)((double)numTicks / (double)timeElapsed * 100000D));
 
 			long jsonTime = System.nanoTime();
 			JsonObject jsonObj = new JsonObject();
-			jsonObj.addProperty("timeElapsed", timeElapsed);
+			jsonObj.addProperty("tickCounter", event.tickCounter);
 			jsonObj.addProperty("timeSinceLastTick", timeSinceLastTick);
-			jsonObj.addProperty("numTicks", numTicks);
+			jsonObj.addProperty("ticksSinceLastStatsAction", numTicks);
 			jsonObj.addProperty("time", BasicFormatter.dateFormat.format(new Date(currentTime)));
 			jsonObj.addProperty("detailedMeasurements", StatsAPI.detailedMeasurementsEnabled);
 			
