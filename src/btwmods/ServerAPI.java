@@ -1,6 +1,5 @@
 package btwmods;
 
-import net.minecraft.server.MinecraftServer;
 import btwmods.io.Settings;
 
 public class ServerAPI {
