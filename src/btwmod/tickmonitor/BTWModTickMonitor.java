@@ -25,15 +25,11 @@ import btwmods.network.CustomPacketEvent;
 import btwmods.network.INetworkListener;
 import btwmods.player.IInstanceListener;
 import btwmods.player.InstanceEvent;
-import btwmods.stats.ChunkStatsComparator;
-import btwmods.stats.EntityStatsComparator;
 import btwmods.stats.IStatsListener;
 import btwmods.stats.StatsEvent;
-import btwmods.stats.ChunkStatsComparator.Stat;
-import btwmods.stats.TileEntityStatsComparator;
-import btwmods.stats.data.ChunkStats;
-import btwmods.stats.data.EntityStats;
-import btwmods.stats.data.TileEntityStats;
+import btwmods.stats.data.BasicStats;
+import btwmods.stats.data.BasicStatsComparator;
+import btwmods.stats.data.BasicStatsMap;
 import btwmods.util.BasicFormatter;
 import btwmods.Util;
 
@@ -79,6 +75,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			.registerTypeAdapter(Class.class, new TypeAdapters.ClassAdapter())
 			.registerTypeAdapter(ChunkCoordIntPair.class, new TypeAdapters.ChunkCoordIntPairAdapter())
 			.registerTypeAdapter(Average.class, new TypeAdapters.AverageTypeAdapter(this))
+			.registerTypeAdapter(BasicStatsMap.class, new TypeAdapters.BasicStatsMapAdapter())
 			.setPrettyPrinting()
 			.enableComplexMapKeySerialization()
 			.create();
@@ -301,14 +298,14 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 	
 	private void outputWorldDetails(StatsEvent event, StringBuilder html, int world) {
 		
-		List<Map.Entry<ChunkCoordIntPair, ChunkStats>> chunkEntries = new ArrayList<Map.Entry<ChunkCoordIntPair, ChunkStats>>(event.worldStats[world].chunkStats.entrySet());
+		List<Map.Entry<ChunkCoordIntPair, BasicStats>> chunkEntries = new ArrayList<Map.Entry<ChunkCoordIntPair, BasicStats>>(event.worldStats[world].chunkStats.entrySet());
 
 		html.append("<h2>World ").append(world).append(" Top " + topNumber + ":</h2>");
 		
 		html.append("<table border=\"0\"><thead><tr><th>Chunks By Tick Time</th><th>Chunks By Entity Count</th><th>Entities By Tick Time</th><th>Entities By Count</th><th>TileEntities By Tick Time</th></tr></thead><tbody><tr><td valign=\"top\">");
 
 		{
-			Collections.sort(chunkEntries, new ChunkStatsComparator<ChunkCoordIntPair>(Stat.TICKTIME, true));
+			Collections.sort(chunkEntries, new BasicStatsComparator<ChunkCoordIntPair>(BasicStatsComparator.Stat.TICKTIME, true));
 			html.append("<table border=\"0\"><thead><tr><th>Chunk</th><th>Tick Time</th><th>Entities</th></tr></thead><tbody>");
 			double chunksTotal = 0;
 			int entitiesTotal = 0;
@@ -324,12 +321,12 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 						html.append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos);
 					
 					html.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
-						.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
+						.append(" ms</td><td>").append(chunkEntries.get(i).getValue().count)
 						.append("</td></tr>");
 				}
 
 				chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();
-				entitiesTotal += chunkEntries.get(i).getValue().entityCount;
+				entitiesTotal += chunkEntries.get(i).getValue().count;
 			}
 
 			html.append("<tr><td>Totals</td><td>").append(Util.DECIMAL_FORMAT_3.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
@@ -339,7 +336,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 		html.append("</td><td valign=\"top\">");
 
 		{
-			Collections.sort(chunkEntries, new ChunkStatsComparator<ChunkCoordIntPair>(Stat.ENTITIES, true));
+			Collections.sort(chunkEntries, new BasicStatsComparator<ChunkCoordIntPair>(BasicStatsComparator.Stat.COUNT, true));
 			html.append("<table border=\"0\"><thead><tr><th>Chunk</th><th>Tick Time</th><th>Entities</th></tr></thead><tbody>");
 			double chunksTotal = 0;
 			int displayed = 0;
@@ -355,24 +352,24 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 						html.append(chunkEntries.get(i).getKey().chunkXPos).append("/").append(chunkEntries.get(i).getKey().chunkZPos);
 					
 					html.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(chunkEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
-						.append(" ms</td><td>").append(chunkEntries.get(i).getValue().entityCount)
+						.append(" ms</td><td>").append(chunkEntries.get(i).getValue().count)
 						.append("</td></tr>");
 				}
 
 				chunksTotal += chunkEntries.get(i).getValue().tickTime.getAverage();
-				entitiesTotal += chunkEntries.get(i).getValue().entityCount;
+				entitiesTotal += chunkEntries.get(i).getValue().count;
 			}
 
 			html.append("<tr><td>Totals</td><td>").append(Util.DECIMAL_FORMAT_3.format(chunksTotal * 1.0E-6D)).append("ms</td><td>").append(entitiesTotal).append("</td></tr>");
 			html.append("</tbody></table>");
 		}
 
-		List<Map.Entry<Class, EntityStats>> entityEntries = new ArrayList<Map.Entry<Class, EntityStats>>(event.worldStats[world].entityStats.entrySet());
+		List<Map.Entry<Class, BasicStats>> entityEntries = new ArrayList<Map.Entry<Class, BasicStats>>(event.worldStats[world].entityStats.entrySet());
 		
 		html.append("</td><td valign=\"top\">");
 
 		{
-			Collections.sort(entityEntries, new EntityStatsComparator<Class>(EntityStatsComparator.Stat.TICKTIME, true));
+			Collections.sort(entityEntries, new BasicStatsComparator<Class>(BasicStatsComparator.Stat.TICKTIME, true));
 			html.append("<table border=\"0\"><thead><tr><th>Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
 			double entitiesTotal = 0;
 			int displayed = 0;
@@ -381,7 +378,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 					displayed++;
 					html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
 							.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
-							.append(" ms</td><td>").append(entityEntries.get(i).getValue().entityCount)
+							.append(" ms</td><td>").append(entityEntries.get(i).getValue().count)
 							.append("</td></tr>");
 				}
 
@@ -395,7 +392,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 		html.append("</td><td valign=\"top\">");
 
 		{
-			Collections.sort(entityEntries, new EntityStatsComparator<Class>(EntityStatsComparator.Stat.ENTITIES, true));
+			Collections.sort(entityEntries, new BasicStatsComparator<Class>(BasicStatsComparator.Stat.COUNT, true));
 			html.append("<table border=\"0\"><thead><tr><th>Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
 			double entitiesTotal = 0;
 			int displayed = 0;
@@ -404,7 +401,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 					displayed++;
 					html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
 							.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
-							.append(" ms</td><td>").append(entityEntries.get(i).getValue().entityCount)
+							.append(" ms</td><td>").append(entityEntries.get(i).getValue().count)
 							.append("</td></tr>");
 				}
 
@@ -415,12 +412,12 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			html.append("</tbody></table>");
 		}
 
-		List<Map.Entry<Class, TileEntityStats>> tileEntityEntries = new ArrayList<Map.Entry<Class, TileEntityStats>>(event.worldStats[world].tileEntityStats.entrySet());
+		List<Map.Entry<Class, BasicStats>> tileEntityEntries = new ArrayList<Map.Entry<Class, BasicStats>>(event.worldStats[world].tileEntityStats.entrySet());
 		
 		html.append("</td><td valign=\"top\">");
 
 		{
-			Collections.sort(tileEntityEntries, new TileEntityStatsComparator<Class>(TileEntityStatsComparator.Stat.TICKTIME, true));
+			Collections.sort(tileEntityEntries, new BasicStatsComparator<Class>(BasicStatsComparator.Stat.TICKTIME, true));
 			html.append("<table border=\"0\"><thead><tr><th>Tile Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
 			double entitiesTotal = 0;
 			int displayed = 0;
@@ -429,7 +426,7 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 					displayed++;
 					html.append("<tr><td>").append(tileEntityEntries.get(i).getKey().getSimpleName())
 							.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(tileEntityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
-							.append(" ms</td><td>").append(tileEntityEntries.get(i).getValue().tileEntityCount)
+							.append(" ms</td><td>").append(tileEntityEntries.get(i).getValue().count)
 							.append("</td></tr>");
 				}
 

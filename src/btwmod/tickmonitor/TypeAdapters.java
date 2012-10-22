@@ -2,13 +2,22 @@ package btwmod.tickmonitor;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.minecraft.src.ChunkCoordIntPair;
 
 import btwmods.Util;
 import btwmods.measure.Average;
+import btwmods.stats.data.BasicStats;
+import btwmods.stats.data.BasicStatsComparator;
+import btwmods.stats.data.BasicStatsMap;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.TypeAdapter;
@@ -75,5 +84,63 @@ public class TypeAdapters {
 		public Average read(JsonReader in) throws IOException {
 			return null;
 		}
+	}
+	
+	public static class BasicStatsMapAdapter<T> implements JsonSerializer<BasicStatsMap> {
+		
+		@Override
+		public JsonElement serialize(BasicStatsMap src, Type typeOfSrc, JsonSerializationContext context) {
+			JsonObject obj = new JsonObject();
+			BasicStatsMap outMap = src;
+			
+			obj.addProperty("total", src.size());
+			
+			double totalTickTime = 0;
+			long totalCount = 0;
+			List<T> topTickTime = new ArrayList<T>();
+			List<T> topCount = new ArrayList<T>();
+			
+			if (src.size() > 0) {
+				outMap = new BasicStatsMap();
+				
+				Set<Map.Entry<T, BasicStats>> statsSet = src.entrySet();
+				
+				// Get the entries as a list that can be sorted.
+				List<Map.Entry<T, BasicStats>> entries = new ArrayList<Map.Entry<T, BasicStats>>(statsSet);
+				
+				// Get the totals.
+				for (Map.Entry<T, BasicStats> entry : entries) {
+					totalTickTime += entry.getValue().tickTime.getAverage();
+					totalCount += entry.getValue().count;
+				}
+				
+				// Sort by tick time.
+				Collections.sort(entries, new BasicStatsComparator<T>(BasicStatsComparator.Stat.TICKTIME, true));
+				
+				// Add the top X chunks from the sorted list, and also mark them as chunks to include.
+				for (int i = 0; i < Math.min(entries.size(), BTWModTickMonitor.getTopNumber()) - 1; i++) {
+					outMap.put(entries.get(i).getKey(), entries.get(i).getValue());
+					topTickTime.add(entries.get(i).getKey());
+				}
+				
+				// Sort by tick time.
+				Collections.sort(entries, new BasicStatsComparator<T>(BasicStatsComparator.Stat.COUNT, true));
+				
+				// Add the top X chunks from the sorted list, and also mark them as chunks to include.
+				for (int i = 0; i < Math.min(entries.size(), BTWModTickMonitor.getTopNumber()) - 1; i++) {
+					outMap.put(entries.get(i).getKey(), entries.get(i).getValue());
+					topCount.add(entries.get(i).getKey());
+				}
+			}
+			
+			obj.addProperty("totalTickTime", Util.DECIMAL_FORMAT_3.format(totalTickTime));
+			obj.addProperty("totalCount", totalCount);
+			obj.add("topTickTime", context.serialize(topCount));
+			obj.add("topCount", context.serialize(topCount));
+			obj.add("lookup", context.serialize(outMap, Map.class));
+			
+			return obj;
+		}
+		
 	}
 }
