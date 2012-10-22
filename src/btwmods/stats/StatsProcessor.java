@@ -143,6 +143,14 @@ public class StatsProcessor implements Runnable {
 				worldStats[i].timeSync.resetCurrent();
 				worldStats[i].buildActiveChunkSet.resetCurrent();
 				worldStats[i].checkPlayerLight.resetCurrent();
+				worldStats[i].entitiesRegular.resetCurrent();
+				worldStats[i].entitiesRemove.resetCurrent();
+				worldStats[i].entitiesTile.resetCurrent();
+				worldStats[i].entitiesTilePending.resetCurrent();
+				worldStats[i].lightingAndRain.resetCurrent();
+				worldStats[i].updatePlayerEntities.resetCurrent();
+				worldStats[i].updatePlayerList.resetCurrent();
+				worldStats[i].weatherEffects.resetCurrent();
 				
 				// Reset the ChunkStats.
 				Iterator<Map.Entry<ChunkCoordIntPair, ChunkStats>> chunkStatsIterator = worldStats[i].chunkStats.entrySet().iterator();
@@ -201,7 +209,7 @@ public class StatsProcessor implements Runnable {
 							worldStats[worldMeasurement.worldIndex].mobSpawning.incrementCurrent(measurement.getTime());
 							break;
 							
-						case WEATHER:
+						case MOOD_LIGHT_AND_WEATHER:
 							worldStats[worldMeasurement.worldIndex].weather.incrementCurrent(measurement.getTime());
 							break;
 							
@@ -261,6 +269,38 @@ public class StatsProcessor implements Runnable {
 							
 							tileEntityStats.tileEntityCount++;
 							
+							break;
+							
+						case ENTITIES_REGULAR:
+							worldStats[worldMeasurement.worldIndex].entitiesRegular.incrementCurrent(measurement.getTime());
+							break;
+							
+						case ENTITIES_REMOVE:
+							worldStats[worldMeasurement.worldIndex].entitiesRemove.incrementCurrent(measurement.getTime());
+							break;
+							
+						case ENTITIES_TILE:
+							worldStats[worldMeasurement.worldIndex].entitiesTile.incrementCurrent(measurement.getTime());
+							break;
+							
+						case ENTITIES_TILEPENDING:
+							worldStats[worldMeasurement.worldIndex].entitiesTilePending.incrementCurrent(measurement.getTime());
+							break;
+							
+						case LIGHTNING_AND_RAIN:
+							worldStats[worldMeasurement.worldIndex].lightingAndRain.incrementCurrent(measurement.getTime());
+							break;
+							
+						case UPDATE_PLAYER_ENTITIES:
+							worldStats[worldMeasurement.worldIndex].updatePlayerEntities.incrementCurrent(measurement.getTime());
+							break;
+							
+						case UPDATE_PLAYER_LIST:
+							worldStats[worldMeasurement.worldIndex].updatePlayerList.incrementCurrent(measurement.getTime());
+							break;
+							
+						case WEATHER_EFFECTS:
+							worldStats[worldMeasurement.worldIndex].weatherEffects.incrementCurrent(measurement.getTime());
 							break;
 					}
 					

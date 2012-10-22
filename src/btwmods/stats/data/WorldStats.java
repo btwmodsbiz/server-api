@@ -19,6 +19,14 @@ public class WorldStats {
 	public final Average loadedChunks = new Average(); // TODO: make this longer?
 	public int id2ChunkMap = -1;
 	public final Average droppedChunksSet = new Average();
+	public final Average entitiesRegular = new Average();
+	public final Average entitiesRemove = new Average();
+	public final Average entitiesTile = new Average();
+	public final Average entitiesTilePending = new Average();
+	public final Average lightingAndRain = new Average();
+	public final Average updatePlayerEntities = new Average();
+	public final Average updatePlayerList = new Average();
+	public final Average weatherEffects = new Average();
 	public final Map<ChunkCoordIntPair, ChunkStats> chunkStats = new LinkedHashMap<ChunkCoordIntPair, ChunkStats>();
 	public final Map<Class, EntityStats> entityStats = new LinkedHashMap<Class, EntityStats>();
 	public final Map<Class, TileEntityStats> tileEntityStats = new LinkedHashMap<Class, TileEntityStats>();
