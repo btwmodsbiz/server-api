@@ -172,6 +172,7 @@ public class StatsAPI {
 			stats.tickEnd = System.currentTimeMillis();
 			stats.tickCounter = tickCounter;
 			stats.tickTime = server.tickTimeArray[tickCounter % 100];
+			stats.players = server.getConfigurationManager().getAllUsernames();
 			stats.sentPacketCount = server.sentPacketCountArray[tickCounter % 100];
 			stats.sentPacketSize = server.sentPacketSizeArray[tickCounter % 100];
 			stats.receivedPacketCount = server.receivedPacketCountArray[tickCounter % 100];

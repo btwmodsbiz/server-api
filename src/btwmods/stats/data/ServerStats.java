@@ -5,6 +5,7 @@ import btwmods.measure.Average;
 public class ServerStats {
 	public long lastTickEnd = -1;
 	public final Average tickTime = new Average();
+	public String[] players;
 	public final Average sentPacketCount = new Average();
 	public final Average sentPacketSize = new Average();
 	public final Average receivedPacketCount = new Average();

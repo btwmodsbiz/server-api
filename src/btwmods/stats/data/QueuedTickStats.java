@@ -8,6 +8,7 @@ public class QueuedTickStats {
 	public long tickEnd;
 	public int tickCounter;
 	public long tickTime;
+	public String[] players;
 	public long sentPacketCount;
 	public long sentPacketSize;
 	public long receivedPacketCount;

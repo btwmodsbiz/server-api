@@ -123,6 +123,7 @@ public class StatsProcessor implements Runnable {
 			
 			serverStats.lastTickEnd = Math.max(serverStats.lastTickEnd, stats.tickEnd);
 			serverStats.tickTime.record(stats.tickTime);
+			serverStats.players = stats.players;
 			serverStats.sentPacketCount.record(stats.sentPacketCount);
 			serverStats.sentPacketSize.record(stats.sentPacketSize);
 			serverStats.receivedPacketCount.record(stats.receivedPacketCount);
