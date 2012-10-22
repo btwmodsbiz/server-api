@@ -3,8 +3,16 @@ package btwmods;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DecimalFormat;
 
 public class Util {
+	public static final DecimalFormat DECIMAL_FORMAT_3 = new DecimalFormat("0.000");
+	public static final DecimalFormat DECIMAL_FORMAT_2 = new DecimalFormat("0.00");
+	public static final DecimalFormat DECIMAL_FORMAT_1 = new DecimalFormat("0.0");
+	public static final DecimalFormat DECIMAL_FORMAT_3MAX = new DecimalFormat("0.###");
+	public static final DecimalFormat DECIMAL_FORMAT_2MAX = new DecimalFormat("0.##");
+	public static final DecimalFormat DECIMAL_FORMAT_1MAX = new DecimalFormat("0.#");
+	
 	public static String getStackTrace() {
 		return getStackTrace(new Throwable(""));
 	}
