@@ -16,6 +16,10 @@ public class Measurements<T extends Measurement> {
 		enabled = isEnabled;
 	}
 	
+	public boolean completedMeasurements() {
+		return dataStack.size() == 0;
+	}
+	
 	public boolean isEnabled() {
 		return enabled;
 	}

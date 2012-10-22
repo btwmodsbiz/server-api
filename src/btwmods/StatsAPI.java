@@ -2,8 +2,10 @@ package btwmods;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
@@ -186,6 +188,13 @@ public class StatsAPI {
 				stats.droppedChunksSet[i] = droppedChunksSet[i].size();
 			}
 			
+			if (!measurements.completedMeasurements()) {
+				measurements.setEnabled(false);
+				detailedMeasurementsEnabled = false;
+				measurements.startNew();
+				ModLoader.outputError("StatsAPI detected that not all measurements were completed properly. Detailed measurements disabled.", Level.SEVERE);
+			}
+			
 			// Save measurements and clear it for the next round.
 			stats.measurements = measurements.startNew();
 			
@@ -215,8 +224,17 @@ public class StatsAPI {
 	
 	/**
 	 * End a measurement.
+	 * @param type The type that matches the last {@link #begin} statement. 
 	 */
 	public static void end(Type type) {
-		measurements.end();
+		try {
+			measurements.end();
+		}
+		catch (NoSuchElementException e) {
+			measurements.setEnabled(false);
+			detailedMeasurementsEnabled = false;
+			measurements.startNew();
+			ModLoader.outputError(e, "StatsAPI#end() called unexpectedly. Detailed measurements disabled.", Level.SEVERE);
+		}
 	}
 }
