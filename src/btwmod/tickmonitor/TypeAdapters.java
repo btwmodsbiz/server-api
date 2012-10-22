@@ -51,10 +51,11 @@ public class TypeAdapters {
 			
 			out.name("history");
 			out.beginArray();
-			if (average.getTotal() > 0) {
+			if (average.getTotal() > 0 && average.getTick() >= 0) {
 				long[] history = average.getHistory();
-				for (int i = 0; i < Math.min(average.getResolution(), average.getTick() + 1); i++) {
-					out.value(history[i]);
+				int backIndex = average.getTick() - average.getResolution();
+				for (int i = average.getTick(); i >= 0 && i > backIndex; i--) {
+					out.value(history[i % average.getResolution()]);
 				}
 			}
 			out.endArray();
