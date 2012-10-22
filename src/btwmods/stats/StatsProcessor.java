@@ -239,7 +239,14 @@ public class StatsProcessor implements Runnable {
 							EntityUpdate entityUpdate = (EntityUpdate)worldMeasurement;
 							coords = new ChunkCoordIntPair(entityUpdate.chunkX, entityUpdate.chunkZ);
 							
-							Class entityKey = entityUpdate.itemId >= 0 ? Item.itemsList[entityUpdate.itemId].getClass() : entityUpdate.entity;
+							Class entityKey = entityUpdate.entity; 
+							
+							if (entityUpdate.itemId >= 256) {
+								entityKey = Item.itemsList[entityUpdate.itemId].getClass();
+							}
+							else if (entityUpdate.itemId >= 0) {
+								entityKey = Block.blocksList[entityUpdate.itemId].getClass();
+							}
 							
 							BasicStats entityStats = worldStats[worldMeasurement.worldIndex].entityStats.get(entityKey);
 							if (entityStats == null) {
