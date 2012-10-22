@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 
 import net.minecraft.src.ChunkCoordIntPair;
 
+import btwmods.Util;
 import btwmods.measure.Average;
 
 import com.google.gson.JsonElement;
@@ -40,7 +41,7 @@ public class TypeAdapters {
 			out.beginObject();
 			
 			out.name("average");
-			out.value((int)(average.getAverage() * 1000) / 1000D);
+			out.value(Util.DECIMAL_FORMAT_3.format(average.getAverage()));
 			
 			out.name("resolution");
 			out.value(average.getResolution());
