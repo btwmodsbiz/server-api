@@ -5,17 +5,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.Block;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Item;
 import btwmods.ModLoader;
 import btwmods.StatsAPI;
 import btwmods.events.EventDispatcher;
 import btwmods.measure.Average;
-import btwmods.stats.data.ChunkStats;
-import btwmods.stats.data.EntityStats;
+import btwmods.stats.data.BasicStats;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.data.ServerStats;
-import btwmods.stats.data.TileEntityStats;
 import btwmods.stats.data.WorldStats;
 import btwmods.stats.measurements.BlockUpdate;
 import btwmods.stats.measurements.EntityUpdate;
@@ -154,9 +153,9 @@ public class StatsProcessor implements Runnable {
 				worldStats[i].weatherEffects.resetCurrent();
 				
 				// Reset the ChunkStats.
-				Iterator<Map.Entry<ChunkCoordIntPair, ChunkStats>> chunkStatsIterator = worldStats[i].chunkStats.entrySet().iterator();
+				Iterator<Map.Entry<ChunkCoordIntPair, BasicStats>> chunkStatsIterator = worldStats[i].chunkStats.entrySet().iterator();
 				while (chunkStatsIterator.hasNext()) {
-					Map.Entry<ChunkCoordIntPair, ChunkStats> entry = chunkStatsIterator.next();
+					Map.Entry<ChunkCoordIntPair, BasicStats> entry = chunkStatsIterator.next();
 					
 					if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
 						chunkStatsIterator.remove();
@@ -167,9 +166,9 @@ public class StatsProcessor implements Runnable {
 				}
 				
 				// Reset the EntityStats.
-				Iterator<Map.Entry<Class, EntityStats>> entityStatsIterator = worldStats[i].entityStats.entrySet().iterator();
+				Iterator<Map.Entry<Class, BasicStats>> entityStatsIterator = worldStats[i].entityStats.entrySet().iterator();
 				while (entityStatsIterator.hasNext()) {
-					Map.Entry<Class, EntityStats> entry = entityStatsIterator.next();
+					Map.Entry<Class, BasicStats> entry = entityStatsIterator.next();
 					
 					if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
 						entityStatsIterator.remove();
@@ -181,9 +180,9 @@ public class StatsProcessor implements Runnable {
 				
 				
 				// Reset the TileEntityStats.
-				Iterator<Map.Entry<Class, TileEntityStats>> tileEntityStatsIterator = worldStats[i].tileEntityStats.entrySet().iterator();
+				Iterator<Map.Entry<Class, BasicStats>> tileEntityStatsIterator = worldStats[i].tileEntityStats.entrySet().iterator();
 				while (tileEntityStatsIterator.hasNext()) {
-					Map.Entry<Class, TileEntityStats> entry = tileEntityStatsIterator.next();
+					Map.Entry<Class, BasicStats> entry = tileEntityStatsIterator.next();
 					
 					if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
 						tileEntityStatsIterator.remove();
@@ -242,16 +241,16 @@ public class StatsProcessor implements Runnable {
 							
 							Class entityKey = entityUpdate.itemId >= 0 ? Item.itemsList[entityUpdate.itemId].getClass() : entityUpdate.entity;
 							
-							EntityStats entityStats = worldStats[worldMeasurement.worldIndex].entityStats.get(entityKey);
+							BasicStats entityStats = worldStats[worldMeasurement.worldIndex].entityStats.get(entityKey);
 							if (entityStats == null) {
-								worldStats[worldMeasurement.worldIndex].entityStats.put(entityKey, entityStats = new EntityStats(entityKey));
+								worldStats[worldMeasurement.worldIndex].entityStats.put(entityKey, entityStats = new BasicStats());
 								entityStats.tickTime.record(measurement.getTime());
 							}
 							else {
 								entityStats.tickTime.incrementCurrent(measurement.getTime());
 							}
 							
-							entityStats.entityCount++;
+							entityStats.count++;
 							
 							break;
 							
@@ -259,16 +258,16 @@ public class StatsProcessor implements Runnable {
 							TileEntityUpdate tileEntityUpdate = (TileEntityUpdate)worldMeasurement;
 							coords = new ChunkCoordIntPair(tileEntityUpdate.chunkX, tileEntityUpdate.chunkZ);
 							
-							TileEntityStats tileEntityStats = worldStats[worldMeasurement.worldIndex].tileEntityStats.get(tileEntityUpdate.tileEntity);
+							BasicStats tileEntityStats = worldStats[worldMeasurement.worldIndex].tileEntityStats.get(tileEntityUpdate.tileEntity);
 							if (tileEntityStats == null) {
-								worldStats[worldMeasurement.worldIndex].tileEntityStats.put(tileEntityUpdate.tileEntity, tileEntityStats = new TileEntityStats(tileEntityUpdate.tileEntity));
+								worldStats[worldMeasurement.worldIndex].tileEntityStats.put(tileEntityUpdate.tileEntity, tileEntityStats = new BasicStats());
 								tileEntityStats.tickTime.record(measurement.getTime());
 							}
 							else {
 								tileEntityStats.tickTime.incrementCurrent(measurement.getTime());
 							}
 							
-							tileEntityStats.tileEntityCount++;
+							tileEntityStats.count++;
 							
 							break;
 							
@@ -307,9 +306,9 @@ public class StatsProcessor implements Runnable {
 					
 					// Get the average for this chunk and increment it.
 					if (coords != null) {
-						ChunkStats chunkStats = worldStats[worldMeasurement.worldIndex].chunkStats.get(coords);
+						BasicStats chunkStats = worldStats[worldMeasurement.worldIndex].chunkStats.get(coords);
 						if (chunkStats == null) {
-							worldStats[worldMeasurement.worldIndex].chunkStats.put(coords, chunkStats = new ChunkStats());
+							worldStats[worldMeasurement.worldIndex].chunkStats.put(coords, chunkStats = new BasicStats());
 							chunkStats.tickTime.record(measurement.getTime());
 						}
 						else {
@@ -317,7 +316,7 @@ public class StatsProcessor implements Runnable {
 						}
 						
 						if (measurement.identifier == Type.ENTITY_UPDATE)
-							chunkStats.entityCount++;
+							chunkStats.count++;
 					}
 				}
 			}

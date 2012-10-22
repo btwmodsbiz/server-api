@@ -1,8 +1,5 @@
 package btwmods.stats.data;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import net.minecraft.src.ChunkCoordIntPair;
 import btwmods.measure.Average;
 
@@ -27,7 +24,7 @@ public class WorldStats {
 	public final Average updatePlayerEntities = new Average();
 	public final Average updatePlayerList = new Average();
 	public final Average weatherEffects = new Average();
-	public final Map<ChunkCoordIntPair, ChunkStats> chunkStats = new LinkedHashMap<ChunkCoordIntPair, ChunkStats>();
-	public final Map<Class, EntityStats> entityStats = new LinkedHashMap<Class, EntityStats>();
-	public final Map<Class, TileEntityStats> tileEntityStats = new LinkedHashMap<Class, TileEntityStats>();
+	public final BasicStatsMap<ChunkCoordIntPair> chunkStats = new BasicStatsMap<ChunkCoordIntPair>();
+	public final BasicStatsMap<Class> entityStats = new BasicStatsMap<Class>();
+	public final BasicStatsMap<Class> tileEntityStats = new BasicStatsMap<Class>();
 }
