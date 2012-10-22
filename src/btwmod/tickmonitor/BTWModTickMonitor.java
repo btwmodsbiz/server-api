@@ -163,6 +163,8 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			jsonObj.addProperty("timeSinceLastTick", timeSinceLastTick);
 			jsonObj.addProperty("numTicks", numTicks);
 			jsonObj.addProperty("time", BasicFormatter.dateFormat.format(new Date(currentTime)));
+			jsonObj.addProperty("detailedMeasurements", StatsAPI.detailedMeasurementsEnabled);
+			
 			jsonObj.add("statsActionTime", gson.toJsonTree(statsActionTime));
 			jsonObj.add("statsActionIOTime", gson.toJsonTree(statsActionIOTime));
 			jsonObj.add("ticksPerSecondArray", gson.toJsonTree(ticksPerSecond));
