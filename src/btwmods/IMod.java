@@ -7,13 +7,15 @@ public interface IMod {
 	/**
 	 * Human-readable name of the mod that will display in the logs.
 	 * @return the name of the mod.
+	 * @throws Exception 
 	 */
-	public String getName();
+	public String getName() throws Exception;
 	
-	public void init(Settings settings);
+	public void init(Settings settings) throws Exception;
 	
 	/**
 	 * Cleanup and remove listeners.
+	 * @throws Exception 
 	 */
-	public void unload();
+	public void unload() throws Exception;
 }
