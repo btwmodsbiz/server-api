@@ -52,7 +52,7 @@ public class TypeAdapters {
 			out.name("latest");
 			out.value(average.getLatest());
 			
-			if (monitor.isIncludingHistory()) {
+			if (monitor.includeHistory()) {
 				out.name("resolution");
 				out.value(average.getResolution());
 				

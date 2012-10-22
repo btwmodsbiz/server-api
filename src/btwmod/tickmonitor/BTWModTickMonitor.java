@@ -40,19 +40,27 @@ import btwmods.Util;
 public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener, IInstanceListener {
 
 	private static int topNumber = 20;
+	private static boolean includeHistory = false;
 	private static String publicLink = null;
 	private static File htmlFile = new File(new File("."), "stats.html");
 	private static File jsonFile = new File(new File("."), "stats.txt");
+    private static long tooLongWarningTime = 1000;
+    private static long reportingDelay = 1000;
+	
+	public static boolean includeHistory() {
+		return includeHistory;
+	}
+	
+	public static int getTopNumber() {
+		return topNumber;
+	}
 	
     private boolean isRunning = true; // TODO: make this false by default.
-    private long tooLongWarningTime = 1000;
-    private long reportingDelay = 1000;
 	private long lastStatsTime = 0;
 	private int lastTickCounter = -1;
 	private Average statsActionTime = new Average(10);
 	private Average statsActionIOTime = new Average(10);
 	private Average ticksPerSecond = new Average(10);
-	private boolean includeHistory = false;
 	
 	private Gson gson;
 	
@@ -130,10 +138,6 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 
 	public boolean isRunning() {
 		return isRunning;
-	}
-	
-	public boolean isIncludingHistory() {
-		return includeHistory;
 	}
 
 	/**
