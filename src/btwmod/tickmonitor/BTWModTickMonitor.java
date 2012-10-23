@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.minecraft.server.MinecraftServer;
@@ -171,7 +172,14 @@ public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener
 			jsonObj.add("ticksPerSecondArray", gson.toJsonTree(ticksPerSecond));
 			
 			jsonObj.addProperty("jsonTime", "_____JSONTIME_____");
-			jsonObj.add("statsEvent", gson.toJsonTree(event));
+			
+			JsonObject serverStats = (JsonObject)gson.toJsonTree(event.serverStats);
+			for (Map.Entry<String, JsonElement> entry : serverStats.entrySet()) {
+				jsonObj.add(entry.getKey(), entry.getValue());
+			}
+			
+			jsonObj.add("worlds", gson.toJsonTree(event.worldStats));
+			
 			String json = gson.toJson(jsonObj).replace("_____JSONTIME_____", Util.DECIMAL_FORMAT_3.format((jsonTime = System.nanoTime() - jsonTime) * 1.0E-6D));
 			
 			// Debugging loop to ramp up CPU usage by the thread.
