@@ -22,7 +22,7 @@ public class WorldStats {
 	public final Average entitiesTilePending = new Average();
 	public final Average lightingAndRain = new Average();
 	public final Average updatePlayerEntities = new Average();
-	public final Average updatePlayerList = new Average();
+	public final Average updateTrackedEntityPlayerLists = new Average();
 	public final Average weatherEffects = new Average();
 	public final Average trackedEntities = new Average();
 	public final BasicStatsMap<ChunkCoordIntPair> chunkStats = new BasicStatsMap<ChunkCoordIntPair>();

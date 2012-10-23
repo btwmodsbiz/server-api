@@ -150,7 +150,7 @@ public class StatsProcessor implements Runnable {
 				worldStats[i].entitiesTilePending.resetCurrent();
 				worldStats[i].lightingAndRain.resetCurrent();
 				worldStats[i].updatePlayerEntities.resetCurrent();
-				worldStats[i].updatePlayerList.resetCurrent();
+				worldStats[i].updateTrackedEntityPlayerLists.resetCurrent();
 				worldStats[i].weatherEffects.resetCurrent();
 				
 				// Reset the ChunkStats.
@@ -303,8 +303,8 @@ public class StatsProcessor implements Runnable {
 							worldStats[worldMeasurement.worldIndex].updatePlayerEntities.incrementCurrent(measurement.getTime());
 							break;
 							
-						case UPDATE_PLAYER_LIST:
-							worldStats[worldMeasurement.worldIndex].updatePlayerList.incrementCurrent(measurement.getTime());
+						case UPDATE_TRACKED_ENTITY_PLAYER_LISTS:
+							worldStats[worldMeasurement.worldIndex].updateTrackedEntityPlayerLists.incrementCurrent(measurement.getTime());
 							break;
 							
 						case WEATHER_EFFECTS:
