@@ -17,5 +17,6 @@ public class QueuedTickStats {
 	public int[] loadedChunks;
 	public int[] id2ChunkMap;
 	public int[] droppedChunksSet;
+	public int[] trackedEntities;
 	public ArrayDeque<TickMeasurement> measurements;
 }

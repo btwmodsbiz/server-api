@@ -12,6 +12,7 @@ import net.minecraft.src.Block;
 import net.minecraft.src.ChunkProviderServer;
 import net.minecraft.src.CommandHandler;
 import net.minecraft.src.Entity;
+import net.minecraft.src.EntityTracker;
 import net.minecraft.src.LongHashMap;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.TileEntity;
@@ -61,6 +62,7 @@ public class StatsAPI {
 	private static List[] loadedChunks;
 	private static LongHashMap[] id2ChunkMap;
 	private static Set[] droppedChunksSet;
+	private static Set[] trackedEntitiesSet;
 	
 	/**
 	 * Should only be called by ModLoader.
@@ -86,15 +88,20 @@ public class StatsAPI {
 		Field droppedChunksSetField = ChunkProviderServer.class.getDeclaredField("droppedChunksSet");
 		droppedChunksSetField.setAccessible(true);
 		
+		Field trackedEntitiesSetField = EntityTracker.class.getDeclaredField("trackedEntitySet");
+		trackedEntitiesSetField.setAccessible(true);
+		
 		loadedChunks = new List[server.worldServers.length];
 		id2ChunkMap = new LongHashMap[server.worldServers.length];
 		droppedChunksSet = new Set[server.worldServers.length];
+		trackedEntitiesSet = new Set[server.worldServers.length];
 		
 		for (int i = 0; i < server.worldServers.length; i++) {
 			ChunkProviderServer provider = (ChunkProviderServer)server.worldServers[i].getChunkProvider();
 			loadedChunks[i] = (List)loadedChunksField.get(provider);
 			id2ChunkMap[i] = (LongHashMap)id2ChunkMapField.get(provider);
 			droppedChunksSet[i] = (Set)droppedChunksSetField.get(provider);
+			trackedEntitiesSet[i] = (Set)trackedEntitiesSetField.get(server.worldServers[i].getEntityTracker());
 		}
 		
 		((CommandHandler)server.getCommandManager()).registerCommand(new CommandStats());
@@ -182,11 +189,13 @@ public class StatsAPI {
 			stats.loadedChunks = new int[stats.worldTickTimes.length];
 			stats.id2ChunkMap = new int[stats.worldTickTimes.length];
 			stats.droppedChunksSet = new int[stats.worldTickTimes.length];
+			stats.trackedEntities = new int[stats.worldTickTimes.length];
 			for (int i = 0; i < stats.worldTickTimes.length; i++) {
 				stats.worldTickTimes[i] = server.timeOfLastDimensionTick[i][tickCounter % 100];
 				stats.loadedChunks[i] = loadedChunks[i].size();
 				stats.id2ChunkMap[i] = id2ChunkMap[i].getNumHashElements();
 				stats.droppedChunksSet[i] = droppedChunksSet[i].size();
+				stats.trackedEntities[i] = trackedEntitiesSet[i].size();
 			}
 			
 			if (!measurements.completedMeasurements()) {
