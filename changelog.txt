@@ -1,37 +1,59 @@
+Version 1.4 (vMC 1.3.2 BTW 4.22)
+
+  - Added average tracked entities per world to StatsAPI.
+
+  - Changed the organization of the JSON to remove some unnecessary steps.
+
+  - Changed a measurement Type name to be more accurate.
+
+  - Refactored coordinate information from BlockUpdate, EntityUpdate and TileEntityUpdate
+    measurements to WorldLocationMeasurement.
+  
+
 Version 1.3 (vMC 1.3.2 BTW 4.22)
 
-- Added TileEntity tracking to StatsAPI.
-- Added TileEntity stats to Tick Monitor.
-- Added JSON output to Tick Monitor.
-- Added better handling of unexpected end() calls or incomplete measurements to StatsAPI.
-- Added more measurements to StatAPI. Mostly measuring more code related to entities.
-- Added player names to StatsAPI data.
-- Added setting to Tick Monitor to toggle detailed history in the JSON output.
+  - Added TileEntity tracking to StatsAPI.
 
-- Changed stat data related classes to a generalized one.
+  - Added TileEntity stats to Tick Monitor.
 
-- Fixed ConcurrentModificationException problem in EventDispatcherFactory when an invocation fails.
-- Fixed problem with misidentified EntityItem data.
+  - Added JSON output to Tick Monitor.
+
+  - Added better handling of unexpected end() calls or incomplete measurements to StatsAPI.
+
+  - Added more measurements to StatAPI. Mostly measuring more code related to entities.
+
+  - Added player names to StatsAPI data.
+
+  - Added setting to Tick Monitor to toggle detailed history in the JSON output.
+
+  - Changed stat data related classes to a generalized one.
+
+  - Fixed ConcurrentModificationException problem in EventDispatcherFactory when an invocation fails.
+
+  - Fixed problem with misidentified EntityItem data.
+
 
 Version 1.2 (vMC 1.3.2 BTW 4.22)
 
-- Updated to BTW 4.22.
+  - Updated to BTW 4.22.
+
 
 Version 1.1 (vMC 1.3.2 BTW 4.21)
 
-- Added toggle for initial chunk loading and allowing spawning chunks to unload.
-  In btwmods/ModLoader.txt use allowunloadspawnchunks=true/false and preloadspawnchunks=true/false
+  - Added toggle for initial chunk loading and allowing spawning chunks to unload.
+    In btwmods/ModLoader.txt use allowunloadspawnchunks=true/false and preloadspawnchunks=true/false
   
-- Added stats for loaded chunks, cached chunks and dropped chunks to StatsAPI.
+  - Added stats for loaded chunks, cached chunks and dropped chunks to StatsAPI.
 
-- Added support for StatAPI changes to Tick Monitor.
+  - Added support for StatAPI changes to Tick Monitor.
 
-- Added detailed output for all worlds to Tick Monitor.
+  - Added detailed output for all worlds to Tick Monitor.
 
-- Changed EntityItem entries in the entity stats to store as the Item class instead.
+  - Changed EntityItem entries in the entity stats to store as the Item class instead.
 
-- Changed (improved) StatsAPI failure handling.
+  - Changed (improved) StatsAPI failure handling.
+
 
 Version 1.0 (vMC 1.3.2 BTW 4.21)
 
-- Initial release
+  - Initial release
