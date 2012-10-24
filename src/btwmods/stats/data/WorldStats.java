@@ -1,5 +1,8 @@
 package btwmods.stats.data;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import net.minecraft.src.ChunkCoordIntPair;
 import btwmods.measure.Average;
 
@@ -28,4 +31,42 @@ public class WorldStats {
 	public final BasicStatsMap<ChunkCoordIntPair> chunkStats = new BasicStatsMap<ChunkCoordIntPair>();
 	public final BasicStatsMap<Class> entityStats = new BasicStatsMap<Class>();
 	public final BasicStatsMap<Class> tileEntityStats = new BasicStatsMap<Class>();
+	
+	// Reset the averages to 0.
+	public void reset() {
+		measurementQueue.resetCurrent();
+		mobSpawning.resetCurrent();
+		blockTick.resetCurrent();
+		weather.resetCurrent();
+		entities.resetCurrent();
+		timeSync.resetCurrent();
+		buildActiveChunkSet.resetCurrent();
+		checkPlayerLight.resetCurrent();
+		entitiesRegular.resetCurrent();
+		entitiesRemove.resetCurrent();
+		entitiesTile.resetCurrent();
+		entitiesTilePending.resetCurrent();
+		lightingAndRain.resetCurrent();
+		updatePlayerEntities.resetCurrent();
+		updateTrackedEntityPlayerLists.resetCurrent();
+		weatherEffects.resetCurrent();
+
+		resetCurrentMap(chunkStats);
+		resetCurrentMap(entityStats);
+		resetCurrentMap(tileEntityStats);
+	}
+	
+	private static void resetCurrentMap(BasicStatsMap map) {
+		Iterator<Map.Entry<Class, BasicStats>> iterator = map.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Map.Entry<Class, BasicStats> entry = iterator.next();
+			
+			if (entry.getValue().tickTime.getAverage() == 0.0D && entry.getValue().tickTime.getTick() > Average.RESOLUTION) {
+				iterator.remove();
+			}
+			else {
+				entry.getValue().resetCurrent();
+			}
+		}
+	}
 }

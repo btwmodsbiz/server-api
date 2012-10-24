@@ -1,7 +1,5 @@
 package btwmods.stats;
 
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
@@ -11,7 +9,6 @@ import net.minecraft.src.Item;
 import btwmods.ModLoader;
 import btwmods.StatsAPI;
 import btwmods.events.EventDispatcher;
-import btwmods.measure.Average;
 import btwmods.stats.data.BasicStats;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.data.ServerStats;
@@ -134,64 +131,9 @@ public class StatsProcessor implements Runnable {
 				worldStats[i].id2ChunkMap = stats.id2ChunkMap[i];
 				worldStats[i].droppedChunksSet.record(stats.droppedChunksSet[i]);
 				worldStats[i].trackedEntities.record(stats.trackedEntities[i]);
-
-				// Reset the measurement entries to 0.
-				worldStats[i].measurementQueue.resetCurrent();
-				worldStats[i].mobSpawning.resetCurrent();
-				worldStats[i].blockTick.resetCurrent();
-				worldStats[i].weather.resetCurrent();
-				worldStats[i].entities.resetCurrent();
-				worldStats[i].timeSync.resetCurrent();
-				worldStats[i].buildActiveChunkSet.resetCurrent();
-				worldStats[i].checkPlayerLight.resetCurrent();
-				worldStats[i].entitiesRegular.resetCurrent();
-				worldStats[i].entitiesRemove.resetCurrent();
-				worldStats[i].entitiesTile.resetCurrent();
-				worldStats[i].entitiesTilePending.resetCurrent();
-				worldStats[i].lightingAndRain.resetCurrent();
-				worldStats[i].updatePlayerEntities.resetCurrent();
-				worldStats[i].updateTrackedEntityPlayerLists.resetCurrent();
-				worldStats[i].weatherEffects.resetCurrent();
 				
-				// Reset the ChunkStats.
-				Iterator<Map.Entry<ChunkCoordIntPair, BasicStats>> chunkStatsIterator = worldStats[i].chunkStats.entrySet().iterator();
-				while (chunkStatsIterator.hasNext()) {
-					Map.Entry<ChunkCoordIntPair, BasicStats> entry = chunkStatsIterator.next();
-					
-					if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
-						chunkStatsIterator.remove();
-					}
-					else {
-						entry.getValue().resetCurrent();
-					}
-				}
-				
-				// Reset the EntityStats.
-				Iterator<Map.Entry<Class, BasicStats>> entityStatsIterator = worldStats[i].entityStats.entrySet().iterator();
-				while (entityStatsIterator.hasNext()) {
-					Map.Entry<Class, BasicStats> entry = entityStatsIterator.next();
-					
-					if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
-						entityStatsIterator.remove();
-					}
-					else {
-						entry.getValue().resetCurrent();
-					}
-				}
-				
-				
-				// Reset the TileEntityStats.
-				Iterator<Map.Entry<Class, BasicStats>> tileEntityStatsIterator = worldStats[i].tileEntityStats.entrySet().iterator();
-				while (tileEntityStatsIterator.hasNext()) {
-					Map.Entry<Class, BasicStats> entry = tileEntityStatsIterator.next();
-					
-					if (entry.getValue().tickTime.getAverage() == 0 && entry.getValue().tickTime.getTick() > Average.RESOLUTION * 3) {
-						tileEntityStatsIterator.remove();
-					}
-					else {
-						entry.getValue().resetCurrent();
-					}
-				}
+				// Reset the current value of averages to 0.
+				worldStats[i].reset();
 			}
 			
 			// Add the time taken by each measurement type.
