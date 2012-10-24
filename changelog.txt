@@ -1,3 +1,13 @@
+Version 1.5 (vMC 1.3.2 BTW 4.22)
+
+  - Added stats for individual tracked entities to StatsAPI.
+  
+  - Added "Admin Commands" mod with a "/who" command.
+  
+  - Fixed bug causing stats in JSON to not use the correct sorting for tick time.
+  
+  - Fixed bug in ModLoader that prevented the alternate mod class names (e.g. mod_MyMod.class) from being recognized.
+
 Version 1.4 (vMC 1.3.2 BTW 4.22)
 
   - Added average tracked entities per world to StatsAPI.
