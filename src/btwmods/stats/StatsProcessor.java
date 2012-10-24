@@ -17,6 +17,7 @@ import btwmods.stats.measurements.BlockUpdate;
 import btwmods.stats.measurements.EntityUpdate;
 import btwmods.stats.measurements.TickMeasurement;
 import btwmods.stats.measurements.TileEntityUpdate;
+import btwmods.stats.measurements.TrackedEntityUpdate;
 import btwmods.stats.measurements.WorldMeasurement;
 
 public class StatsProcessor implements Runnable {
@@ -251,6 +252,30 @@ public class StatsProcessor implements Runnable {
 							
 						case WEATHER_EFFECTS:
 							worldStats[worldMeasurement.worldIndex].weatherEffects.incrementCurrent(measurement.getTime());
+							break;
+							
+						case UPDATE_TRACKED_ENTITY_PLAYER_LIST:
+							TrackedEntityUpdate trackedEntityUpdate = (TrackedEntityUpdate)worldMeasurement;
+							
+							Class trackedEntityKey = trackedEntityUpdate.entity;
+							
+							if (trackedEntityUpdate.itemId >= 256) {
+								trackedEntityKey = Item.itemsList[trackedEntityUpdate.itemId].getClass();
+							}
+							else if (trackedEntityUpdate.itemId >= 0) {
+								trackedEntityKey = Block.blocksList[trackedEntityUpdate.itemId].getClass();
+							}
+							
+							BasicStats trackedEntityStats = worldStats[worldMeasurement.worldIndex].trackedEntityStats.get(trackedEntityKey);
+							if (trackedEntityStats == null) {
+								worldStats[worldMeasurement.worldIndex].trackedEntityStats.put(trackedEntityKey, trackedEntityStats = new BasicStats());
+								trackedEntityStats.tickTime.record(measurement.getTime());
+							}
+							else {
+								trackedEntityStats.tickTime.incrementCurrent(measurement.getTime());
+							}
+							
+							trackedEntityStats.count++;
 							break;
 					}
 					

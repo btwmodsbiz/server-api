@@ -13,6 +13,7 @@ import net.minecraft.src.ChunkProviderServer;
 import net.minecraft.src.CommandHandler;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityTracker;
+import net.minecraft.src.EntityTrackerEntry;
 import net.minecraft.src.LongHashMap;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.TileEntity;
@@ -30,6 +31,7 @@ import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.measurements.BlockUpdate;
 import btwmods.stats.measurements.EntityUpdate;
 import btwmods.stats.measurements.TileEntityUpdate;
+import btwmods.stats.measurements.TrackedEntityUpdate;
 import btwmods.stats.measurements.WorldMeasurement;
 
 public class StatsAPI {
@@ -230,6 +232,10 @@ public class StatsAPI {
 
 	public static void beginTileEntityUpdate(World world, TileEntity tileEntity) {
 		measurements.begin(new TileEntityUpdate(world, tileEntity));
+	}
+
+	public static void beginUpdateTrackedEntityPlayerList(World world, EntityTrackerEntry trackerEntry) {
+		measurements.begin(new TrackedEntityUpdate(world, trackerEntry));
 	}
 	
 	/**

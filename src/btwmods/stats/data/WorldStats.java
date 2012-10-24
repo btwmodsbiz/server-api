@@ -31,6 +31,7 @@ public class WorldStats {
 	public final BasicStatsMap<ChunkCoordIntPair> chunkStats = new BasicStatsMap<ChunkCoordIntPair>();
 	public final BasicStatsMap<Class> entityStats = new BasicStatsMap<Class>();
 	public final BasicStatsMap<Class> tileEntityStats = new BasicStatsMap<Class>();
+	public final BasicStatsMap<Class> trackedEntityStats = new BasicStatsMap<Class>();
 	
 	// Reset the averages to 0.
 	public void reset() {
@@ -54,6 +55,7 @@ public class WorldStats {
 		resetCurrentMap(chunkStats);
 		resetCurrentMap(entityStats);
 		resetCurrentMap(tileEntityStats);
+		resetCurrentMap(trackedEntityStats);
 	}
 	
 	private static void resetCurrentMap(BasicStatsMap map) {
