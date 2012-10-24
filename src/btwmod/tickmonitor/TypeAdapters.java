@@ -123,7 +123,7 @@ public class TypeAdapters {
 					topTickTime.add(entries.get(i).getKey());
 				}
 				
-				// Sort by tick time.
+				// Sort by count.
 				Collections.sort(entries, new BasicStatsComparator<T>(BasicStatsComparator.Stat.COUNT, true));
 				
 				// Add the top X chunks from the sorted list, and also mark them as chunks to include.
@@ -135,7 +135,7 @@ public class TypeAdapters {
 			
 			obj.addProperty("totalTickTime", Util.DECIMAL_FORMAT_3.format(totalTickTime));
 			obj.addProperty("totalCount", totalCount);
-			obj.add("topTickTime", context.serialize(topCount));
+			obj.add("topTickTime", context.serialize(topTickTime));
 			obj.add("topCount", context.serialize(topCount));
 			obj.add("lookup", context.serialize(outMap, Map.class));
 			
