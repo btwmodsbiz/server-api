@@ -45,9 +45,9 @@ public class TypeAdapters {
 	
 	public static class AverageTypeAdapter extends TypeAdapter<Average> {
 		
-		private final BTWModTickMonitor monitor;
+		private final mod_TickMonitor monitor;
 		
-		public AverageTypeAdapter(BTWModTickMonitor monitor) {
+		public AverageTypeAdapter(mod_TickMonitor monitor) {
 			this.monitor = monitor;
 		}
 
@@ -118,7 +118,7 @@ public class TypeAdapters {
 				Collections.sort(entries, new BasicStatsComparator<T>(BasicStatsComparator.Stat.TICKTIME, true));
 				
 				// Add the top X chunks from the sorted list, and also mark them as chunks to include.
-				for (int i = 0; i < Math.min(entries.size(), BTWModTickMonitor.getTopNumber()) - 1; i++) {
+				for (int i = 0; i < Math.min(entries.size(), mod_TickMonitor.getTopNumber()) - 1; i++) {
 					outMap.put(entries.get(i).getKey(), entries.get(i).getValue());
 					topTickTime.add(entries.get(i).getKey());
 				}
@@ -127,7 +127,7 @@ public class TypeAdapters {
 				Collections.sort(entries, new BasicStatsComparator<T>(BasicStatsComparator.Stat.COUNT, true));
 				
 				// Add the top X chunks from the sorted list, and also mark them as chunks to include.
-				for (int i = 0; i < Math.min(entries.size(), BTWModTickMonitor.getTopNumber()) - 1; i++) {
+				for (int i = 0; i < Math.min(entries.size(), mod_TickMonitor.getTopNumber()) - 1; i++) {
 					outMap.put(entries.get(i).getKey(), entries.get(i).getValue());
 					topCount.add(entries.get(i).getKey());
 				}

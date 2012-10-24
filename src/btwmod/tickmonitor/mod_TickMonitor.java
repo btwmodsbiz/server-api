@@ -34,7 +34,7 @@ import btwmods.stats.data.BasicStatsMap;
 import btwmods.util.BasicFormatter;
 import btwmods.Util;
 
-public class BTWModTickMonitor implements IMod, IStatsListener, INetworkListener, IInstanceListener {
+public class mod_TickMonitor implements IMod, IStatsListener, INetworkListener, IInstanceListener {
 
 	private static int topNumber = 20;
 	private static boolean includeHistory = false;

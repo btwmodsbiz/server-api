@@ -9,9 +9,9 @@ import net.minecraft.src.WrongUsageException;
 
 public class MonitorCommand extends CommandBase {
 	
-	private BTWModTickMonitor mod;
+	private mod_TickMonitor mod;
 	
-	public MonitorCommand(BTWModTickMonitor mod) {
+	public MonitorCommand(mod_TickMonitor mod) {
 		this.mod = mod;
 	}
 
