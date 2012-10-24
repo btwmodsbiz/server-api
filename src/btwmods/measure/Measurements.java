@@ -49,8 +49,15 @@ public class Measurements<T extends Measurement> {
 		}
 	}
 	
-	public void end() {
-		if (enabled)
-			measurements.push((T)dataStack.pop().end());
+	public void end(Object identifier) {
+		if (enabled) {
+			T popped = (T)dataStack.pop().end();
+			if (popped.identifier.equals(identifier)) {
+				measurements.push(popped);
+			}
+			else {
+				throw new IllegalStateException("Tried ending measurement " + popped.identifier.toString() + " as " + identifier.toString());
+			}
+		}
 	}
 }

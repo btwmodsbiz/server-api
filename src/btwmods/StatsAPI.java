@@ -244,7 +244,13 @@ public class StatsAPI {
 	 */
 	public static void end(Type type) {
 		try {
-			measurements.end();
+			measurements.end(type);
+		}
+		catch (IllegalStateException e) {
+			measurements.setEnabled(false);
+			detailedMeasurementsEnabled = false;
+			measurements.startNew();
+			ModLoader.outputError(e, "StatsAPI#end() call did not match the type at the top of the stack. Detailed measurements disabled: " + e.getMessage(), Level.SEVERE);
 		}
 		catch (NoSuchElementException e) {
 			measurements.setEnabled(false);
