@@ -42,16 +42,12 @@
 		<jar jarfile="build/minecraft_server.jar" basedir="temp/jarbuild/bin" includes="**/**" excludes="btwmod/**" whenmanifestonly="fail" manifest="temp/jarbuild/bin/META-INF/MANIFEST.MF" />
 
 		<antcall target="modjar">
-			<param name="modname" value="itemlogger" />
-		</antcall>
-
-		<antcall target="modjar">
 			<param name="modname" value="tickmonitor" />
 		</antcall>
 
-		<antcall target="modjar">
-			<param name="modname" value="spawnbeds" />
-		</antcall>
+        <antcall target="modjar">
+            <param name="modname" value="admincommands" />
+        </antcall>
 	</target>
 
 	<target name="modjar">
