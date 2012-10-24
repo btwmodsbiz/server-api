@@ -3,9 +3,7 @@ package btwmods.stats;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.Block;
 import net.minecraft.src.ChunkCoordIntPair;
-import net.minecraft.src.Item;
 import btwmods.ModLoader;
 import btwmods.StatsAPI;
 import btwmods.events.EventDispatcher;
@@ -182,19 +180,9 @@ public class StatsProcessor implements Runnable {
 						case ENTITY_UPDATE:
 							EntityUpdate entityUpdate = (EntityUpdate)worldMeasurement;
 							coords = new ChunkCoordIntPair(entityUpdate.chunkX, entityUpdate.chunkZ);
-							
-							Class entityKey = entityUpdate.entity; 
-							
-							if (entityUpdate.itemId >= 256) {
-								entityKey = Item.itemsList[entityUpdate.itemId].getClass();
-							}
-							else if (entityUpdate.itemId >= 0) {
-								entityKey = Block.blocksList[entityUpdate.itemId].getClass();
-							}
-							
-							BasicStats entityStats = worldStats[worldMeasurement.worldIndex].entityStats.get(entityKey);
+							BasicStats entityStats = worldStats[worldMeasurement.worldIndex].entityStats.get(entityUpdate.name);
 							if (entityStats == null) {
-								worldStats[worldMeasurement.worldIndex].entityStats.put(entityKey, entityStats = new BasicStats());
+								worldStats[worldMeasurement.worldIndex].entityStats.put(entityUpdate.name, entityStats = new BasicStats());
 								entityStats.tickTime.record(measurement.getTime());
 							}
 							else {
@@ -256,19 +244,9 @@ public class StatsProcessor implements Runnable {
 							
 						case UPDATE_TRACKED_ENTITY_PLAYER_LIST:
 							TrackedEntityUpdate trackedEntityUpdate = (TrackedEntityUpdate)worldMeasurement;
-							
-							Class trackedEntityKey = trackedEntityUpdate.entity;
-							
-							if (trackedEntityUpdate.itemId >= 256) {
-								trackedEntityKey = Item.itemsList[trackedEntityUpdate.itemId].getClass();
-							}
-							else if (trackedEntityUpdate.itemId >= 0) {
-								trackedEntityKey = Block.blocksList[trackedEntityUpdate.itemId].getClass();
-							}
-							
-							BasicStats trackedEntityStats = worldStats[worldMeasurement.worldIndex].trackedEntityStats.get(trackedEntityKey);
+							BasicStats trackedEntityStats = worldStats[worldMeasurement.worldIndex].trackedEntityStats.get(trackedEntityUpdate.name);
 							if (trackedEntityStats == null) {
-								worldStats[worldMeasurement.worldIndex].trackedEntityStats.put(trackedEntityKey, trackedEntityStats = new BasicStats());
+								worldStats[worldMeasurement.worldIndex].trackedEntityStats.put(trackedEntityUpdate.name, trackedEntityStats = new BasicStats());
 								trackedEntityStats.tickTime.record(measurement.getTime());
 							}
 							else {

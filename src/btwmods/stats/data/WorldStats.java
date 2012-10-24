@@ -29,9 +29,9 @@ public class WorldStats {
 	public final Average weatherEffects = new Average();
 	public final Average trackedEntities = new Average();
 	public final BasicStatsMap<ChunkCoordIntPair> chunkStats = new BasicStatsMap<ChunkCoordIntPair>();
-	public final BasicStatsMap<Class> entityStats = new BasicStatsMap<Class>();
+	public final BasicStatsMap<String> entityStats = new BasicStatsMap<String>();
 	public final BasicStatsMap<Class> tileEntityStats = new BasicStatsMap<Class>();
-	public final BasicStatsMap<Class> trackedEntityStats = new BasicStatsMap<Class>();
+	public final BasicStatsMap<String> trackedEntityStats = new BasicStatsMap<String>();
 	
 	// Reset the averages to 0.
 	public void reset() {
