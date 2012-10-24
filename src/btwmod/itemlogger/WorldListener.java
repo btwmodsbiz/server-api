@@ -15,7 +15,7 @@ public class WorldListener implements IBlockListener {
 	private IMod mod;
 	private Logger logger;
 
-	public WorldListener(BTWModItemLogger mod, Logger logger) {
+	public WorldListener(mod_ItemLogger mod, Logger logger) {
 		this.mod = mod;
 		this.logger = logger;
 	}

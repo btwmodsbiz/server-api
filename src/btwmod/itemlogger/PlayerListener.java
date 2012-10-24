@@ -19,7 +19,7 @@ public class PlayerListener implements ISlotListener, IDropListener, IContainerL
 	private IMod mod;
 	private Logger logger;
 	
-	public PlayerListener(BTWModItemLogger mod, Logger logger) {
+	public PlayerListener(mod_ItemLogger mod, Logger logger) {
 		this.mod = mod;
 		this.logger = logger;
 	}

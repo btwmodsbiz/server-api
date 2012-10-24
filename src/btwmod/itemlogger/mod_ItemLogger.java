@@ -11,7 +11,7 @@ import btwmods.WorldAPI;
 import btwmods.io.Settings;
 import btwmods.util.BasicFormatter;
 
-public class BTWModItemLogger implements IMod {
+public class mod_ItemLogger implements IMod {
 	
 	public static Logger logger = null;
 	
