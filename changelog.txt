@@ -1,3 +1,11 @@
+Version 1.7 (vMC 1.3.2 BTW 4.22)
+
+  - Added exception throw to Measurements#end() if a measurement is ended with the wrong identifier.
+  
+  - Changed entityStats and trackedEntityStats to use the entity name rather than the Class name as the key.
+  
+  - Fixed bug where a continue statement can throw off measurements.
+
 Version 1.6 (vMC 1.3.2 BTW 4.22)
 
   - Added /dumptracked command to help find issue with the EntityTracker.
