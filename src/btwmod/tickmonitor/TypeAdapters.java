@@ -118,7 +118,7 @@ public class TypeAdapters {
 				Collections.sort(entries, new BasicStatsComparator<T>(BasicStatsComparator.Stat.TICKTIME, true));
 				
 				// Add the top X chunks from the sorted list, and also mark them as chunks to include.
-				for (int i = 0; i < Math.min(entries.size(), mod_TickMonitor.getTopNumber()) - 1; i++) {
+				for (int i = 0; i < Math.min(entries.size(), mod_TickMonitor.getTopNumber()); i++) {
 					outMap.put(entries.get(i).getKey(), entries.get(i).getValue());
 					topTickTime.add(entries.get(i).getKey());
 				}
@@ -127,7 +127,7 @@ public class TypeAdapters {
 				Collections.sort(entries, new BasicStatsComparator<T>(BasicStatsComparator.Stat.COUNT, true));
 				
 				// Add the top X chunks from the sorted list, and also mark them as chunks to include.
-				for (int i = 0; i < Math.min(entries.size(), mod_TickMonitor.getTopNumber()) - 1; i++) {
+				for (int i = 0; i < Math.min(entries.size(), mod_TickMonitor.getTopNumber()); i++) {
 					outMap.put(entries.get(i).getKey(), entries.get(i).getValue());
 					topCount.add(entries.get(i).getKey());
 				}
@@ -137,7 +137,7 @@ public class TypeAdapters {
 			obj.addProperty("totalCount", totalCount);
 			obj.add("topTickTime", context.serialize(topTickTime));
 			obj.add("topCount", context.serialize(topCount));
-			obj.add("lookup", context.serialize(outMap, Map.class));
+			obj.add("lookup", context.serialize(src, Map.class));
 			
 			return obj;
 		}
