@@ -372,19 +372,19 @@ public class mod_TickMonitor implements IMod, IStatsListener, INetworkListener, 
 			html.append("</tbody></table>");
 		}
 
-		List<Map.Entry<Class, BasicStats>> entityEntries = new ArrayList<Map.Entry<Class, BasicStats>>(event.worldStats[world].entityStats.entrySet());
+		List<Map.Entry<String, BasicStats>> entityEntries = new ArrayList<Map.Entry<String, BasicStats>>(event.worldStats[world].entityStats.entrySet());
 		
 		html.append("</td><td valign=\"top\">");
 
 		{
-			Collections.sort(entityEntries, new BasicStatsComparator<Class>(BasicStatsComparator.Stat.TICKTIME, true));
+			Collections.sort(entityEntries, new BasicStatsComparator<String>(BasicStatsComparator.Stat.TICKTIME, true));
 			html.append("<table border=\"0\"><thead><tr><th>Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
 			double entitiesTotal = 0;
 			int displayed = 0;
 			for (int i = 0; i < entityEntries.size(); i++) {
 				if (entityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
 					displayed++;
-					html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
+					html.append("<tr><td>").append(entityEntries.get(i).getKey())
 							.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
 							.append(" ms</td><td>").append(entityEntries.get(i).getValue().count)
 							.append("</td></tr>");
@@ -400,14 +400,14 @@ public class mod_TickMonitor implements IMod, IStatsListener, INetworkListener, 
 		html.append("</td><td valign=\"top\">");
 
 		{
-			Collections.sort(entityEntries, new BasicStatsComparator<Class>(BasicStatsComparator.Stat.COUNT, true));
+			Collections.sort(entityEntries, new BasicStatsComparator<String>(BasicStatsComparator.Stat.COUNT, true));
 			html.append("<table border=\"0\"><thead><tr><th>Entity</th><th>Tick Time</th><th>Count</th></tr></thead><tbody>");
 			double entitiesTotal = 0;
 			int displayed = 0;
 			for (int i = 0; i < entityEntries.size(); i++) {
 				if (entityEntries.get(i).getValue().tickTime.getTotal() != 0 && displayed <= topNumber) {
 					displayed++;
-					html.append("<tr><td>").append(entityEntries.get(i).getKey().getSimpleName())
+					html.append("<tr><td>").append(entityEntries.get(i).getKey())
 							.append("</td><td>").append(Util.DECIMAL_FORMAT_3.format(entityEntries.get(i).getValue().tickTime.getAverage() * 1.0E-6D))
 							.append(" ms</td><td>").append(entityEntries.get(i).getValue().count)
 							.append("</td></tr>");
