@@ -72,6 +72,11 @@ public class ModLoader {
 	public static final String BTWMOD_REGEX = "(?i)^(BTWMod|mod_|BTWMod_).*\\.class$";
 	
 	/**
+	 * Pattern that IMod class files must match in zip files.
+	 */
+	public static final String BTWMODZIP_REGEX = "(?i)^btwmods/(BTWMod|mod_|BTWMod_).*\\.class$";
+	
+	/**
 	 * Prefixed to the output of {@link #outputInfo} and {@link #outputError} calls.
 	 */
 	private static final String LOGPREFIX = "BTWMods: ";
@@ -366,7 +371,7 @@ public class ModLoader {
 			
 			for (Enumeration<? extends ZipEntry> list = zipFile.entries(); list.hasMoreElements(); ) {
 				ZipEntry entry = list.nextElement();
-				if (!entry.isDirectory() && entry.getName().matches("^btwmod/[^/]+/BTWMod.+\\.class$")) {
+				if (!entry.isDirectory() && entry.getName().matches(BTWMODZIP_REGEX)) {
 					names.add(entry.getName().substring(0, entry.getName().length() - ".class".length()).replace('/',  '.'));
 				}
 			}
