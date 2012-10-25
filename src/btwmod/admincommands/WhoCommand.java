@@ -24,13 +24,17 @@ public class WhoCommand extends CommandBase {
 	@Override
 	public void processCommand(ICommandSender sender, String[] args) {
 		if (args.length == 0) {
-			sender.sendChatToPlayer("Players:");
-			
 			List players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
-			Iterator playerIterator = players.iterator();
-			while (playerIterator.hasNext()) {
-				EntityPlayerMP player = (EntityPlayerMP)playerIterator.next();
-				sender.sendChatToPlayer(" - " + getPlayerResult(player));
+			
+			if (players.size() == 0) {
+				sender.sendChatToPlayer("No players online.");
+			}
+			else {
+				Iterator playerIterator = players.iterator();
+				while (playerIterator.hasNext()) {
+					EntityPlayerMP player = (EntityPlayerMP)playerIterator.next();
+					sender.sendChatToPlayer(getPlayerResult(player));
+				}
 			}
 		} else {
 			for (int i = 0; i < args.length; i++) {
