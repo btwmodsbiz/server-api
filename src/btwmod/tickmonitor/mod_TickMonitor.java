@@ -23,7 +23,7 @@ import btwmods.StatsAPI;
 import btwmods.io.Settings;
 import btwmods.measure.Average;
 import btwmods.network.CustomPacketEvent;
-import btwmods.network.INetworkListener;
+import btwmods.network.ICustomPacketListener;
 import btwmods.player.IInstanceListener;
 import btwmods.player.InstanceEvent;
 import btwmods.stats.IStatsListener;
@@ -34,7 +34,7 @@ import btwmods.stats.data.BasicStatsMap;
 import btwmods.util.BasicFormatter;
 import btwmods.Util;
 
-public class mod_TickMonitor implements IMod, IStatsListener, INetworkListener, IInstanceListener {
+public class mod_TickMonitor implements IMod, IStatsListener, ICustomPacketListener, IInstanceListener {
 
 	private static int topNumber = 20;
 	private static boolean includeHistory = false;
