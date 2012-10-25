@@ -7,29 +7,29 @@ import java.util.Set;
 
 import btwmods.events.IAPIListener;
 import btwmods.network.CustomPacketEvent;
-import btwmods.network.INetworkListener;
+import btwmods.network.ICustomPacketListener;
 
 public class NetworkAPI {
 	
 	private static final String BASE_CHANNEL_NAME = "BM|";
 	
 	// Normal channel lookup (by channel extension).
-	private static Map<String, INetworkListener> networkListeners = new HashMap<String, INetworkListener>();
+	private static Map<String, ICustomPacketListener> networkListeners = new HashMap<String, ICustomPacketListener>();
 	
-	// Reverse channel lookup (by INetworkListener).
-	private static Map<INetworkListener, Set<String>> channelListeners = new HashMap<INetworkListener, Set<String>>();
+	// Reverse channel lookup (by ICustomPacketListener).
+	private static Map<ICustomPacketListener, Set<String>> channelListeners = new HashMap<ICustomPacketListener, Set<String>>();
 	
 	private NetworkAPI() { }
 	
 	/**
-	 * Registered a custom channel to a {@link INetworkListener}.
+	 * Registered a custom channel to a {@link ICustomPacketListener}.
 	 * 
 	 * @param channelExtension the extension that will be added to the base channel name used by the API.
-	 * @param listener the listener that implements {@link INetworkListener}.
+	 * @param listener the listener that implements {@link ICustomPacketListener}.
 	 * @return true if the channel was registered; false if the channel is already registered.
 	 * @throws IllegalArgumentException if channelExtension is null or empty, or if listener is null.
 	 */
-	public static boolean registerCustomChannel(String channelExtension, INetworkListener listener) throws IllegalArgumentException {
+	public static boolean registerCustomChannel(String channelExtension, ICustomPacketListener listener) throws IllegalArgumentException {
 		if (channelExtension == null || channelExtension.length() == 0)
 			throw new IllegalArgumentException("channelExtension cannot be null or a zero length string");
 		
@@ -54,7 +54,7 @@ public class NetworkAPI {
 	/**
 	 * Unregister all custom channels for a listener.
 	 * 
-	 * @param listener the listener that implements {@link INetworkListener}.
+	 * @param listener the listener that implements {@link ICustomPacketListener}.
 	 * @throws IllegalArgumentException if listener is null.
 	 */
 	public static void unregisterCustomChannels(IAPIListener listener) throws IllegalArgumentException {
@@ -77,11 +77,11 @@ public class NetworkAPI {
 	 * Unregister a channel attached to a listener.
 	 * 
 	 * @param channelExtension the extension that will be added to the base channel name used by the API.
-	 * @param listener the listener that implements {@link INetworkListener}.
+	 * @param listener the listener that implements {@link ICustomPacketListener}.
 	 * @return true if the channel was unregistered; false if a channel was not found by that name, or it is registered to another listener.
 	 * @throws IllegalArgumentException if channelExtension is null or empty, or if listener is null.
 	 */
-	public static boolean unregisterCustomChannel(String channelExtension, INetworkListener listener) throws IllegalArgumentException {
+	public static boolean unregisterCustomChannel(String channelExtension, ICustomPacketListener listener) throws IllegalArgumentException {
 		if (channelExtension == null || channelExtension.length() == 0)
 			throw new IllegalArgumentException("channelExtension cannot be null or a zero length string");
 		
@@ -101,7 +101,7 @@ public class NetworkAPI {
 		
 		if (networkListeners.containsKey(channel)) {
 			CustomPacketEvent event = new CustomPacketEvent(channel, data, length);
-			INetworkListener listener = networkListeners.get(channel);
+			ICustomPacketListener listener = networkListeners.get(channel);
 			try {
 				listener.customPacketAction(event);
 				return event.isHandled();
