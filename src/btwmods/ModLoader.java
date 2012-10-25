@@ -136,6 +136,16 @@ public class ModLoader {
 			settings = loadSettings("BTWMods");
 			
 			try {
+				NetworkAPI.init(settings);
+			}
+			catch (Exception e) {
+				outputError(e, "NetworkAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
+				outputError("Initialization aborted.", Level.SEVERE);
+				hasInit = true;
+				return;
+			}
+			
+			try {
 				StatsAPI.init(settings);
 			}
 			catch (Exception e) {

@@ -1,17 +1,30 @@
 package btwmods;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
+import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.NetServerHandler;
+import net.minecraft.src.Packet;
+
+import btwmods.events.EventDispatcher;
+import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
+import btwmods.io.Settings;
 import btwmods.network.CustomPacketEvent;
 import btwmods.network.ICustomPacketListener;
+import btwmods.network.IPacketListener;
+import btwmods.network.PacketEvent;
 
 public class NetworkAPI {
 	
 	private static final String BASE_CHANNEL_NAME = "BM|";
+	
+	private static Field playerEntityField;
 	
 	// Normal channel lookup (by channel extension).
 	private static Map<String, ICustomPacketListener> networkListeners = new HashMap<String, ICustomPacketListener>();
@@ -19,7 +32,22 @@ public class NetworkAPI {
 	// Reverse channel lookup (by ICustomPacketListener).
 	private static Map<ICustomPacketListener, Set<String>> channelListeners = new HashMap<ICustomPacketListener, Set<String>>();
 	
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IPacketListener.class });
+	
 	private NetworkAPI() { }
+	
+	public static void init(@SuppressWarnings("unused") Settings settings) throws NoSuchFieldException {
+		playerEntityField = NetServerHandler.class.getDeclaredField("playerEntity");
+		playerEntityField.setAccessible(true);
+	}
+	
+	public static void addListener(IAPIListener listener) {
+		listeners.addListener(listener);
+	}
+
+	public static void removeListener(IAPIListener listener) {
+		listeners.removeListener(listener);
+	}
 	
 	/**
 	 * Registered a custom channel to a {@link ICustomPacketListener}.
@@ -112,5 +140,24 @@ public class NetworkAPI {
 			}
 		}
 		return false;
+	}
+
+	public static void receivedPlayerPacket(Packet packet, NetServerHandler netHandler) {
+		if (playerEntityField == null)
+			return;
+		
+		try {
+			EntityPlayerMP player = (EntityPlayerMP)playerEntityField.get(netHandler);
+			
+			if (!listeners.isEmpty(IPacketListener.class)) {
+				PacketEvent event = PacketEvent.ReceivedPlayerPacket(player, packet, netHandler);
+				((IPacketListener)listeners).packetAction(event);
+			}
+		}
+		catch (Exception e) {
+			ModLoader.outputError(e, "NetworkAPI failed to get playerEntity Field from NetHandler: " + e.getMessage(), Level.SEVERE);
+			ModLoader.outputError("NetworkAPI's inspection of received packets has been disabled.", Level.SEVERE);
+			playerEntityField = null;
+		}
 	}
 }
