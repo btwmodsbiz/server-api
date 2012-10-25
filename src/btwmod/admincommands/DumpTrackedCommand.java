@@ -60,17 +60,23 @@ public class DumpTrackedCommand extends CommandBase {
 				if (obj == null) {
 					sb.append("Tracking null!\n");
 				}
-				else {
-					sb.append("Tracking ").append(obj.getClass().getSimpleName());
+				else if (obj instanceof Entity) {
+					Entity entity = (Entity)obj;
+					sb.append("ID ")
+						.append(entity.entityId).append(": ")
+						.append(entity instanceof EntityItem ? ((EntityItem)entity).item.getItemName() : entity.getEntityName())
+						.append(" (").append(entity.getClass().getSimpleName()).append(") in chunk ")
+						.append(entity.chunkCoordX).append(",").append(entity.chunkCoordZ)
+						.append(" at ").append((long)entity.posX).append("/").append((long)entity.posY).append("/").append((long)entity.posZ);
 					
-					if (obj instanceof EntityItem) {
-						sb.append(" (").append(((EntityItem)obj).item.getItemName()).append(")");
-					}
-					else {
-						sb.append(" (").append(((Entity)obj).getEntityName()).append(")");
+					if (entity instanceof EntityItem) {
+						sb.append(" with age of ").append(((EntityItem)entity).age);
 					}
 					
 					sb.append("\n");
+				}
+				else {
+					sb.append("Tracking non-entity: ").append(obj.getClass().getSimpleName()).append("\n");
 				}
 			}
 		}
