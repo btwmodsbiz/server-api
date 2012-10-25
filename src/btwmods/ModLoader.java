@@ -74,7 +74,7 @@ public class ModLoader {
 	/**
 	 * Pattern that IMod class files must match in zip files.
 	 */
-	public static final String BTWMODZIP_REGEX = "(?i)^btwmods/(BTWMod|mod_|BTWMod_).*\\.class$";
+	public static final String BTWMODZIP_REGEX = "(?i)^btwmod/[^/\\n\\r]+/(BTWMod|mod_|BTWMod_).*\\.class$";
 	
 	/**
 	 * Prefixed to the output of {@link #outputInfo} and {@link #outputError} calls.
