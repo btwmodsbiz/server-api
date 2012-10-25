@@ -1,3 +1,7 @@
+Version 1.9 (vMC 1.3.2 BTW 4.22)
+
+  - Added age for XP orbs to the output of /dumptracked.
+
 Version 1.8 (vMC 1.3.2 BTW 4.22)
   
   - Added basic AFK tracking to the /who command in the Admin Commands mod.
