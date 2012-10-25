@@ -9,6 +9,12 @@ import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.ICommandSender;
 
 public class WhoCommand extends CommandBase {
+	
+	private final mod_AdminCommands mod;
+	
+	public WhoCommand(mod_AdminCommands mod) {
+		this.mod = mod;
+	}
 
 	@Override
 	public String getCommandName() {
@@ -33,7 +39,7 @@ public class WhoCommand extends CommandBase {
 		}
 	}
 
-	private static String getPlayerResult(String username) {
+	private String getPlayerResult(String username) {
 		EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerEntity(username);
 		if (player == null)
 			return "Player not found: " + username;
@@ -41,9 +47,10 @@ public class WhoCommand extends CommandBase {
 			return getPlayerResult(player);
 	}
 
-	private static String getPlayerResult(EntityPlayerMP player) {
-		return player.username + " in " + player.worldObj.provider.getDimensionName() + " at " + (int)player.posX + " " + (int)player.posY + " "
-				+ (int)player.posZ;
+	private String getPlayerResult(EntityPlayerMP player) {
+		long seconds = mod.getTimeSinceLastPlayerAction(player);
+		return player.username + " in " + player.worldObj.provider.getDimensionName() + " at " + (long)player.posX + " " + (long)player.posY + " "
+				+ (long)player.posZ + (seconds >= mod.getSecondsForAFK() ? " (AFK " + seconds + " seconds)" : "");
 	}
 
 	public String getCommandUsage(ICommandSender sender) {
