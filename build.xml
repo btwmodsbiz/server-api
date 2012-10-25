@@ -48,10 +48,6 @@
 		<antcall target="modjar">
 			<param name="modname" value="tickmonitor" />
 		</antcall>
-
-        <antcall target="modjar">
-            <param name="modname" value="admincommands" />
-        </antcall>
 	</target>
 
 	<target name="modjar">
