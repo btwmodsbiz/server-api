@@ -16,6 +16,7 @@ import net.minecraft.src.Entity;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityTracker;
 import net.minecraft.src.EntityTrackerEntry;
+import net.minecraft.src.EntityXPOrb;
 import net.minecraft.src.ICommandSender;
 
 public class DumpTrackedCommand extends CommandBase {
@@ -71,6 +72,9 @@ public class DumpTrackedCommand extends CommandBase {
 					
 					if (entity instanceof EntityItem) {
 						sb.append(" with age of ").append(((EntityItem)entity).age);
+					}
+					else if (entity instanceof EntityXPOrb) {
+						sb.append(" with age of ").append(((EntityXPOrb)entity).xpOrbAge);
 					}
 					
 					sb.append("\n");
