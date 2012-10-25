@@ -20,6 +20,7 @@ import btwmods.network.PacketEvent;
 
 public class mod_AdminCommands implements IMod, IPacketListener {
 	
+	private long secondsForAFK = 300;
 	private final Map<EntityPlayerMP, Long> lastPlayerAction = new HashMap<EntityPlayerMP, Long>();
 	
 	private WhoCommand whoCommand;
@@ -29,12 +30,26 @@ public class mod_AdminCommands implements IMod, IPacketListener {
 	public String getName() throws Exception {
 		return "Admin Commands";
 	}
+	
+	public long getSecondsForAFK() {
+		return secondsForAFK;
+	}
+
+	@Override
+	public IMod getMod() {
+		return this;
+	}
 
 	@Override
 	public void init(Settings settings) throws Exception {
 		NetworkAPI.addListener(this);
 		CommandsAPI.registerCommand(whoCommand = new WhoCommand(), this);
 		CommandsAPI.registerCommand(dumpTrackedCommand = new DumpTrackedCommand(), this);
+
+		// Load settings
+		if (settings.isLong("secondsforafk")) {
+			secondsForAFK = settings.getLong("secondsforaFK");
+		}
 	}
 
 	@Override
@@ -42,11 +57,6 @@ public class mod_AdminCommands implements IMod, IPacketListener {
 		NetworkAPI.removeListener(this);
 		CommandsAPI.unregisterCommand(whoCommand);
 		CommandsAPI.unregisterCommand(dumpTrackedCommand);
-	}
-
-	@Override
-	public IMod getMod() {
-		return this;
 	}
 
 	@Override
@@ -61,5 +71,14 @@ public class mod_AdminCommands implements IMod, IPacketListener {
 			
 			lastPlayerAction.put(event.getPlayer(), new Long(System.currentTimeMillis()));
 		}
+	}
+	
+	public boolean isPlayerAFK(EntityPlayerMP player) {
+		return getTimeSinceLastPlayerAction(player) >= secondsForAFK;
+	}
+	
+	public long getTimeSinceLastPlayerAction(EntityPlayerMP player) {
+		Long timeSinceLastAction = lastPlayerAction.get(player);
+		return timeSinceLastAction == null ? 0 : (System.currentTimeMillis() - timeSinceLastAction.longValue()) / 1000L;
 	}
 }
