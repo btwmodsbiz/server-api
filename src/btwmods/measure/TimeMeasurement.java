@@ -1,6 +1,6 @@
 package btwmods.measure;
 
-public abstract class Measurement<E> {
+public abstract class TimeMeasurement<E> {
 	
 	public final E identifier;
 	private long time;
@@ -9,7 +9,7 @@ public abstract class Measurement<E> {
 		return time;
 	}
 	
-	public Measurement(E identifier) {
+	public TimeMeasurement(E identifier) {
 		this.identifier = identifier;
 	}
 	
@@ -17,7 +17,7 @@ public abstract class Measurement<E> {
 		this.time = System.nanoTime();
 	}
 	
-	public Measurement<E> end() {
+	public TimeMeasurement<E> end() {
 		time = System.nanoTime() - time;
 		return this;
 	}

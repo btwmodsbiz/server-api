@@ -2,7 +2,7 @@ package btwmods.measure;
 
 import java.util.ArrayDeque;
 
-public class Measurements<T extends Measurement> {
+public class Measurements<T extends TimeMeasurement> {
 	
 	private boolean enabled;
 	private ArrayDeque<T> measurements = new ArrayDeque<T>();
