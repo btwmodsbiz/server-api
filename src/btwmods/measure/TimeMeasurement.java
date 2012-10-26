@@ -1,8 +1,7 @@
 package btwmods.measure;
 
-public abstract class TimeMeasurement<E> {
+public class TimeMeasurement<E> extends Measurement<E> {
 	
-	public final E identifier;
 	private long time;
 	
 	public long getTime() {
@@ -10,7 +9,7 @@ public abstract class TimeMeasurement<E> {
 	}
 	
 	public TimeMeasurement(E identifier) {
-		this.identifier = identifier;
+		super(identifier);
 	}
 	
 	public void start() {
