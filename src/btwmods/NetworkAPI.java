@@ -151,7 +151,7 @@ public class NetworkAPI {
 		try {
 			EntityPlayerMP player = (EntityPlayerMP)playerEntityField.get(netHandler);
 			
-			StatsAPI.record(new PlayerNetworkMeasurement(NetworkType.RECEIVED_FROM_PLAYER, player, packet.getPacketSize()));
+			StatsAPI.record(new PlayerNetworkMeasurement(NetworkType.RECEIVED, player, packet.getPacketSize()));
 			
 			if (!listeners.isEmpty(IPacketListener.class)) {
 				PacketEvent event = PacketEvent.ReceivedPlayerPacket(player, packet, netHandler);
@@ -172,7 +172,7 @@ public class NetworkAPI {
 		try {
 			EntityPlayerMP player = (EntityPlayerMP)playerEntityField.get(netHandler);
 			
-			StatsAPI.record(new PlayerNetworkMeasurement(NetworkType.SENT_TO_PLAYER, player, packet.getPacketSize()));
+			StatsAPI.record(new PlayerNetworkMeasurement(NetworkType.SENT, player, packet.getPacketSize()));
 			
 			if (!listeners.isEmpty(IPacketListener.class)) {
 				PacketEvent event = PacketEvent.SentPlayerPacket(player, packet, netHandler);
