@@ -33,7 +33,7 @@
 	</target>
 
 	<target name="compile" depends="combine">
-		<javac srcdir="temp/jarbuild/src" compiler="javac1.6" classpath="temp/jarbuild/bin" destdir="temp/jarbuild/bin" failonerror="true" includeantruntime="false"/>
+		<javac srcdir="temp/jarbuild/src" compiler="javac1.6" debug="true" classpath="temp/jarbuild/bin" destdir="temp/jarbuild/bin" failonerror="true" includeantruntime="false"/>
 	</target>
 
 	<target name="jarbuild" depends="compile">
