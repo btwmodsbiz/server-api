@@ -14,6 +14,8 @@ import btwmods.stats.data.ServerStats;
 import btwmods.stats.data.WorldStats;
 import btwmods.stats.measurements.BlockUpdate;
 import btwmods.stats.measurements.EntityUpdate;
+import btwmods.stats.measurements.NetworkMeasurement;
+import btwmods.stats.measurements.PlayerNetworkMeasurement;
 import btwmods.stats.measurements.TileEntityUpdate;
 import btwmods.stats.measurements.TrackedEntityUpdate;
 import btwmods.stats.measurements.WorldMeasurement;
@@ -140,7 +142,20 @@ public class StatsProcessor implements Runnable {
 			while ((measurement = stats.measurements.poll()) != null) {
 				ChunkCoordIntPair coords = null;
 				
-				if (measurement instanceof WorldMeasurement) {
+				if (measurement instanceof NetworkMeasurement) {
+					NetworkMeasurement networkMeasurement = (NetworkMeasurement)measurement;
+					
+					if (networkMeasurement.identifier == NetworkType.RECEIVED)
+						serverStats.receivedByes += (long)networkMeasurement.size;
+					else
+						serverStats.sentByes += (long)networkMeasurement.size;
+					
+					if (measurement instanceof PlayerNetworkMeasurement) {
+						// TODO: record player network usage.
+					}
+				}
+				
+				else if (measurement instanceof WorldMeasurement) {
 					WorldMeasurement worldMeasurement = (WorldMeasurement)measurement;
 				
 					worldStats[worldMeasurement.worldIndex].measurementQueue.incrementCurrent(1);
