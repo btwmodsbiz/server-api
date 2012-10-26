@@ -2,7 +2,7 @@ package btwmods.stats.data;
 
 import java.util.ArrayDeque;
 
-import btwmods.stats.measurements.TickMeasurement;
+import btwmods.measure.Measurement;
 
 public class QueuedTickStats {
 	public long tickEnd;
@@ -18,5 +18,5 @@ public class QueuedTickStats {
 	public int[] id2ChunkMap;
 	public int[] droppedChunksSet;
 	public int[] trackedEntities;
-	public ArrayDeque<TickMeasurement> measurements;
+	public ArrayDeque<Measurement> measurements;
 }

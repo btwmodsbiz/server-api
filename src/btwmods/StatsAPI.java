@@ -26,6 +26,7 @@ import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
 import btwmods.io.Settings;
+import btwmods.measure.Measurement;
 import btwmods.measure.Measurements;
 import btwmods.stats.IStatsListener;
 import btwmods.stats.CommandStats;
@@ -216,6 +217,10 @@ public class StatsAPI {
 			
 			statsQueue.add(stats);
 		}
+	}
+
+	public static void record(Measurement measurement) {
+		measurements.record(measurement);
 	}
 
 	public static void begin(Type type, World world) {

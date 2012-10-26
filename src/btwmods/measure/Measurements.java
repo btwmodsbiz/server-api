@@ -2,11 +2,11 @@ package btwmods.measure;
 
 import java.util.ArrayDeque;
 
-public class Measurements<T extends TimeMeasurement> {
+public class Measurements {
 	
 	private boolean enabled;
-	private ArrayDeque<T> measurements = new ArrayDeque<T>();
-	private ArrayDeque<T> dataStack = new ArrayDeque<T>();
+	private ArrayDeque<Measurement> measurements = new ArrayDeque<Measurement>();
+	private ArrayDeque<TimeMeasurement> timeStack = new ArrayDeque<TimeMeasurement>();
 	
 	public Measurements() {
 		this(true);
@@ -17,7 +17,7 @@ public class Measurements<T extends TimeMeasurement> {
 	}
 	
 	public boolean completedMeasurements() {
-		return dataStack.size() == 0;
+		return timeStack.size() == 0;
 	}
 	
 	public boolean isEnabled() {
@@ -31,27 +31,32 @@ public class Measurements<T extends TimeMeasurement> {
 		}
 	}
 	
-	public ArrayDeque<T> startNew() {
-		ArrayDeque<T> old = measurements;
+	public ArrayDeque<Measurement> startNew() {
+		ArrayDeque<Measurement> old = measurements;
 		
 		if ((enabled && measurements.size() > 0) || measurements.size() != 0) {
-			measurements = new ArrayDeque<T>();
-			dataStack = new ArrayDeque<T>();
+			measurements = new ArrayDeque<Measurement>();
+			timeStack = new ArrayDeque<TimeMeasurement>();
 		}
 		
 		return old;
 	}
 	
-	public void begin(T data) {
+	public void record(Measurement measurement) {
+		if (enabled)
+			measurements.push(measurement);
+	}
+	
+	public void begin(TimeMeasurement data) {
 		if (enabled) {
-			dataStack.push(data);
+			timeStack.push(data);
 			data.start();
 		}
 	}
 	
 	public void end(Object identifier) {
 		if (enabled) {
-			T popped = (T)dataStack.pop().end();
+			Measurement popped = timeStack.pop().end();
 			if (popped.identifier.equals(identifier)) {
 				measurements.push(popped);
 			}
