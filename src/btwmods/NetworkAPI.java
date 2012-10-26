@@ -19,6 +19,8 @@ import btwmods.network.CustomPacketEvent;
 import btwmods.network.ICustomPacketListener;
 import btwmods.network.IPacketListener;
 import btwmods.network.PacketEvent;
+import btwmods.stats.NetworkType;
+import btwmods.stats.measurements.PlayerNetworkMeasurement;
 
 public class NetworkAPI {
 	
@@ -149,6 +151,8 @@ public class NetworkAPI {
 		try {
 			EntityPlayerMP player = (EntityPlayerMP)playerEntityField.get(netHandler);
 			
+			StatsAPI.record(new PlayerNetworkMeasurement(NetworkType.RECEIVED_FROM_PLAYER, player, packet.getPacketSize()));
+			
 			if (!listeners.isEmpty(IPacketListener.class)) {
 				PacketEvent event = PacketEvent.ReceivedPlayerPacket(player, packet, netHandler);
 				((IPacketListener)listeners).packetAction(event);
@@ -167,6 +171,8 @@ public class NetworkAPI {
 		
 		try {
 			EntityPlayerMP player = (EntityPlayerMP)playerEntityField.get(netHandler);
+			
+			StatsAPI.record(new PlayerNetworkMeasurement(NetworkType.SENT_TO_PLAYER, player, packet.getPacketSize()));
 			
 			if (!listeners.isEmpty(IPacketListener.class)) {
 				PacketEvent event = PacketEvent.SentPlayerPacket(player, packet, netHandler);
