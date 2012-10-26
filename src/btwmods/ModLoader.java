@@ -105,6 +105,12 @@ public class ModLoader {
 	private static Set<String> ignoredModClasses = new HashSet<String>();
 	
 	/**
+	 * About the time the server was started.
+	 * Specifically, it's the time at which this class was loaded by the ClassLoader.
+	 */
+	public static long serverStartTime = System.currentTimeMillis();
+	
+	/**
 	 * Initialize the ModLoader and mods. Should only be called from the {@link World} constructor.
 	 */
 	public static void init() {
