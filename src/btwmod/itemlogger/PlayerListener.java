@@ -47,7 +47,7 @@ public class PlayerListener implements ISlotListener, IDropListener, IContainerL
 
 	@Override
 	public void dropAction(DropEvent event) {
-		
+		// TODO: record how and where the player died if inventory is fully ejected.
 	}
 
 	@Override
