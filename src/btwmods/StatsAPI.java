@@ -15,6 +15,7 @@ import net.minecraft.src.Entity;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityList;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.EntityTracker;
 import net.minecraft.src.EntityTrackerEntry;
 import net.minecraft.src.EntityXPOrb;
@@ -30,6 +31,7 @@ import btwmods.measure.Measurement;
 import btwmods.measure.Measurements;
 import btwmods.stats.IStatsListener;
 import btwmods.stats.CommandStats;
+import btwmods.stats.NetworkType;
 import btwmods.stats.StatsProcessor;
 import btwmods.stats.Type;
 import btwmods.stats.data.QueuedTickStats;
@@ -221,6 +223,14 @@ public class StatsAPI {
 
 	public static void record(Measurement measurement) {
 		measurements.record(measurement);
+	}
+	
+	public static void recordNetworkIO(NetworkType type, int bytes) {
+		recordNetworkIO(type, bytes, null);
+	}
+	
+	public static void recordNetworkIO(NetworkType type, int bytes, EntityPlayerMP player) {
+		
 	}
 
 	public static void begin(Type type, World world) {
