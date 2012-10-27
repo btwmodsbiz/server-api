@@ -25,6 +25,7 @@ public class mod_AdminCommands implements IMod, IPacketListener {
 	
 	private WhoCommand whoCommand;
 	private DumpTrackedCommand dumpTrackedCommand;
+	private ReliableUpdatesCommand reliableUpdatesCommand;
 
 	@Override
 	public String getName() throws Exception {
@@ -45,6 +46,7 @@ public class mod_AdminCommands implements IMod, IPacketListener {
 		NetworkAPI.addListener(this);
 		CommandsAPI.registerCommand(whoCommand = new WhoCommand(this), this);
 		CommandsAPI.registerCommand(dumpTrackedCommand = new DumpTrackedCommand(), this);
+		CommandsAPI.registerCommand(reliableUpdatesCommand = new ReliableUpdatesCommand(), this);
 
 		// Load settings
 		if (settings.isLong("secondsforafk")) {
@@ -57,6 +59,7 @@ public class mod_AdminCommands implements IMod, IPacketListener {
 		NetworkAPI.removeListener(this);
 		CommandsAPI.unregisterCommand(whoCommand);
 		CommandsAPI.unregisterCommand(dumpTrackedCommand);
+		CommandsAPI.unregisterCommand(reliableUpdatesCommand);
 	}
 
 	@Override
