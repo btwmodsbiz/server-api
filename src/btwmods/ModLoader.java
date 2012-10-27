@@ -533,17 +533,17 @@ public class ModLoader {
 			outputError(name + " has been unloaded disabled as much as possible.", Level.SEVERE);
 	}
 
-	public static void reportCommandFailure(RuntimeException e, CommandBase command, IMod mod) {
-
-		String name = command.getClass().getName();
+	public static void reportCommandFailure(RuntimeException e, String registeredCommandName, CommandBase command, IMod mod) {
+		
+		String modName = mod.getClass().getSimpleName();
 		try {
-			name = mod.getName() + " (" + name + ")";
+			modName = mod.getName() + " (" + modName + ")";
 		}
 		catch (Throwable ex) { }
 		
 		// Unregister the command so it does not run again.
 		CommandsAPI.unregisterCommand(command);
 		
-		outputError(e, name + " threw a " + e.getClass().getSimpleName() + (e.getMessage() == null ? "." : ": " + e.getMessage()), Level.SEVERE);
+		outputError(e, "The /" + registeredCommandName + " command registed by " + modName + " threw a " + e.getClass().getSimpleName() + " and has been unregistered" + (e.getMessage() == null ? "." : ": " + e.getMessage()), Level.SEVERE);
 	}
 }

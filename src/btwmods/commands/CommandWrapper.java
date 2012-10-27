@@ -91,7 +91,7 @@ public class CommandWrapper extends CommandBase {
 	
 	private RuntimeException handleException(RuntimeException e, ICommandSender sender) {
 		if (sender == null || !(e instanceof CommandException)) {
-			ModLoader.reportCommandFailure(e, command, mod);
+			ModLoader.reportCommandFailure(e, registeredCommandName, command, mod);
 		}
 		
 		return e;
