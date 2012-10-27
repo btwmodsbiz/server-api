@@ -37,6 +37,7 @@ import btwmods.stats.Type;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.measurements.BlockUpdate;
 import btwmods.stats.measurements.EntityUpdate;
+import btwmods.stats.measurements.PlayerNetworkMeasurement;
 import btwmods.stats.measurements.TileEntityUpdate;
 import btwmods.stats.measurements.TrackedEntityUpdate;
 import btwmods.stats.measurements.WorldMeasurement;
@@ -72,6 +73,9 @@ public class StatsAPI {
 	private static LongHashMap[] id2ChunkMap;
 	private static Set[] droppedChunksSet;
 	private static Set[] trackedEntitiesSet;
+	
+	private static long bytesSent = 0;
+	private static long bytesReceived = 0;
 	
 	/**
 	 * Should only be called by ModLoader.
@@ -194,6 +198,9 @@ public class StatsAPI {
 			stats.receivedPacketCount = server.receivedPacketCountArray[tickCounter % 100];
 			stats.receivedPacketSize = server.receivedPacketSizeArray[tickCounter % 100];
 			
+			stats.bytesReceived = bytesReceived;
+			stats.bytesSent = bytesSent;
+			
 			stats.worldTickTimes = new long[server.timeOfLastDimensionTick.length];
 			stats.loadedChunks = new int[stats.worldTickTimes.length];
 			stats.id2ChunkMap = new int[stats.worldTickTimes.length];
@@ -230,7 +237,13 @@ public class StatsAPI {
 	}
 	
 	public static void recordNetworkIO(NetworkType type, int bytes, EntityPlayerMP player) {
+		if (type == NetworkType.RECEIVED)
+			bytesReceived += (long)bytes;
+		else
+			bytesSent += (long)bytes;
 		
+		if (player != null)
+			record(new PlayerNetworkMeasurement(type, player, bytes));
 	}
 
 	public static void begin(Type type, World world) {

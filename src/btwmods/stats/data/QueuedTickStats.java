@@ -19,4 +19,6 @@ public class QueuedTickStats {
 	public int[] droppedChunksSet;
 	public int[] trackedEntities;
 	public ArrayDeque<Measurement> measurements;
+	public long bytesSent;
+	public long bytesReceived;
 }

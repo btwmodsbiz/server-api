@@ -126,6 +126,9 @@ public class StatsProcessor implements Runnable {
 			serverStats.receivedPacketCount.record(stats.receivedPacketCount);
 			serverStats.receivedPacketSize.record(stats.receivedPacketSize);
 			
+			serverStats.bytesSent = stats.bytesSent;
+			serverStats.bytesReceived = stats.bytesReceived;
+			
 			for (int i = 0; i < worldStats.length; i++) {
 				worldStats[i].worldTickTime.record(stats.worldTickTimes[i]);
 				worldStats[i].loadedChunks.record(stats.loadedChunks[i]);
