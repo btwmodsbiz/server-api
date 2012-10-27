@@ -20,7 +20,6 @@ import btwmods.network.ICustomPacketListener;
 import btwmods.network.IPacketListener;
 import btwmods.network.PacketEvent;
 import btwmods.stats.NetworkType;
-import btwmods.stats.measurements.PlayerNetworkMeasurement;
 
 public class NetworkAPI {
 	
@@ -145,44 +144,46 @@ public class NetworkAPI {
 	}
 
 	public static void receivedPlayerPacket(Packet packet, NetServerHandler netHandler) {
-		if (playerEntityField == null)
-			return;
+		EntityPlayerMP player = null;
 		
-		try {
-			EntityPlayerMP player = (EntityPlayerMP)playerEntityField.get(netHandler);
-			
-			StatsAPI.record(new PlayerNetworkMeasurement(NetworkType.RECEIVED, player, packet.getPacketSize()));
-			
-			if (!listeners.isEmpty(IPacketListener.class)) {
-				PacketEvent event = PacketEvent.ReceivedPlayerPacket(player, packet, netHandler);
-				((IPacketListener)listeners).packetAction(event);
+		if (playerEntityField != null) {
+			try {
+				player = (EntityPlayerMP)playerEntityField.get(netHandler);
+				
+				if (!listeners.isEmpty(IPacketListener.class)) {
+					PacketEvent event = PacketEvent.ReceivedPlayerPacket(player, packet, netHandler);
+					((IPacketListener)listeners).packetAction(event);
+				}
+			}
+			catch (Exception e) {
+				ModLoader.outputError(e, "NetworkAPI failed to get playerEntity Field from NetHandler: " + e.getMessage(), Level.SEVERE);
+				ModLoader.outputError("NetworkAPI's inspection of packets received from players has been disabled.", Level.SEVERE);
+				playerEntityField = null;
 			}
 		}
-		catch (Exception e) {
-			ModLoader.outputError(e, "NetworkAPI failed to get playerEntity Field from NetHandler: " + e.getMessage(), Level.SEVERE);
-			ModLoader.outputError("NetworkAPI's inspection of received packets has been disabled.", Level.SEVERE);
-			playerEntityField = null;
-		}
+		
+		StatsAPI.recordNetworkIO(NetworkType.RECEIVED, packet.getPacketSize(), player);
 	}
 
 	public static void sentPlayerPacket(Packet packet, NetServerHandler netHandler) {
-		if (playerEntityField == null)
-			return;
+		EntityPlayerMP player = null;
 		
-		try {
-			EntityPlayerMP player = (EntityPlayerMP)playerEntityField.get(netHandler);
-			
-			StatsAPI.record(new PlayerNetworkMeasurement(NetworkType.SENT, player, packet.getPacketSize()));
-			
-			if (!listeners.isEmpty(IPacketListener.class)) {
-				PacketEvent event = PacketEvent.SentPlayerPacket(player, packet, netHandler);
-				((IPacketListener)listeners).packetAction(event);
+		if (playerEntityField != null) {
+			try {
+				player = (EntityPlayerMP)playerEntityField.get(netHandler);
+				
+				if (!listeners.isEmpty(IPacketListener.class)) {
+					PacketEvent event = PacketEvent.SentPlayerPacket(player, packet, netHandler);
+					((IPacketListener)listeners).packetAction(event);
+				}
+			}
+			catch (Exception e) {
+				ModLoader.outputError(e, "NetworkAPI failed to get playerEntity Field from NetHandler: " + e.getMessage(), Level.SEVERE);
+				ModLoader.outputError("NetworkAPI's inspection of packets sent to players has been disabled.", Level.SEVERE);
+				playerEntityField = null;
 			}
 		}
-		catch (Exception e) {
-			ModLoader.outputError(e, "NetworkAPI failed to get playerEntity Field from NetHandler: " + e.getMessage(), Level.SEVERE);
-			ModLoader.outputError("NetworkAPI's inspection of received packets has been disabled.", Level.SEVERE);
-			playerEntityField = null;
-		}
+
+		StatsAPI.recordNetworkIO(NetworkType.SENT, packet.getPacketSize(), player);
 	}
 }
