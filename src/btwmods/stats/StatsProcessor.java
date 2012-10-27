@@ -146,9 +146,9 @@ public class StatsProcessor implements Runnable {
 					NetworkMeasurement networkMeasurement = (NetworkMeasurement)measurement;
 					
 					if (networkMeasurement.identifier == NetworkType.RECEIVED)
-						serverStats.receivedByes += (long)networkMeasurement.size;
+						serverStats.bytesReceivedFromPlayers += (long)networkMeasurement.size;
 					else
-						serverStats.sentByes += (long)networkMeasurement.size;
+						serverStats.bytesSentToPlayers += (long)networkMeasurement.size;
 					
 					if (measurement instanceof PlayerNetworkMeasurement) {
 						// TODO: record player network usage.

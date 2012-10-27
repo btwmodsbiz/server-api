@@ -12,6 +12,6 @@ public class ServerStats {
 	public final Average receivedPacketSize = new Average();
 	public final Average statsThreadTime = new Average();
 	public final Average statsThreadQueueCount = new Average();
-	public long sentByes = 0L;
-	public long receivedByes = 0L;
+	public long bytesSentToPlayers = 0L;
+	public long bytesReceivedFromPlayers = 0L;
 }
