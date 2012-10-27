@@ -9,7 +9,7 @@ import net.minecraft.src.Packet;
 public class PacketEvent extends EventObject {
 
 	public enum Type {
-		SENT_TO_PLAYER, RECEIVED_FROM_PLAYER, SERVER_SENT, SERVER_RECIEVED
+		SENT_TO_PLAYER, RECEIVED_FROM_PLAYER, SERVER_SENT, SERVER_RECEIVED
 	};
 
 	private EntityPlayerMP player = null;
