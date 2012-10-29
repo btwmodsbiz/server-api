@@ -4,9 +4,9 @@ import java.lang.reflect.Field;
 import java.util.Properties;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.CommandBase;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.ICommand;
 import net.minecraft.src.ICommandSender;
 import net.minecraft.src.StringTranslate;
 
@@ -66,7 +66,7 @@ public class TranslationsAPI {
 	 * @param command The command to create the key for.
 	 * @return The key for the command.
 	 */
-	public static String getTranslationKey(IMod mod, CommandBase command) {
+	public static String getTranslationKey(IMod mod, ICommand command) {
 		return TranslationsAPI.getTranslationKey(mod, "command." + command.getCommandName());
 	}
 	

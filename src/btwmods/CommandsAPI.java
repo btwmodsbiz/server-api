@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.CommandBase;
 import net.minecraft.src.CommandHandler;
+import net.minecraft.src.ICommand;
 import btwmods.commands.CommandWrapper;
 
 public class CommandsAPI {
@@ -24,14 +24,14 @@ public class CommandsAPI {
 		commandSet = (Set)commandSetField.get(MinecraftServer.getServer().getCommandManager());
 	}
 	
-	public static void registerCommand(CommandBase command, IMod mod) {
+	public static void registerCommand(ICommand command, IMod mod) {
 		if (commandMap == null || commandSet == null)
 			return;
 		
 		((CommandHandler)MinecraftServer.getServer().getCommandManager()).registerCommand(new CommandWrapper(command, mod));
 	}
 	
-	public static void unregisterCommand(CommandBase command) {
+	public static void unregisterCommand(ICommand command) {
 		if (commandMap == null || commandSet == null)
 			return;
 			

@@ -7,15 +7,16 @@ import btwmods.ModLoader;
 
 import net.minecraft.src.CommandBase;
 import net.minecraft.src.CommandException;
+import net.minecraft.src.ICommand;
 import net.minecraft.src.ICommandSender;
 
 public class CommandWrapper extends CommandBase {
 	
 	private String registeredCommandName = null;
-	public final CommandBase command;
+	public final ICommand command;
 	public final IMod mod;
 	
-	public CommandWrapper(CommandBase command, IMod mod) {
+	public CommandWrapper(ICommand command, IMod mod) {
 		if (command == null || mod == null)
 			throw new NullPointerException();
 		

@@ -19,7 +19,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.CommandBase;
+import net.minecraft.src.ICommand;
 import net.minecraft.src.World;
 
 import btwmods.events.IAPIListener;
@@ -533,7 +533,7 @@ public class ModLoader {
 			outputError(name + " has been unloaded disabled as much as possible.", Level.SEVERE);
 	}
 
-	public static void reportCommandFailure(RuntimeException e, String registeredCommandName, CommandBase command, IMod mod) {
+	public static void reportCommandFailure(RuntimeException e, String registeredCommandName, ICommand command, IMod mod) {
 		
 		String modName = mod.getClass().getSimpleName();
 		try {
