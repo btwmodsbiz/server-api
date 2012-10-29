@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Sever Jar + Mod Zips" default="jarbuild" basedir="../../">
+<project name="Sever Jar + Mod Zips" default="build" basedir="../../">
+	
+	<target name="build" depends="compile,jars">
+	
+	</target>
+	
 	<target name="setup">
 		<delete dir="temp/jarbuild" failonerror="true" />
 		<mkdir dir="temp/jarbuild" />
@@ -36,10 +41,14 @@
 		<javac srcdir="temp/jarbuild/src" compiler="javac1.6" debug="true" classpath="temp/jarbuild/bin" destdir="temp/jarbuild/bin" failonerror="true" includeantruntime="false"/>
 	</target>
 
-	<target name="jarbuild" depends="compile">
+	<target name="jars">
 		<echo message="minecraft_server.jar" />
 		<delete file="build/minecraft_server.jar" failonerror="true" />
 		<jar jarfile="build/minecraft_server.jar" basedir="temp/jarbuild/bin" includes="**/**" excludes="btwmod/**" whenmanifestonly="fail" manifest="temp/jarbuild/bin/META-INF/MANIFEST.MF" />
+		
+        <echo message="btwmods.jar" />
+        <delete file="build/btwmods.jar" failonerror="true" />
+        <jar jarfile="build/btwmods.jar" basedir="temp/jarbuild/bin" includes="btwmods/**" whenmanifestonly="fail" />
 
         <antcall target="modjar">
             <param name="modname" value="admincommands" />
