@@ -162,16 +162,6 @@ public class ModLoader {
 			}
 			
 			try {
-				TranslationsAPI.init();
-			}
-			catch (Exception e) {
-				outputError(e, "TranslationsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
-				outputError("Initialization aborted.", Level.SEVERE);
-				hasInit = true;
-				return;
-			}
-			
-			try {
 				ServerAPI.init(settings);
 			}
 			catch (Exception e) {
