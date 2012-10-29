@@ -172,16 +172,6 @@ public class ModLoader {
 			}
 			
 			try {
-				CommandsAPI.init();
-			}
-			catch (Exception e) {
-				outputError(e, "CommandsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
-				outputError("Initialization aborted.", Level.SEVERE);
-				hasInit = true;
-				return;
-			}
-			
-			try {
 				ServerAPI.init(settings);
 			}
 			catch (Exception e) {
@@ -545,5 +535,16 @@ public class ModLoader {
 		CommandsAPI.unregisterCommand(command);
 		
 		outputError(e, "The /" + registeredCommandName + " command registed by " + modName + " threw a " + e.getClass().getSimpleName() + " and has been unregistered" + (e.getMessage() == null ? "." : ": " + e.getMessage()), Level.SEVERE);
+	}
+
+	public static void reportCommandRegistrationFailure(Throwable e, ICommand command, IMod mod) {
+		
+		String modName = mod.getClass().getSimpleName();
+		try {
+			modName = mod.getName() + " (" + modName + ")";
+		}
+		catch (Throwable ex) { }
+		
+		outputError(e, modName + " failed to register the " + command.getClass().getSimpleName() + " command as it threw a " + e.getClass().getSimpleName() + (e.getMessage() == null ? "." : ": " + e.getMessage()), Level.SEVERE);
 	}
 }

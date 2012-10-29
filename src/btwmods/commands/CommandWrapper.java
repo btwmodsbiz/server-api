@@ -13,15 +13,20 @@ import net.minecraft.src.ICommandSender;
 public class CommandWrapper extends CommandBase {
 	
 	private String registeredCommandName = null;
+	private List registeredCommandAliases = null;
 	public final ICommand command;
 	public final IMod mod;
 	
-	public CommandWrapper(ICommand command, IMod mod) {
+	public CommandWrapper(ICommand command, IMod mod) throws Exception {
 		if (command == null || mod == null)
 			throw new NullPointerException();
 		
 		this.command = command;
 		this.mod = mod;
+		
+		// Cache the command name and aliases, since it is important that they do not change.
+		registeredCommandName = command.getCommandName();
+		registeredCommandAliases = command.getCommandAliases();
 	}
 	
 	public String getReigsteredCommandName() {
@@ -30,21 +35,12 @@ public class CommandWrapper extends CommandBase {
 	
 	@Override
 	public String getCommandName() {
-		try {
-			if (registeredCommandName == null) {
-				// Cache the command name the first time it's called, as this is what it will be registered as in the ICommandManager.
-				return this.registeredCommandName = command.getCommandName();
-			}
-			else {
-				return command.getCommandName();
-			}
-		}
-		catch (RuntimeException e) {
-			handleException(e, null);
-			
-			// Return the original command name when registering with the ICommandManager.
-			return registeredCommandName;
-		}
+		return registeredCommandName;
+	}
+
+	@Override
+	public List getCommandAliases() {
+		return registeredCommandAliases;
 	}
 
 	@Override
