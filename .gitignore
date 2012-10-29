@@ -1,7 +1,5 @@
 !/.gitignore
-/jars/*
-/bin
-/server-src/
-/unused
-/src/btwmod/dev
+/jars/
+/bin/
+/src/btwmod/dev/
 /lib/
