@@ -170,17 +170,19 @@ public class ReflectionAPI {
 			}
 			catch (IOException e) {
 				ModLoader.outputError(e, "ReflectionAPI threw an exception (" + e.getClass().getSimpleName() + ") while reading the classes lookup: " + e.getMessage(), Level.SEVERE);
+				return;
 			}
-			
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException e) { }
+			finally {
+				if (reader != null) {
+					try {
+						reader.close();
+					} catch (IOException e) { }
+				}
 			}
 			
 			if (!done) {
 				classLookup.clear();
-				ModLoader.outputError("ReflectionAPI attempt to load an incomplete class lookup.");
+				ModLoader.outputError("ReflectionAPI failed to load the class lookup as it was incomplete.");
 				new File(lookupDir, "classes.txt").delete();
 			}
 		}
