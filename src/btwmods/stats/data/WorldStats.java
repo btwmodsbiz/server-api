@@ -17,7 +17,7 @@ public class WorldStats {
 	public final Average buildActiveChunkSet = new Average();
 	public final Average checkPlayerLight = new Average();
 	public final Average loadedChunks = new Average(); // TODO: make this longer?
-	public int id2ChunkMap = -1;
+	public final Average id2ChunkMap = new Average(); // TODO: make this longer?
 	public final Average droppedChunksSet = new Average();
 	public final Average entitiesRegular = new Average();
 	public final Average entitiesRemove = new Average();
