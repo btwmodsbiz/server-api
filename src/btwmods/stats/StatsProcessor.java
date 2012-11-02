@@ -135,6 +135,8 @@ public class StatsProcessor implements Runnable {
 				worldStats[i].loadedChunks.record(stats.loadedChunks[i]);
 				worldStats[i].id2ChunkMap.record(stats.id2ChunkMap[i]);
 				worldStats[i].droppedChunksSet.record(stats.droppedChunksSet[i]);
+				worldStats[i].loadedEntityList.record(stats.loadedEntityList[i]);
+				worldStats[i].loadedTileEntityList.record(stats.loadedTileEntityList[i]);
 				worldStats[i].trackedEntities.record(stats.trackedEntities[i]);
 				
 				// Reset the current value of averages to 0.

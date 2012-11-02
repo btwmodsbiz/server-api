@@ -27,6 +27,8 @@ public class WorldStats {
 	public final Average updatePlayerEntities = new Average();
 	public final Average updateTrackedEntityPlayerLists = new Average();
 	public final Average weatherEffects = new Average();
+	public final Average loadedEntityList = new Average();
+	public final Average loadedTileEntityList = new Average();
 	public final Average trackedEntities = new Average();
 	public final BasicStatsMap<ChunkCoordIntPair> chunkStats = new BasicStatsMap<ChunkCoordIntPair>();
 	public final BasicStatsMap<String> entityStats = new BasicStatsMap<String>();

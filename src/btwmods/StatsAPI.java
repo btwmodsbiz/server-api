@@ -207,12 +207,16 @@ public class StatsAPI {
 			stats.loadedChunks = new int[stats.worldTickTimes.length];
 			stats.id2ChunkMap = new int[stats.worldTickTimes.length];
 			stats.droppedChunksSet = new int[stats.worldTickTimes.length];
+			stats.loadedEntityList = new int[stats.worldTickTimes.length];
+			stats.loadedTileEntityList = new int[stats.worldTickTimes.length];
 			stats.trackedEntities = new int[stats.worldTickTimes.length];
 			for (int i = 0; i < stats.worldTickTimes.length; i++) {
 				stats.worldTickTimes[i] = server.timeOfLastDimensionTick[i][tickCounter % 100];
 				stats.loadedChunks[i] = loadedChunks[i].size();
 				stats.id2ChunkMap[i] = id2ChunkMap[i].getNumHashElements();
 				stats.droppedChunksSet[i] = droppedChunksSet[i].size();
+				stats.loadedEntityList[i] = server.worldServers[i].loadedEntityList.size();
+				stats.loadedTileEntityList[i] = server.worldServers[i].loadedTileEntityList.size();
 				stats.trackedEntities[i] = trackedEntitiesSet[i].size();
 			}
 			
