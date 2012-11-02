@@ -38,8 +38,9 @@ public class NetworkAPI {
 	private NetworkAPI() { }
 	
 	public static void init(@SuppressWarnings("unused") Settings settings) throws NoSuchFieldException {
-		playerEntityField = NetServerHandler.class.getDeclaredField("playerEntity");
-		playerEntityField.setAccessible(true);
+		playerEntityField = ReflectionAPI.getPrivateField(NetServerHandler.class, "playerEntity");
+		if (playerEntityField == null)
+			throw new NoSuchFieldException("playerEntity");
 	}
 	
 	public static void addListener(IAPIListener listener) {

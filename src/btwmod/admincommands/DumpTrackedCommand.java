@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import btwmods.ModLoader;
+import btwmods.ReflectionAPI;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.CommandBase;
@@ -21,24 +22,25 @@ import net.minecraft.src.ICommandSender;
 
 public class DumpTrackedCommand extends CommandBase {
 	
-	private static Set[] trackedEntitiesSet;
+	private static Set[] trackedEntitiesSet = null;
 	
 	public DumpTrackedCommand() {
-		Field trackedEntitiesSetField;
-		MinecraftServer server = MinecraftServer.getServer();
+		Field trackedEntitiesSetField = ReflectionAPI.getPrivateField(EntityTracker.class, "trackedEntitySet");
 		
-		try {
-			trackedEntitiesSetField = EntityTracker.class.getDeclaredField("trackedEntitySet");
-			trackedEntitiesSetField.setAccessible(true);
-			
-			trackedEntitiesSet = new Set[server.worldServers.length];
-			for (int i = 0; i < server.worldServers.length; i++) {
-				trackedEntitiesSet[i] = (Set)trackedEntitiesSetField.get(server.worldServers[i].getEntityTracker());
+		if (trackedEntitiesSetField == null) {
+			ModLoader.outputError(DumpTrackedCommand.class.getSimpleName() + " failed to get " + EntityTracker.class.getName() + "#trackedEntitySet Field");
+		}
+		else {
+			try {
+				MinecraftServer server = MinecraftServer.getServer();
+				
+				trackedEntitiesSet = new Set[server.worldServers.length];
+				for (int i = 0; i < server.worldServers.length; i++) {
+					trackedEntitiesSet[i] = (Set)trackedEntitiesSetField.get(server.worldServers[i].getEntityTracker());
+				}
+			} catch (IllegalAccessException e) {
+				ModLoader.outputError(e, DumpTrackedCommand.class.getSimpleName() + " failed to get trackedEntitySet instance: " + e.getMessage());
 			}
-		} catch (NoSuchFieldException e) {
-			ModLoader.outputError(e, "Failed to get trackedEntitySet Field: " + e.getMessage());
-		} catch (IllegalAccessException e) {
-			ModLoader.outputError(e, "Failed to get trackedEntitySet instance: " + e.getMessage());
 		}
 	}
 
@@ -49,6 +51,9 @@ public class DumpTrackedCommand extends CommandBase {
 
 	@Override
 	public void processCommand(ICommandSender sender, String[] args) {
+		if (trackedEntitiesSet == null)
+			return;
+		
 		int trackedEntities = 0;
 		File dump = new File(new File("."), "trackeddump.txt");
 		StringBuffer sb = new StringBuffer();

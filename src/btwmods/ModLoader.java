@@ -141,6 +141,8 @@ public class ModLoader {
 			// Load settings.
 			settings = loadSettings("BTWMods");
 			
+			ReflectionAPI.init(settings);
+			
 			try {
 				NetworkAPI.init(settings);
 			}
@@ -398,7 +400,7 @@ public class ModLoader {
 					outputError(e, "Failed (" + e.getClass().getSimpleName() + ") while running init for: " + binaryName);
 				}
 				
-				outputInfo("Loaded: " + (modName == null ? binaryName : modName + " (" + binaryName + ")"));
+				outputInfo("Loaded " + (modName == null ? binaryName : modName + " (" + binaryName + ")"));
 			}
 		} catch (Throwable e) {
 			outputError(e, "Failed (" + e.getClass().getSimpleName() + ") to create an instance of: " + binaryName);

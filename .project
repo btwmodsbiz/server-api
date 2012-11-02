@@ -25,6 +25,11 @@
 			<type>2</type>
 			<locationURI>DEV_ENVIRONMENT/bin/javalib</locationURI>
 		</link>
+		<link>
+			<name>src/btwmods/server_ro.srg</name>
+			<type>1</type>
+			<locationURI>MCP_LOC/temp/server_ro.srg</locationURI>
+		</link>
 	</linkedResources>
 	<filteredResources>
 		<filter>

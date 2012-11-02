@@ -91,18 +91,20 @@ public class StatsAPI {
 		if (settings.isBoolean("[statsapi]detailedmeasurements")) {
 			detailedMeasurementsEnabled = settings.getBoolean("[statsapi]detailedmeasurements");
 		}
-
-		Field loadedChunksField = ChunkProviderServer.class.getDeclaredField("loadedChunks");
-		loadedChunksField.setAccessible(true);
 		
-		Field id2ChunkMapField = ChunkProviderServer.class.getDeclaredField("id2ChunkMap");
-		id2ChunkMapField.setAccessible(true);
+		Field loadedChunksField = ReflectionAPI.getPrivateField(ChunkProviderServer.class, "loadedChunks");
+		Field id2ChunkMapField = ReflectionAPI.getPrivateField(ChunkProviderServer.class, "id2ChunkMap");
+		Field droppedChunksSetField = ReflectionAPI.getPrivateField(ChunkProviderServer.class, "droppedChunksSet");
+		Field trackedEntitiesSetField = ReflectionAPI.getPrivateField(EntityTracker.class, "trackedEntitySet");
 		
-		Field droppedChunksSetField = ChunkProviderServer.class.getDeclaredField("droppedChunksSet");
-		droppedChunksSetField.setAccessible(true);
-		
-		Field trackedEntitiesSetField = EntityTracker.class.getDeclaredField("trackedEntitySet");
-		trackedEntitiesSetField.setAccessible(true);
+		if (loadedChunksField == null)
+			throw new NoSuchFieldException("loadedChunks");
+		if (id2ChunkMapField == null)
+			throw new NoSuchFieldException("id2ChunkMap");
+		if (droppedChunksSetField == null)
+			throw new NoSuchFieldException("droppedChunksSet");
+		if (trackedEntitiesSetField == null)
+			throw new NoSuchFieldException("trackedEntitySet");
 		
 		loadedChunks = new List[server.worldServers.length];
 		id2ChunkMap = new LongHashMap[server.worldServers.length];
