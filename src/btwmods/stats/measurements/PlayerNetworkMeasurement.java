@@ -1,7 +1,7 @@
 package btwmods.stats.measurements;
 
 import net.minecraft.src.EntityPlayerMP;
-import btwmods.stats.NetworkType;
+import btwmods.network.NetworkType;
 
 public class PlayerNetworkMeasurement extends NetworkMeasurement {
 

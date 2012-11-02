@@ -1,7 +1,7 @@
 package btwmods.stats.measurements;
 
 import btwmods.measure.Measurement;
-import btwmods.stats.NetworkType;
+import btwmods.network.NetworkType;
 
 public class NetworkMeasurement extends Measurement<NetworkType> {
 	

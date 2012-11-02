@@ -1,4 +1,4 @@
-package btwmods.stats;
+package btwmods.network;
 
 public enum NetworkType {
 	SENT,

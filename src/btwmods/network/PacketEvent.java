@@ -8,14 +8,10 @@ import net.minecraft.src.Packet;
 
 public class PacketEvent extends EventObject {
 
-	public enum Type {
-		SENT_TO_PLAYER, RECEIVED_FROM_PLAYER, SERVER_SENT, SERVER_RECEIVED
-	};
-
 	private EntityPlayerMP player = null;
 	private NetServerHandler netServerHandler = null;
 	private Packet packet;
-	private Type type;
+	private NetworkType type;
 	
 	public EntityPlayerMP getPlayer() {
 		return player;
@@ -25,7 +21,7 @@ public class PacketEvent extends EventObject {
 		return packet;
 	}
 	
-	public Type getType() {
+	public NetworkType getType() {
 		return type;
 	}
 	
@@ -34,16 +30,16 @@ public class PacketEvent extends EventObject {
 	}
 	
 	public static PacketEvent ReceivedPlayerPacket(EntityPlayerMP player, Packet packet, NetServerHandler netHandler) {
-		PacketEvent event = new PacketEvent(Type.RECEIVED_FROM_PLAYER, player, packet, netHandler);
+		PacketEvent event = new PacketEvent(NetworkType.RECEIVED, player, packet, netHandler);
 		return event;
 	}
 
 	public static PacketEvent SentPlayerPacket(EntityPlayerMP player, Packet packet, NetServerHandler netHandler) {
-		PacketEvent event = new PacketEvent(Type.SENT_TO_PLAYER, player, packet, netHandler);
+		PacketEvent event = new PacketEvent(NetworkType.SENT, player, packet, netHandler);
 		return event;
 	}
 
-	private PacketEvent(Type type, EntityPlayerMP player, Packet packet, NetServerHandler netServerHandler) {
+	private PacketEvent(NetworkType type, EntityPlayerMP player, Packet packet, NetServerHandler netServerHandler) {
 		super(player);
 		this.type = type;
 		this.player = player;

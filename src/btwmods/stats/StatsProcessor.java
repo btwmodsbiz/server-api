@@ -8,6 +8,7 @@ import btwmods.ModLoader;
 import btwmods.StatsAPI;
 import btwmods.events.EventDispatcher;
 import btwmods.measure.Measurement;
+import btwmods.network.NetworkType;
 import btwmods.stats.data.BasicStats;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.data.ServerStats;

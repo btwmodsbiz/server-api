@@ -18,8 +18,8 @@ import btwmods.io.Settings;
 import btwmods.network.CustomPacketEvent;
 import btwmods.network.ICustomPacketListener;
 import btwmods.network.IPacketListener;
+import btwmods.network.NetworkType;
 import btwmods.network.PacketEvent;
-import btwmods.stats.NetworkType;
 
 public class NetworkAPI {
 	
