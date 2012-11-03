@@ -17,6 +17,7 @@ import btwmods.stats.measurements.BlockUpdate;
 import btwmods.stats.measurements.EntityUpdate;
 import btwmods.stats.measurements.NetworkMeasurement;
 import btwmods.stats.measurements.PlayerNetworkMeasurement;
+import btwmods.stats.measurements.SpawnedLiving;
 import btwmods.stats.measurements.TileEntityUpdate;
 import btwmods.stats.measurements.TrackedEntityUpdate;
 import btwmods.stats.measurements.WorldMeasurement;
@@ -280,6 +281,11 @@ public class StatsProcessor implements Runnable {
 						case LOAD_CHUNK:
 							worldStats[worldMeasurement.worldIndex].chunkLoading.incrementCurrent(1L);
 							worldStats[worldMeasurement.worldIndex].chunkLoadingTime.incrementCurrent(worldMeasurement.getTime());
+							break;
+							
+						case SPAWN_LIVING:
+							SpawnedLiving spawnedLiving = (SpawnedLiving)worldMeasurement;
+							worldStats[worldMeasurement.worldIndex].spawnedLiving.incrementCurrent(spawnedLiving.count);
 							break;
 					}
 					

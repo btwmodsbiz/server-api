@@ -39,6 +39,7 @@ import btwmods.stats.measurements.BlockUpdate;
 import btwmods.stats.measurements.ChunkMeasurement;
 import btwmods.stats.measurements.EntityUpdate;
 import btwmods.stats.measurements.PlayerNetworkMeasurement;
+import btwmods.stats.measurements.SpawnedLiving;
 import btwmods.stats.measurements.TileEntityUpdate;
 import btwmods.stats.measurements.TrackedEntityUpdate;
 import btwmods.stats.measurements.WorldMeasurement;
@@ -251,6 +252,10 @@ public class StatsAPI {
 		
 		if (player != null)
 			record(new PlayerNetworkMeasurement(type, player, bytes));
+	}
+
+	public static void recordSpawning(World world, int spawned) {
+		measurements.record(new SpawnedLiving(world, spawned));
 	}
 
 	public static void begin(Type type, World world) {

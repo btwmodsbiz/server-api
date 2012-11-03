@@ -32,6 +32,7 @@ public class WorldStats {
 	public final Average loadedEntityList = new Average();
 	public final Average loadedTileEntityList = new Average();
 	public final Average trackedEntities = new Average();
+	public final Average spawnedLiving = new Average();
 	public final BasicStatsMap<ChunkCoordIntPair> chunkStats = new BasicStatsMap<ChunkCoordIntPair>();
 	public final BasicStatsMap<String> entityStats = new BasicStatsMap<String>();
 	public final BasicStatsMap<Class> tileEntityStats = new BasicStatsMap<Class>();
@@ -57,6 +58,7 @@ public class WorldStats {
 		updatePlayerEntities.resetCurrent();
 		updateTrackedEntityPlayerLists.resetCurrent();
 		weatherEffects.resetCurrent();
+		spawnedLiving.resetCurrent();
 
 		resetCurrentMap(chunkStats);
 		resetCurrentMap(entityStats);
