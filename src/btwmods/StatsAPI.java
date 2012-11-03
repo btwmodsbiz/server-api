@@ -36,6 +36,7 @@ import btwmods.stats.StatsProcessor;
 import btwmods.stats.Type;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.measurements.BlockUpdate;
+import btwmods.stats.measurements.ChunkMeasurement;
 import btwmods.stats.measurements.EntityUpdate;
 import btwmods.stats.measurements.PlayerNetworkMeasurement;
 import btwmods.stats.measurements.TileEntityUpdate;
@@ -274,6 +275,10 @@ public class StatsAPI {
 
 	public static void beginUpdateTrackedEntityPlayerList(World world, EntityTrackerEntry trackerEntry) {
 		measurements.begin(new TrackedEntityUpdate(world, trackerEntry));
+	}
+
+	public static void beginLoadChunk(World world, int chunkX, int chunkY) {
+		measurements.begin(new ChunkMeasurement(Type.LOAD_CHUNK, world, chunkX, chunkY));
 	}
 	
 	/**

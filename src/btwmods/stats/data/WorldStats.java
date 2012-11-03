@@ -16,6 +16,8 @@ public class WorldStats {
 	public final Average timeSync = new Average();
 	public final Average buildActiveChunkSet = new Average();
 	public final Average checkPlayerLight = new Average();
+	public final Average chunkLoading = new Average();
+	public final Average chunkLoadingTime = new Average();
 	public final Average loadedChunks = new Average(); // TODO: make this longer?
 	public final Average id2ChunkMap = new Average(); // TODO: make this longer?
 	public final Average droppedChunksSet = new Average();
@@ -45,6 +47,8 @@ public class WorldStats {
 		timeSync.resetCurrent();
 		buildActiveChunkSet.resetCurrent();
 		checkPlayerLight.resetCurrent();
+		chunkLoading.resetCurrent();
+		chunkLoadingTime.resetCurrent();
 		entitiesRegular.resetCurrent();
 		entitiesRemove.resetCurrent();
 		entitiesTile.resetCurrent();

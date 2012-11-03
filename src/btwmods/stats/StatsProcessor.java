@@ -276,6 +276,11 @@ public class StatsProcessor implements Runnable {
 							
 							trackedEntityStats.count++;
 							break;
+							
+						case LOAD_CHUNK:
+							worldStats[worldMeasurement.worldIndex].chunkLoading.incrementCurrent(1L);
+							worldStats[worldMeasurement.worldIndex].chunkLoadingTime.incrementCurrent(worldMeasurement.getTime());
+							break;
 					}
 					
 					// Get the average for this chunk and increment it.
