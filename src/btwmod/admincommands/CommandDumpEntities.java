@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,9 +24,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.CommandBase;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityAnimal;
+import net.minecraft.src.EntityGhast;
+import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityList;
 import net.minecraft.src.EntityLiving;
+import net.minecraft.src.EntityMob;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntitySlime;
 import net.minecraft.src.ICommandSender;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
@@ -62,11 +65,6 @@ public class CommandDumpEntities extends CommandBase {
 	}
 
 	@Override
-	public List getCommandAliases() {
-        return Arrays.asList(new String[] { "entities" });
-	}
-
-	@Override
 	public List addTabCompletionOptions(ICommandSender sender, String[] args) {
 		if (args.length == 1) {
 			getWorldNames();
@@ -81,8 +79,8 @@ public class CommandDumpEntities extends CommandBase {
 			getTileEntityMappings();
 			return getListOfStringsMatchingLastWord(args, tileEntityNames.toArray(new String[tileEntityNames.size()]));
 		}
-		
-		return null;
+
+		return super.addTabCompletionOptions(sender, args);
 	}
 
 	@Override
@@ -131,6 +129,22 @@ public class CommandDumpEntities extends CommandBase {
 					entityJson.addProperty("x", entity.posX);
 					entityJson.addProperty("y", entity.posY);
 					entityJson.addProperty("z", entity.posZ);
+					
+					if (entity instanceof EntityLiving)
+						entityJson.addProperty("isLiving", true);
+					
+					if (entity instanceof EntityAnimal)
+						entityJson.addProperty("isAnimal", true);
+					
+					if (entity instanceof EntityMob || entity instanceof EntityGhast || entity instanceof EntitySlime)
+						entityJson.addProperty("isMonster", true);
+					
+					if (entity instanceof EntityItem)
+						entityJson.addProperty("isItem", true);
+					
+					if (entity instanceof EntityPlayer)
+						entityJson.addProperty("isPlayer", true);
+					
 					json.add(entityJson);
 					count++;
 				}
