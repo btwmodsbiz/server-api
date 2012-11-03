@@ -26,6 +26,7 @@ public class mod_AdminCommands implements IMod, IPacketListener {
 	private WhoCommand whoCommand;
 	private DumpTrackedCommand dumpTrackedCommand;
 	private ReliableUpdatesCommand reliableUpdatesCommand;
+	private CommandDumpEntities commandDumpEntities;
 
 	@Override
 	public String getName() throws Exception {
@@ -47,6 +48,7 @@ public class mod_AdminCommands implements IMod, IPacketListener {
 		CommandsAPI.registerCommand(whoCommand = new WhoCommand(this), this);
 		CommandsAPI.registerCommand(dumpTrackedCommand = new DumpTrackedCommand(), this);
 		CommandsAPI.registerCommand(reliableUpdatesCommand = new ReliableUpdatesCommand(), this);
+		CommandsAPI.registerCommand(commandDumpEntities = new CommandDumpEntities(settings), this);
 
 		// Load settings
 		if (settings.isLong("secondsforafk")) {
@@ -60,6 +62,7 @@ public class mod_AdminCommands implements IMod, IPacketListener {
 		CommandsAPI.unregisterCommand(whoCommand);
 		CommandsAPI.unregisterCommand(dumpTrackedCommand);
 		CommandsAPI.unregisterCommand(reliableUpdatesCommand);
+		CommandsAPI.unregisterCommand(commandDumpEntities);
 	}
 
 	@Override
