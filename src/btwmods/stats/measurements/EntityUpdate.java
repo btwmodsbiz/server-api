@@ -5,7 +5,7 @@ import btwmods.stats.Type;
 import net.minecraft.src.Entity;
 import net.minecraft.src.World;
 
-public class EntityUpdate extends WorldLocationMeasurement {
+public class EntityUpdate extends LocationMeasurement {
 	public final Class entity;
 	public final String name;
 	

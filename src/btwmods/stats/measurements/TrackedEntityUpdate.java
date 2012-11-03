@@ -5,7 +5,7 @@ import btwmods.stats.Type;
 import net.minecraft.src.EntityTrackerEntry;
 import net.minecraft.src.World;
 
-public class TrackedEntityUpdate extends WorldLocationMeasurement {
+public class TrackedEntityUpdate extends LocationMeasurement {
 	public final Class entity;
 	public final String name;
 	

@@ -4,7 +4,7 @@ import btwmods.stats.Type;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 
-public class TileEntityUpdate extends WorldLocationMeasurement {
+public class TileEntityUpdate extends LocationMeasurement {
 
 	public final Class tileEntity;
 

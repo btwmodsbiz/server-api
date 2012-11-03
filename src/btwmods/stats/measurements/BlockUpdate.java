@@ -5,7 +5,7 @@ import net.minecraft.src.Block;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.World;
 
-public class BlockUpdate extends WorldLocationMeasurement {
+public class BlockUpdate extends LocationMeasurement {
 	
 	public final int blockID;
 
