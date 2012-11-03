@@ -49,9 +49,9 @@ public class WhoCommand extends CommandBase {
 				long seconds = mod.getTimeSinceLastPlayerAction(player);
 				if (seconds >= mod.getSecondsForAFK())
 					sb.append(" (AFK ").append(formatSeconds(seconds)).append(")");
-				
-				sender.sendChatToPlayer("Players: " + sb.toString());
 			}
+			
+			sender.sendChatToPlayer("Players: " + sb.toString());
 		}
 		else if (args.length == 0) {
 			List players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
