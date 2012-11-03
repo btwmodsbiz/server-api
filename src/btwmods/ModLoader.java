@@ -140,8 +140,16 @@ public class ModLoader {
 			
 			// Load settings.
 			settings = loadSettings("BTWMods");
-			
-			ReflectionAPI.init(settings);
+
+			try {
+				ReflectionAPI.init(settings);
+			}
+			catch (Exception e) {
+				outputError(e, "ReflectionAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
+				outputError("Initialization aborted.", Level.SEVERE);
+				hasInit = true;
+				return;
+			}
 			
 			try {
 				NetworkAPI.init(settings);
@@ -158,6 +166,16 @@ public class ModLoader {
 			}
 			catch (Exception e) {
 				outputError(e, "StatsAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
+				outputError("Initialization aborted.", Level.SEVERE);
+				hasInit = true;
+				return;
+			}
+			
+			try {
+				WorldAPI.init(settings);
+			}
+			catch (Exception e) {
+				outputError(e, "WorldAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
 				outputError("Initialization aborted.", Level.SEVERE);
 				hasInit = true;
 				return;

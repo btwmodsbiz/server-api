@@ -1,25 +1,19 @@
 package btwmods;
 
-import java.lang.reflect.Field;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
-import net.minecraft.src.ChunkProviderServer;
 import net.minecraft.src.CommandHandler;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityList;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
-import net.minecraft.src.EntityTracker;
 import net.minecraft.src.EntityTrackerEntry;
 import net.minecraft.src.EntityXPOrb;
-import net.minecraft.src.LongHashMap;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
@@ -71,11 +65,6 @@ public class StatsAPI {
 	 */
 	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<QueuedTickStats>();
 	
-	private static List[] loadedChunks;
-	private static LongHashMap[] id2ChunkMap;
-	private static Set[] droppedChunksSet;
-	private static Set[] trackedEntitiesSet;
-	
 	private static long bytesSent = 0;
 	private static long bytesReceived = 0;
 	
@@ -92,33 +81,6 @@ public class StatsAPI {
 		// Load settings
 		if (settings.isBoolean("[statsapi]detailedmeasurements")) {
 			detailedMeasurementsEnabled = settings.getBoolean("[statsapi]detailedmeasurements");
-		}
-		
-		Field loadedChunksField = ReflectionAPI.getPrivateField(ChunkProviderServer.class, "loadedChunks");
-		Field id2ChunkMapField = ReflectionAPI.getPrivateField(ChunkProviderServer.class, "id2ChunkMap");
-		Field droppedChunksSetField = ReflectionAPI.getPrivateField(ChunkProviderServer.class, "droppedChunksSet");
-		Field trackedEntitiesSetField = ReflectionAPI.getPrivateField(EntityTracker.class, "trackedEntitySet");
-		
-		if (loadedChunksField == null)
-			throw new NoSuchFieldException("loadedChunks");
-		if (id2ChunkMapField == null)
-			throw new NoSuchFieldException("id2ChunkMap");
-		if (droppedChunksSetField == null)
-			throw new NoSuchFieldException("droppedChunksSet");
-		if (trackedEntitiesSetField == null)
-			throw new NoSuchFieldException("trackedEntitySet");
-		
-		loadedChunks = new List[server.worldServers.length];
-		id2ChunkMap = new LongHashMap[server.worldServers.length];
-		droppedChunksSet = new Set[server.worldServers.length];
-		trackedEntitiesSet = new Set[server.worldServers.length];
-		
-		for (int i = 0; i < server.worldServers.length; i++) {
-			ChunkProviderServer provider = (ChunkProviderServer)server.worldServers[i].getChunkProvider();
-			loadedChunks[i] = (List)loadedChunksField.get(provider);
-			id2ChunkMap[i] = (LongHashMap)id2ChunkMapField.get(provider);
-			droppedChunksSet[i] = (Set)droppedChunksSetField.get(provider);
-			trackedEntitiesSet[i] = (Set)trackedEntitiesSetField.get(server.worldServers[i].getEntityTracker());
 		}
 		
 		((CommandHandler)server.getCommandManager()).registerCommand(new CommandStats());
@@ -214,12 +176,12 @@ public class StatsAPI {
 			stats.trackedEntities = new int[stats.worldTickTimes.length];
 			for (int i = 0; i < stats.worldTickTimes.length; i++) {
 				stats.worldTickTimes[i] = server.timeOfLastDimensionTick[i][tickCounter % 100];
-				stats.loadedChunks[i] = loadedChunks[i].size();
-				stats.id2ChunkMap[i] = id2ChunkMap[i].getNumHashElements();
-				stats.droppedChunksSet[i] = droppedChunksSet[i].size();
+				stats.loadedChunks[i] = WorldAPI.getLoadedChunks()[i].size();
+				stats.id2ChunkMap[i] = WorldAPI.getCachedChunks()[i].getNumHashElements();
+				stats.droppedChunksSet[i] = WorldAPI.getDroppedChunks()[i].size();
 				stats.loadedEntityList[i] = server.worldServers[i].loadedEntityList.size();
 				stats.loadedTileEntityList[i] = server.worldServers[i].loadedTileEntityList.size();
-				stats.trackedEntities[i] = trackedEntitiesSet[i].size();
+				stats.trackedEntities[i] = WorldAPI.getTrackedEntities()[i].size();
 			}
 			
 			if (!measurements.completedMeasurements()) {
