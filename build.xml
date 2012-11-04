@@ -28,12 +28,14 @@
         <copy todir="temp/jarbuild/bin" failonerror="true">
             <fileset dir="workspace/server-api/src" excludes="**/**.java" />
             <fileset dir="workspace/server-src/src" excludes="**/**.java" />
+            <fileset dir="workspace/server-mods/src" excludes="**/**.java" />
         </copy>
 
 		<!-- Copy source files -->
 		<copy todir="temp/jarbuild/src" failonerror="true">
 			<fileset dir="workspace/server-api/src" includes="**/**.java" />
 			<fileset dir="workspace/server-src/src" includes="**/**.java" />
+            <fileset dir="workspace/server-mods/src" includes="**/**.java" />
 		</copy>
 	</target>
 
