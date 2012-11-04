@@ -15,12 +15,14 @@ import java.util.Set;
 
 import btwmods.ModLoader;
 import btwmods.ReflectionAPI;
+import btwmods.WorldAPI;
 import btwmods.io.Settings;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.Chunk;
 import net.minecraft.src.CommandBase;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityAnimal;
@@ -85,16 +87,24 @@ public class CommandDumpEntities extends CommandBase {
 
 	@Override
 	public void processCommand(ICommandSender sender, String[] args) {
+		long startTime = System.currentTimeMillis();
+		
 		if (args.length < 1 || !worldNames.containsKey(args[0]))
 			throw new WrongUsageException(getCommandUsage(sender), new Object[0]);
 		
 		boolean doTile = args.length > 1 && args[1].equalsIgnoreCase("tile");
 		
-		JsonArray json = new JsonArray();
-		World world = MinecraftServer.getServer().worldServers[worldNames.get(args[0]).intValue()];
+		JsonObject json = new JsonObject();
+		
+		JsonArray entities = new JsonArray();
+		json.add("entities", entities);
+		
+		int worldIndex = worldNames.get(args[0]).intValue();
+		World world = MinecraftServer.getServer().worldServers[worldIndex];
 		Iterator iterator;
 		
-		int count = 0;
+		int entityCount = 0;
+		int chunkCount = 0;
 		int total = doTile ? world.loadedTileEntityList.size() : world.loadedEntityList.size();
 				
 		if (doTile) {
@@ -145,8 +155,8 @@ public class CommandDumpEntities extends CommandBase {
 					if (entity instanceof EntityPlayer)
 						entityJson.addProperty("isPlayer", true);
 					
-					json.add(entityJson);
-					count++;
+					entities.add(entityJson);
+					entityCount++;
 				}
 			}
 			else if (next instanceof TileEntity) {
@@ -158,26 +168,43 @@ public class CommandDumpEntities extends CommandBase {
 					tileEntityJson.addProperty("x", tileEntity.xCoord);
 					tileEntityJson.addProperty("y", tileEntity.yCoord);
 					tileEntityJson.addProperty("z", tileEntity.zCoord);
-					json.add(tileEntityJson);
-					count++;
+					entities.add(tileEntityJson);
+					entityCount++;
 				}
 			}
 			else {
 				JsonObject unknownJson = new JsonObject();
 				unknownJson.addProperty("type", "Unknown");
 				unknownJson.addProperty("class", next.getClass().getSimpleName());
-				json.add(unknownJson);
+				entities.add(unknownJson);
 			}
 		}
-			
+		
+		JsonArray chunks = new JsonArray();
+		json.add("chunks", chunks);
+		
+		Iterator chunkIterator = WorldAPI.getLoadedChunks()[worldIndex].iterator();
+		while (chunkIterator.hasNext()) {
+			Object obj = chunkIterator.next();
+			if (obj instanceof Chunk) {
+				Chunk chunk = (Chunk)obj;
+				JsonObject chunkJson = new JsonObject();
+				chunkJson.addProperty("x", chunk.xPosition);
+				chunkJson.addProperty("z", chunk.zPosition);
+				chunks.add(chunkJson);
+				chunkCount++;
+			}
+		}
+		
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(dumpFile));
 			writer.write(json.toString());
 			writer.close();
-			sender.sendChatToPlayer("Dumped " + count + " of " + total + (doTile ? " tile" : "") + " entities.");
+			sender.sendChatToPlayer("Dumped " + entityCount + " of " + total + (doTile ? " tile" : "") + " entities and "
+					+ chunkCount + " chunks (" + (System.currentTimeMillis() - startTime) + " ms).");
 			
 		} catch (IOException e) {
-			sender.sendChatToPlayer("Failed to dump entities: " + e.getMessage());
+			sender.sendChatToPlayer("Failed to save to dump file: " + e.getMessage());
 		}
 	}
 	
