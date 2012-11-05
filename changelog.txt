@@ -1,6 +1,10 @@
-Version 3.0 (vMC 1.4.2 BTW 4.31)
+Version 3.1(vMC 1.4.2 BTW 4.31c)
 
-  - Updated to BTW 4.31.
+  - Updated to BTW 4.31c. 
+
+Version 3.0 (vMC 1.4.2 BTW 4.31a)
+
+  - Updated to BTW 4.31a.
   
   - Changed (Moved) btwmods.ServerAPI.doUnloadSpawnChunks() check to avoid
     checking coordinates unnecessarily.
