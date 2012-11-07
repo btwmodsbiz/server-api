@@ -1,4 +1,8 @@
-Version 3.1(vMC 1.4.2 BTW 4.31c)
+Version 3.2 (vMC 1.4.2 BTW 4.32)
+
+  - Updated to BTW 4.32.
+
+Version 3.1 (vMC 1.4.2 BTW 4.31c)
 
   - Updated to BTW 4.31c. 
 
