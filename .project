@@ -16,14 +16,24 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>jars</name>
+			<name>lib/javalib</name>
 			<type>2</type>
-			<locationURI>MCP_LOC/jars</locationURI>
+			<locationURI>DEV_ENVIRONMENT/bin/javalib</locationURI>
 		</link>
 		<link>
 			<name>lib</name>
 			<type>2</type>
-			<locationURI>DEV_ENVIRONMENT/bin/javalib</locationURI>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>lib/mojang</name>
+			<type>2</type>
+			<locationURI>DEV_ENVIRONMENT/archives/mojang</locationURI>
+		</link>
+		<link>
+			<name>lib/workdir</name>
+			<type>2</type>
+			<locationURI>WORKSPACE_LOC/.minecraft</locationURI>
 		</link>
 		<link>
 			<name>src/btwmods/server_ro.srg</name>
@@ -42,12 +52,30 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1349980242103</id>
-			<name>jars</name>
+			<id>1352405308807</id>
+			<name>lib/mojang</name>
 			<type>13</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-name-matches-false-false-minecraft_server.jar</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1352405970790</id>
+			<name>lib/workdir</name>
+			<type>9</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-btwmods</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1352405970815</id>
+			<name>lib/workdir</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*.exe</arguments>
 			</matcher>
 		</filter>
 	</filteredResources>
