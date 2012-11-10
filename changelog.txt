@@ -1,3 +1,9 @@
+Version 4.33.0 (vMC 1.4.2 BTW 4.33)
+
+  - Updated to BTW 4.33.
+  
+  - Changed version number so it starts with the BTW version.
+
 Version 3.3 (vMC 1.4.2 BTW 4.32)
 
   - Added ability to intercept packets to NetworkAPI.
