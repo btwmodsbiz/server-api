@@ -6,6 +6,7 @@ import btwmods.events.IAPIListener;
 import btwmods.player.BlockEvent;
 import btwmods.player.ContainerEvent;
 import btwmods.player.DropEvent;
+import btwmods.player.IActionListener;
 import btwmods.player.IBlockListener;
 import btwmods.player.IContainerListener;
 import btwmods.player.IDropListener;
@@ -14,6 +15,7 @@ import btwmods.player.ISlotListener;
 import btwmods.player.InstanceEvent;
 import btwmods.player.InstanceEvent.METADATA;
 import btwmods.player.InvocationWrapper;
+import btwmods.player.PlayerActionEvent;
 import btwmods.player.RespawnPosition;
 import btwmods.player.SlotEvent;
 
@@ -21,6 +23,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.Container;
+import net.minecraft.src.DamageSource;
+import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
@@ -235,6 +239,13 @@ public class PlayerAPI {
 		if (!listeners.isEmpty(IInstanceListener.class)) {
         	InstanceEvent event = InstanceEvent.WriteToNBT(player, nbtTagCompound);
         	((IInstanceListener)listeners).instanceAction(event);
+		}
+	}
+
+	public static void onPlayerAttack(EntityLiving attackedEntity, DamageSource source) {
+		if (!listeners.isEmpty(IActionListener.class)) {
+			PlayerActionEvent event = PlayerActionEvent.Attack(attackedEntity, source);
+        	((IActionListener)listeners).onPlayerAction(event);
 		}
 	}
 	
