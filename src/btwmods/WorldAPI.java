@@ -8,9 +8,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkProviderServer;
+import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityTracker;
+import net.minecraft.src.ItemStack;
 import net.minecraft.src.LongHashMap;
+import net.minecraft.src.Packet5PlayerInventory;
 import net.minecraft.src.World;
+import net.minecraft.src.WorldServer;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
@@ -88,5 +92,15 @@ public class WorldAPI {
 	public static void blockBroken(World world, Chunk chunk, Block block, int x, int y, int z, @SuppressWarnings("unused") int blockID, int blockMetadata) {
 		BlockEvent event = BlockEvent.Broken(world, chunk, block, blockMetadata, x, y, z);
 		((IBlockListener)listeners).blockAction(event);
+	}
+	
+	public static void sendEntityEquipmentUpdate(EntityLiving entity) {
+		if (entity.worldObj instanceof WorldServer) {
+			WorldServer world = (WorldServer)entity.worldObj;
+			for (int slot = 0; slot < 5; ++slot) {
+				ItemStack item = entity.getEquipmentInSlot(slot);
+				world.getEntityTracker().sendPacketToTrackedPlayers(entity, new Packet5PlayerInventory(entity.entityId, slot, item));
+			}
+		}
 	}
 }
