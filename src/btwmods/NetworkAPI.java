@@ -11,16 +11,17 @@ import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.NetServerHandler;
 import net.minecraft.src.Packet;
-
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
 import btwmods.io.Settings;
 import btwmods.network.CustomPacketEvent;
 import btwmods.network.ICustomPacketListener;
+import btwmods.network.IPacketHandlerListener;
 import btwmods.network.IPacketListener;
 import btwmods.network.NetworkType;
 import btwmods.network.PacketEvent;
+import btwmods.network.PacketHandlerEvent;
 
 public class NetworkAPI {
 	
@@ -34,7 +35,7 @@ public class NetworkAPI {
 	// Reverse channel lookup (by ICustomPacketListener).
 	private static Map<ICustomPacketListener, Set<String>> channelListeners = new HashMap<ICustomPacketListener, Set<String>>();
 	
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IPacketListener.class });
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IPacketListener.class, IPacketHandlerListener.class });
 	
 	private NetworkAPI() { }
 	
@@ -187,5 +188,16 @@ public class NetworkAPI {
 		}
 
 		StatsAPI.recordNetworkIO(NetworkType.SENT, packet.getPacketSize(), player);
+	}
+	
+	public static Packet onSendPlayerPacket(Packet packet, EntityPlayerMP player) {
+		if (!listeners.isEmpty(IPacketHandlerListener.class)) {
+			PacketHandlerEvent event = PacketHandlerEvent.SendPlayerPacket(player, packet);
+			((IPacketHandlerListener)listeners).onHandlePacket(event);
+			
+			return event.getPacket();
+		}
+		
+		return packet;
 	}
 }
