@@ -249,7 +249,14 @@ public class PlayerAPI {
 		}
 	}
 	
-	public static void playerMetadataChanged(EntityPlayer player, InstanceEvent.METADATA metadata, Object newValue) {
+	public static void onPlayerMetadataChanged(EntityPlayer player, InstanceEvent.METADATA metadata) {
+		if (!listeners.isEmpty(IInstanceListener.class)) {
+        	InstanceEvent event = InstanceEvent.MetadataChanged(player, metadata);
+        	((IInstanceListener)listeners).instanceAction(event);
+		}
+	}
+	
+	public static void onPlayerMetadataChanged(EntityPlayer player, InstanceEvent.METADATA metadata, Object newValue) {
 		if (!listeners.isEmpty(IInstanceListener.class)) {
         	InstanceEvent event = InstanceEvent.MetadataChanged(player, metadata, newValue);
         	((IInstanceListener)listeners).instanceAction(event);
