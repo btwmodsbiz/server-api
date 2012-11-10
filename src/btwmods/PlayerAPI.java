@@ -12,10 +12,12 @@ import btwmods.player.IDropListener;
 import btwmods.player.IInstanceListener;
 import btwmods.player.ISlotListener;
 import btwmods.player.InstanceEvent;
+import btwmods.player.InstanceEvent.METADATA;
 import btwmods.player.InvocationWrapper;
 import btwmods.player.RespawnPosition;
 import btwmods.player.SlotEvent;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.Container;
@@ -198,7 +200,7 @@ public class PlayerAPI {
 
 	/**
 	 * @param oldPlayerInstance The old instance of {@link EntityPlayer} that is being recreated.
-	 * @return true if the event has been handled and no others (e.g. hardcore spawning handler) should be called.
+	 * @return The position the player should respawn at, if set by a mod. <code>null</code> otherwise.
 	 */
 	public static RespawnPosition handleRespawn(EntityPlayer oldPlayerInstance) {
 		if (!listeners.isEmpty(IInstanceListener.class)) {
@@ -208,6 +210,18 @@ public class PlayerAPI {
 		}
 		
 		return null;
+	}
+	
+	public static boolean isPvPEnabled(EntityPlayer player) {
+		if (!listeners.isEmpty(IInstanceListener.class)) {
+        	InstanceEvent event = InstanceEvent.CheckMetadata(player, METADATA.IS_PVP);
+        	((IInstanceListener)listeners).instanceAction(event);
+        	if (event.isInterrupted()) {
+        		return event.getMetadataBooleanValue();
+        	}
+		}
+		
+		return MinecraftServer.getServer().isPVPEnabled();
 	}
 	
 	public static void readFromNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
@@ -220,6 +234,13 @@ public class PlayerAPI {
 	public static void writeToNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
 		if (!listeners.isEmpty(IInstanceListener.class)) {
         	InstanceEvent event = InstanceEvent.WriteToNBT(player, nbtTagCompound);
+        	((IInstanceListener)listeners).instanceAction(event);
+		}
+	}
+	
+	public static void playerMetadataChanged(EntityPlayer player, InstanceEvent.METADATA metadata, Object newValue) {
+		if (!listeners.isEmpty(IInstanceListener.class)) {
+        	InstanceEvent event = InstanceEvent.MetadataChanged(player, metadata, newValue);
         	((IInstanceListener)listeners).instanceAction(event);
 		}
 	}
