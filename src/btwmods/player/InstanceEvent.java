@@ -153,7 +153,7 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 	}
 	
 	public static InstanceEvent MetadataChanged(EntityPlayer playerInstance, METADATA metadata, Object newValue) {
-		InstanceEvent event = new InstanceEvent(TYPE.CHECK_METADATA, playerInstance);
+		InstanceEvent event = new InstanceEvent(TYPE.METADATA_CHANGED, playerInstance);
 		event.playerInstance = playerInstance;
 		event.metadata = metadata;
 		event.setMetadataValue(newValue);
