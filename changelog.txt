@@ -1,3 +1,16 @@
+Version 3.3 (vMC 1.4.2 BTW 4.32)
+
+  - Added ability to intercept packets to NetworkAPI.
+  
+  - Added tick listener to ServerAPI for the start and end of server ticks.
+  
+  - Added per-player PvP flagging to PlayerAPI.
+  
+  - Added helper method to WorldAPI to send update packets to nearby players
+    about a specific entity's equipment.
+    
+  - Added listeners to PlayerAPI for when a player attacks an EntityLiving.
+
 Version 3.2 (vMC 1.4.2 BTW 4.32)
 
   - Updated to BTW 4.32.
