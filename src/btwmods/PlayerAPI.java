@@ -46,7 +46,7 @@ public class PlayerAPI {
 	}
 
 	public static boolean blockActivationAttempt(int blockId, World world, int x, int y, int z, EntityPlayer player, int direction, float xOffset, float yOffset, float zOffset) {
-		boolean activated;
+		boolean activated = false;
 		
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
 			PlayerBlockEvent event = PlayerBlockEvent.ActivationAttempt(player, Block.blocksList[blockId], x, y, z, direction, xOffset, yOffset, zOffset);
@@ -54,7 +54,8 @@ public class PlayerAPI {
 			activated = event.isHandled();
 		}
 		
-		activated = Block.blocksList[blockId].onBlockActivated(world, x, y, z, player, direction, xOffset, yOffset, zOffset);
+		if (!activated)
+			activated = Block.blocksList[blockId].onBlockActivated(world, x, y, z, player, direction, xOffset, yOffset, zOffset);
 		
 		if (activated) {
 			blockActivated(player, Block.blocksList[blockId], x, y, z);
