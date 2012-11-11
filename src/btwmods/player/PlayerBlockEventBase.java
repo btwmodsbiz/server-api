@@ -14,5 +14,6 @@ public class PlayerBlockEventBase extends BlockEventBase {
 
 	protected PlayerBlockEventBase(EntityPlayer player, World world) {
 		super(player, world);
+		this.player = player;
 	}
 }
