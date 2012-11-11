@@ -4,12 +4,12 @@ import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
 import btwmods.io.Settings;
-import btwmods.player.InvocationWrapper;
+import btwmods.player.PlayerEventInvocationWrapper;
 import btwmods.server.ITickListener;
 import btwmods.server.TickEvent;
 
 public class ServerAPI {
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { ITickListener.class }, new InvocationWrapper());
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { ITickListener.class }, new PlayerEventInvocationWrapper());
 	
 	private static boolean allowUnloadSpawnChunks = true;
 	

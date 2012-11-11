@@ -3,18 +3,18 @@ package btwmods;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
-import btwmods.player.BlockEvent;
+import btwmods.player.PlayerBlockEvent;
 import btwmods.player.ContainerEvent;
 import btwmods.player.DropEvent;
-import btwmods.player.IActionListener;
-import btwmods.player.IBlockListener;
+import btwmods.player.IPlayerActionListener;
+import btwmods.player.IPlayerBlockListener;
 import btwmods.player.IContainerListener;
 import btwmods.player.IDropListener;
-import btwmods.player.IInstanceListener;
+import btwmods.player.IPlayerInstanceListener;
 import btwmods.player.ISlotListener;
-import btwmods.player.InstanceEvent;
-import btwmods.player.InstanceEvent.METADATA;
-import btwmods.player.InvocationWrapper;
+import btwmods.player.PlayerInstanceEvent;
+import btwmods.player.PlayerInstanceEvent.METADATA;
+import btwmods.player.PlayerEventInvocationWrapper;
 import btwmods.player.PlayerActionEvent;
 import btwmods.player.RespawnPosition;
 import btwmods.player.SlotEvent;
@@ -32,8 +32,8 @@ import net.minecraft.src.Slot;
 import net.minecraft.src.World;
 
 public class PlayerAPI {
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IInstanceListener.class, IBlockListener.class, ISlotListener.class,
-			IContainerListener.class, IDropListener.class }, new InvocationWrapper());
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IPlayerInstanceListener.class, IPlayerBlockListener.class, ISlotListener.class,
+			IContainerListener.class, IDropListener.class }, new PlayerEventInvocationWrapper());
 	
 	private PlayerAPI() {}
 	
@@ -48,9 +48,9 @@ public class PlayerAPI {
 	public static boolean blockActivationAttempt(int blockId, World world, int x, int y, int z, EntityPlayer player, int direction, float xOffset, float yOffset, float zOffset) {
 		boolean activated;
 		
-		if (!listeners.isEmpty(IBlockListener.class)) {
-			BlockEvent event = BlockEvent.ActivationAttempt(player, Block.blocksList[blockId], x, y, z, direction, xOffset, yOffset, zOffset);
-			((IBlockListener)listeners).blockAction(event);
+		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
+			PlayerBlockEvent event = PlayerBlockEvent.ActivationAttempt(player, Block.blocksList[blockId], x, y, z, direction, xOffset, yOffset, zOffset);
+			((IPlayerBlockListener)listeners).blockAction(event);
 			activated = event.isHandled();
 		}
 		
@@ -74,9 +74,9 @@ public class PlayerAPI {
 	 * @see net.minecraft.src.ItemInWorldManager#activateBlockOrUseItem(EntityPlayer, World, ItemStack, int, int, int, int, float, float, float)
 	 */
 	public static void blockActivated(EntityPlayer player, Block block, int x, int y, int z) {
-		if (!listeners.isEmpty(IBlockListener.class)) {
-			BlockEvent event = BlockEvent.Activated(player, block, x, y, z);
-			((IBlockListener)listeners).blockAction(event);
+		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
+			PlayerBlockEvent event = PlayerBlockEvent.Activated(player, block, x, y, z);
+			((IPlayerBlockListener)listeners).blockAction(event);
 		}
 
 		if (block instanceof BlockContainer) {
@@ -85,9 +85,9 @@ public class PlayerAPI {
 	}
 	
 	public static boolean blockPlaceAttempt(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
-		if (!listeners.isEmpty(IBlockListener.class)) {
-			BlockEvent event = BlockEvent.PlaceAttempt(player, itemStack, x, y, z, direction, xOffset, yOffset, zOffset);
-			((IBlockListener)listeners).blockAction(event);
+		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
+			PlayerBlockEvent event = PlayerBlockEvent.PlaceAttempt(player, itemStack, x, y, z, direction, xOffset, yOffset, zOffset);
+			((IPlayerBlockListener)listeners).blockAction(event);
 			
 			if (event.isHandled())
 				return event.isAllowed();
@@ -189,16 +189,16 @@ public class PlayerAPI {
 	}
 	
 	public static void login(EntityPlayer player) {
-		if (!listeners.isEmpty(IInstanceListener.class)) {
-        	InstanceEvent event = InstanceEvent.Login(player);
-        	((IInstanceListener)listeners).instanceAction(event);
+		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
+        	PlayerInstanceEvent event = PlayerInstanceEvent.Login(player);
+        	((IPlayerInstanceListener)listeners).instanceAction(event);
 		}
 	}
 	
 	public static void logout(EntityPlayer player) {
-		if (!listeners.isEmpty(IInstanceListener.class)) {
-        	InstanceEvent event = InstanceEvent.Logout(player);
-        	((IInstanceListener)listeners).instanceAction(event);
+		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
+        	PlayerInstanceEvent event = PlayerInstanceEvent.Logout(player);
+        	((IPlayerInstanceListener)listeners).instanceAction(event);
 		}
 	}
 
@@ -207,9 +207,9 @@ public class PlayerAPI {
 	 * @return The position the player should respawn at, if set by a mod. <code>null</code> otherwise.
 	 */
 	public static RespawnPosition handleRespawn(EntityPlayer oldPlayerInstance) {
-		if (!listeners.isEmpty(IInstanceListener.class)) {
-        	InstanceEvent event = InstanceEvent.Respawn(oldPlayerInstance);
-        	((IInstanceListener)listeners).instanceAction(event);
+		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
+        	PlayerInstanceEvent event = PlayerInstanceEvent.Respawn(oldPlayerInstance);
+        	((IPlayerInstanceListener)listeners).instanceAction(event);
         	return event.getRespawnPosition();
 		}
 		
@@ -217,9 +217,9 @@ public class PlayerAPI {
 	}
 	
 	public static boolean isPvPEnabled(EntityPlayer player) {
-		if (!listeners.isEmpty(IInstanceListener.class)) {
-        	InstanceEvent event = InstanceEvent.CheckMetadata(player, METADATA.IS_PVP);
-        	((IInstanceListener)listeners).instanceAction(event);
+		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
+        	PlayerInstanceEvent event = PlayerInstanceEvent.CheckMetadata(player, METADATA.IS_PVP);
+        	((IPlayerInstanceListener)listeners).instanceAction(event);
         	if (event.isInterrupted()) {
         		return event.getMetadataBooleanValue();
         	}
@@ -229,37 +229,37 @@ public class PlayerAPI {
 	}
 	
 	public static void readFromNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
-		if (!listeners.isEmpty(IInstanceListener.class)) {
-        	InstanceEvent event = InstanceEvent.ReadFromNBT(player, nbtTagCompound);
-        	((IInstanceListener)listeners).instanceAction(event);
+		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
+        	PlayerInstanceEvent event = PlayerInstanceEvent.ReadFromNBT(player, nbtTagCompound);
+        	((IPlayerInstanceListener)listeners).instanceAction(event);
 		}
 	}
 	
 	public static void writeToNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
-		if (!listeners.isEmpty(IInstanceListener.class)) {
-        	InstanceEvent event = InstanceEvent.WriteToNBT(player, nbtTagCompound);
-        	((IInstanceListener)listeners).instanceAction(event);
+		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
+        	PlayerInstanceEvent event = PlayerInstanceEvent.WriteToNBT(player, nbtTagCompound);
+        	((IPlayerInstanceListener)listeners).instanceAction(event);
 		}
 	}
 
 	public static void onPlayerAttack(EntityLiving attackedEntity, DamageSource source) {
-		if (!listeners.isEmpty(IActionListener.class)) {
+		if (!listeners.isEmpty(IPlayerActionListener.class)) {
 			PlayerActionEvent event = PlayerActionEvent.Attack(attackedEntity, source);
-        	((IActionListener)listeners).onPlayerAction(event);
+        	((IPlayerActionListener)listeners).onPlayerAction(event);
 		}
 	}
 	
-	public static void onPlayerMetadataChanged(EntityPlayer player, InstanceEvent.METADATA metadata) {
-		if (!listeners.isEmpty(IInstanceListener.class)) {
-        	InstanceEvent event = InstanceEvent.MetadataChanged(player, metadata);
-        	((IInstanceListener)listeners).instanceAction(event);
+	public static void onPlayerMetadataChanged(EntityPlayer player, PlayerInstanceEvent.METADATA metadata) {
+		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
+        	PlayerInstanceEvent event = PlayerInstanceEvent.MetadataChanged(player, metadata);
+        	((IPlayerInstanceListener)listeners).instanceAction(event);
 		}
 	}
 	
-	public static void onPlayerMetadataChanged(EntityPlayer player, InstanceEvent.METADATA metadata, Object newValue) {
-		if (!listeners.isEmpty(IInstanceListener.class)) {
-        	InstanceEvent event = InstanceEvent.MetadataChanged(player, metadata, newValue);
-        	((IInstanceListener)listeners).instanceAction(event);
+	public static void onPlayerMetadataChanged(EntityPlayer player, PlayerInstanceEvent.METADATA metadata, Object newValue) {
+		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
+        	PlayerInstanceEvent event = PlayerInstanceEvent.MetadataChanged(player, metadata, newValue);
+        	((IPlayerInstanceListener)listeners).instanceAction(event);
 		}
 	}
 }

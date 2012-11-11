@@ -5,17 +5,17 @@ import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 
-public class BlockEvent extends PlayerBlockEventBase implements IEventInterrupter {
+public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInterrupter {
 	
-	public static BlockEvent Activated(EntityPlayer player, Block block, int x, int y, int z) {
-		BlockEvent event = new BlockEvent(TYPE.ACTIVATED, player);
+	public static PlayerBlockEvent Activated(EntityPlayer player, Block block, int x, int y, int z) {
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ACTIVATED, player);
 		event.block = block;
 		event.setCoordinates(x, y, z);
 		return event;
 	}
 
-	public static BlockEvent ActivationAttempt(EntityPlayer player, Block block, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
-		BlockEvent event = new BlockEvent(TYPE.ACTIVATION_ATTEMPT, player);
+	public static PlayerBlockEvent ActivationAttempt(EntityPlayer player, Block block, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ACTIVATION_ATTEMPT, player);
 		event.direction = direction;
 		event.xOffset = xOffset;
 		event.yOffset = yOffset;
@@ -25,8 +25,8 @@ public class BlockEvent extends PlayerBlockEventBase implements IEventInterrupte
 		return event;
 	}
 	
-	public static BlockEvent PlaceAttempt(EntityPlayer player, ItemStack itemStack, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
-		BlockEvent event = new BlockEvent(TYPE.PLACE_ATTEMPT, player);
+	public static PlayerBlockEvent PlaceAttempt(EntityPlayer player, ItemStack itemStack, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.PLACE_ATTEMPT, player);
 		event.itemStack = itemStack;
 		event.direction = direction;
 		event.xOffset = xOffset;
@@ -88,7 +88,7 @@ public class BlockEvent extends PlayerBlockEventBase implements IEventInterrupte
 		return itemStack;
 	}
 	
-	private BlockEvent(TYPE type, EntityPlayer player) {
+	private PlayerBlockEvent(TYPE type, EntityPlayer player) {
 		super(player, player.worldObj);
 		this.type = type;
 	}

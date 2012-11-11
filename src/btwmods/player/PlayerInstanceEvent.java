@@ -9,7 +9,7 @@ import btwmods.events.IEventInterrupter;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.NBTTagCompound;
 
-public class InstanceEvent extends EventObject implements IEventInterrupter {
+public class PlayerInstanceEvent extends EventObject implements IEventInterrupter {
 	
 	public enum TYPE { LOGIN, LOGOUT, RESPAWN, READ_NBT, WRITE_NBT, CHECK_METADATA, METADATA_CHANGED };
 	public enum METADATA { IS_PVP };
@@ -113,61 +113,61 @@ public class InstanceEvent extends EventObject implements IEventInterrupter {
 			throw new IllegalStateException("Metadata value is set to " + (metadataValue == null ? "null" : metadataValue.getClass().getSimpleName()) + " but should be " + Double.class.getSimpleName());
 	}
 	
-	public static InstanceEvent Login(EntityPlayer playerInstance) {
-		InstanceEvent event = new InstanceEvent(TYPE.LOGIN, playerInstance);
+	public static PlayerInstanceEvent Login(EntityPlayer playerInstance) {
+		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.LOGIN, playerInstance);
 		event.playerInstance = playerInstance;
 		return event;
 	}
 	
-	public static InstanceEvent Logout(EntityPlayer playerInstance) {
-		InstanceEvent event = new InstanceEvent(TYPE.LOGOUT, playerInstance);
+	public static PlayerInstanceEvent Logout(EntityPlayer playerInstance) {
+		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.LOGOUT, playerInstance);
 		event.playerInstance = playerInstance;
 		return event;
 	}
 	
-	public static InstanceEvent Respawn(EntityPlayer playerInstance) {
-		InstanceEvent event = new InstanceEvent(TYPE.RESPAWN, playerInstance);
+	public static PlayerInstanceEvent Respawn(EntityPlayer playerInstance) {
+		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.RESPAWN, playerInstance);
 		event.playerInstance = playerInstance;
 		return event;
 	}
 
-	public static InstanceEvent ReadFromNBT(EntityPlayer playerInstance, NBTTagCompound nbtTagCompound) {
-		InstanceEvent event = new InstanceEvent(TYPE.READ_NBT, playerInstance);
+	public static PlayerInstanceEvent ReadFromNBT(EntityPlayer playerInstance, NBTTagCompound nbtTagCompound) {
+		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.READ_NBT, playerInstance);
 		event.playerInstance = playerInstance;
 		event.tagCompound = nbtTagCompound;
 		return event;
 	}
 
-	public static InstanceEvent WriteToNBT(EntityPlayer playerInstance, NBTTagCompound nbtTagCompound) {
-		InstanceEvent event = new InstanceEvent(TYPE.WRITE_NBT, playerInstance);
+	public static PlayerInstanceEvent WriteToNBT(EntityPlayer playerInstance, NBTTagCompound nbtTagCompound) {
+		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.WRITE_NBT, playerInstance);
 		event.playerInstance = playerInstance;
 		event.tagCompound = nbtTagCompound;
 		return event;
 	}
 	
-	public static InstanceEvent CheckMetadata(EntityPlayer playerInstance, METADATA metadata) {
-		InstanceEvent event = new InstanceEvent(TYPE.CHECK_METADATA, playerInstance);
+	public static PlayerInstanceEvent CheckMetadata(EntityPlayer playerInstance, METADATA metadata) {
+		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.CHECK_METADATA, playerInstance);
 		event.playerInstance = playerInstance;
 		event.metadata = metadata;
 		return event;
 	}
 	
-	public static InstanceEvent MetadataChanged(EntityPlayer playerInstance, METADATA metadata) {
-		InstanceEvent event = new InstanceEvent(TYPE.METADATA_CHANGED, playerInstance);
+	public static PlayerInstanceEvent MetadataChanged(EntityPlayer playerInstance, METADATA metadata) {
+		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.METADATA_CHANGED, playerInstance);
 		event.playerInstance = playerInstance;
 		event.metadata = metadata;
 		return event;
 	}
 	
-	public static InstanceEvent MetadataChanged(EntityPlayer playerInstance, METADATA metadata, Object newValue) {
-		InstanceEvent event = new InstanceEvent(TYPE.METADATA_CHANGED, playerInstance);
+	public static PlayerInstanceEvent MetadataChanged(EntityPlayer playerInstance, METADATA metadata, Object newValue) {
+		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.METADATA_CHANGED, playerInstance);
 		event.playerInstance = playerInstance;
 		event.metadata = metadata;
 		event.setMetadataValue(newValue);
 		return event;
 	}
 	
-	private InstanceEvent(TYPE type, EntityPlayer playerInstance) {
+	private PlayerInstanceEvent(TYPE type, EntityPlayer playerInstance) {
 		super(playerInstance);
 		this.type = type;
 	}
