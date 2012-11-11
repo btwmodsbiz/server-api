@@ -1,8 +1,9 @@
 package btwmods;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -20,6 +21,7 @@ import java.util.zip.ZipFile;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.ICommand;
+import net.minecraft.src.ServerCommandManager;
 import net.minecraft.src.World;
 
 import btwmods.events.IAPIListener;
@@ -28,6 +30,11 @@ import btwmods.io.Settings;
 public class ModLoader {
 	
 	private ModLoader() {}
+
+	/**
+	 * Settings used by ModLoader.
+	 */
+	private static File errorLog = new File(new File("."), "btwmods/errors.log");
 
 	/**
 	 * Settings used by ModLoader.
@@ -138,8 +145,18 @@ public class ModLoader {
 				// TODO: Can we use our own URLClassLoader instead?
 			}
 			
-			// Load settings.
+			// Load settings file.
 			settings = loadSettings("BTWMods");
+			
+			// Process settings.
+			if (settings.hasKey("errorLog")) {
+				errorLog = new File(settings.get("errorLog"));
+			}
+			
+			// Check that the error log is a valid path to write to.
+			if (errorLog.exists() && !errorLog.isFile()) {
+				outputError("The BTWMods errorLog exists but is not a file: " + errorLog, Level.SEVERE);
+			}
 
 			try {
 				ReflectionAPI.init(settings);
@@ -463,7 +480,7 @@ public class ModLoader {
 	}
 	
 	public static void outputError(String message, Level level) {
-		MinecraftServer.logger.log(level, LOGPREFIX + message);
+		outputLog(message, level);
 	}
 	
 	public static void outputError(Throwable throwable, String message) {
@@ -472,11 +489,48 @@ public class ModLoader {
 	
 	public static void outputError(Throwable throwable, String message, Level level) {
 		outputError(message, level);
-		throwable.printStackTrace(new PrintStream(System.out));
+		
+		// Output the stack trace.
+		String stackTrace = Util.getStackTrace(throwable);
+		MinecraftServer.logger.log(level, stackTrace);
+		errorLogWrite(stackTrace);
 	}
 	
 	public static void outputInfo(String message) {
-		MinecraftServer.logger.info(LOGPREFIX + message);
+		outputLog(message, Level.INFO);
+	}
+	
+	private static void outputLog(String message, Level level) {
+		MinecraftServer.logger.log(level, LOGPREFIX + message);
+		
+		// Notify logged in admins.
+		MinecraftServer server = MinecraftServer.getServer();
+		if (level != Level.INFO && server.getCommandManager() instanceof ServerCommandManager)
+			((ServerCommandManager)server.getCommandManager()).notifyAdmins(server, 1, LOGPREFIX + message, new Object[0]);
+		
+		errorLogWrite(message);
+	}
+	
+	private static void errorLogWrite(String message) {
+		if (errorLog != null) {
+			BufferedWriter writer = null;
+			
+			try {
+				writer = new BufferedWriter(new FileWriter(errorLog, true));
+				writer.write(message);
+				writer.newLine();
+			}
+			catch (IOException e) {
+				MinecraftServer.logger.severe(LOGPREFIX + "Failed to write to the errorLog: " + e.getMessage());
+			}
+			finally {
+				try {
+					if (writer != null)
+						writer.close();
+				}
+				catch (IOException e) { }
+			}
+		}
 	}
 	
 	/**
