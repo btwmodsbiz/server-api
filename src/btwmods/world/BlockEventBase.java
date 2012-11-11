@@ -1,43 +1,52 @@
-package btwmods.player;
+package btwmods.world;
 
 import java.util.EventObject;
 
 import net.minecraft.src.Block;
-import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.Chunk;
 import net.minecraft.src.IInventory;
+import net.minecraft.src.ItemStack;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 
-public abstract class AbstractBlockEvent extends EventObject {
+public abstract class BlockEventBase extends EventObject {
 
-	protected EntityPlayer player;
+	private World world;
+	
+	protected Chunk chunk = null;
 	protected Block block = null;
 	protected int metadata = -1;
-	protected World world = null;
-	protected int x = -1;
-	protected int y = -1;
-	protected int z = -1;
 	
-	protected boolean checkedTileEntity = false;
+	private int x = -1;
+	private int y = -1;
+	private int z = -1;
+	
+	private boolean checkedTileEntity = false;
 	protected TileEntity tileEntity = null;
+	protected ItemStack[] contents = null;
 	
-	public EntityPlayer getPlayer() {
-		return player;
+	public World getWorld() {
+		return world;
+	}
+	
+	public Chunk getChunk() {
+		if (chunk == null && hasCoordinatesSet()) {
+			chunk = world.getChunkFromBlockCoords(x, z);
+		}
+		
+		return chunk;
 	}
 	
 	public Block getBlock() {
+		if (block == null && hasCoordinatesSet()) {
+			block = Block.blocksList[world.getBlockId(x, y, z)];
+		}
+		
 		return block;
 	}
 	
 	public int getMetadata() {
 		return metadata;
-	}
-	
-	public World getWorld() {
-		if (world == null)
-			world = player.worldObj;
-		
-		return world;
 	}
 	
 	public int getX() {
@@ -52,9 +61,21 @@ public abstract class AbstractBlockEvent extends EventObject {
 		return z;
 	}
 	
+	protected void setCoordinates(int x, int y, int z) {
+		if (x >= 0 && y >= 0 && z >= 0) {
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+	}
+	
+	public boolean hasCoordinatesSet() {
+		return x >= 0;
+	}
+	
 	public TileEntity getTileEntity() {
-		if (!checkedTileEntity) {
-			tileEntity = getWorld().getBlockTileEntity(x, y, z);
+		if (tileEntity == null && !checkedTileEntity && hasCoordinatesSet()) {
+			tileEntity = world.getBlockTileEntity(x, y, z);
 			checkedTileEntity = true;
 		}
 		
@@ -65,8 +86,21 @@ public abstract class AbstractBlockEvent extends EventObject {
 		return getTileEntity() instanceof IInventory;
 	}
 	
-	protected AbstractBlockEvent(EntityPlayer player) {
-		super(player);
-		this.player = player;
+	public ItemStack[] getContents() {
+		if (contents == null && hasInventory()) {
+			IInventory inventory = (IInventory)getTileEntity();
+			
+			contents = new ItemStack[inventory.getSizeInventory()];
+			for (int i = 0; i < contents.length; i++) {
+				contents[i] = inventory.getStackInSlot(i);
+			}
+		}
+		
+		return contents;
+	}
+	
+	protected BlockEventBase(Object source, World world) {
+		super(source);
+		this.world = world;
 	}
 }
