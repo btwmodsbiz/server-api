@@ -135,7 +135,7 @@ public class NetworkAPI {
 			CustomPacketEvent event = new CustomPacketEvent(channel, data, length);
 			ICustomPacketListener listener = networkListeners.get(channel);
 			try {
-				listener.customPacketAction(event);
+				listener.onCustomPacket(event);
 				return event.isHandled();
 			}
 			catch (Throwable e) {
@@ -155,7 +155,7 @@ public class NetworkAPI {
 				
 				if (!listeners.isEmpty(IPacketListener.class)) {
 					PacketEvent event = PacketEvent.ReceivedPlayerPacket(player, packet, (NetServerHandler)netHandler);
-					((IPacketListener)listeners).packetAction(event);
+					((IPacketListener)listeners).onPacket(event);
 				}
 			}
 			catch (Exception e) {
@@ -177,7 +177,7 @@ public class NetworkAPI {
 				
 				if (!listeners.isEmpty(IPacketListener.class)) {
 					PacketEvent event = PacketEvent.SentPlayerPacket(player, packet, (NetServerHandler)netHandler);
-					((IPacketListener)listeners).packetAction(event);
+					((IPacketListener)listeners).onPacket(event);
 				}
 			}
 			catch (Exception e) {

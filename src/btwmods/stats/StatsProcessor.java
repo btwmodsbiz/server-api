@@ -79,7 +79,7 @@ public class StatsProcessor implements Runnable {
 						
 						// Run all the listeners.
 						StatsEvent event = new StatsEvent(MinecraftServer.getServer(), tickCounter, serverStats, worldStats);
-						((IStatsListener)listeners).statsAction(event);
+						((IStatsListener)listeners).onStats(event);
 
 						try {
 							Thread.sleep(40L);

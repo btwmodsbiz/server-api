@@ -10,5 +10,5 @@ public interface IStatsListener extends IAPIListener {
 	 * 
 	 * @param event The event data.
 	 */
-	public void statsAction(StatsEvent event);
+	public void onStats(StatsEvent event);
 }

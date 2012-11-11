@@ -50,7 +50,7 @@ public class PlayerAPI {
 		
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
 			PlayerBlockEvent event = PlayerBlockEvent.ActivationAttempt(player, Block.blocksList[blockId], x, y, z, direction, xOffset, yOffset, zOffset);
-			((IPlayerBlockListener)listeners).blockAction(event);
+			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
 			activated = event.isHandled();
 		}
 		
@@ -76,7 +76,7 @@ public class PlayerAPI {
 	public static void blockActivated(EntityPlayer player, Block block, int x, int y, int z) {
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
 			PlayerBlockEvent event = PlayerBlockEvent.Activated(player, block, x, y, z);
-			((IPlayerBlockListener)listeners).blockAction(event);
+			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
 		}
 
 		if (block instanceof BlockContainer) {
@@ -87,7 +87,7 @@ public class PlayerAPI {
 	public static boolean blockPlaceAttempt(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
 			PlayerBlockEvent event = PlayerBlockEvent.PlaceAttempt(player, itemStack, x, y, z, direction, xOffset, yOffset, zOffset);
-			((IPlayerBlockListener)listeners).blockAction(event);
+			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
 			
 			if (event.isHandled())
 				return event.isAllowed();
@@ -99,7 +99,7 @@ public class PlayerAPI {
 	public static void blockRemoved(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
 		if (block instanceof BlockContainer && !listeners.isEmpty(IContainerListener.class)) {
 			ContainerEvent event = ContainerEvent.Removed(player, block, metadata, x, y, z);
-			((IContainerListener)listeners).containerAction(event);
+			((IContainerListener)listeners).onContainerAction(event);
 		}
 	}
 	
@@ -111,7 +111,7 @@ public class PlayerAPI {
 	public static void containerOpened(EntityPlayer player, Block block, Container container, int x, int y, int z) {
 		if (!listeners.isEmpty(IContainerListener.class)) {
 			ContainerEvent event = ContainerEvent.Open(player, block, container, x, y, z);
-			((IContainerListener)listeners).containerAction(event);
+			((IContainerListener)listeners).onContainerAction(event);
 		}
 	}
 	
@@ -131,7 +131,7 @@ public class PlayerAPI {
 			else
 				event = DropEvent.Stack(player, itemStack);
 
-        	((IDropListener)listeners).dropAction(event);
+        	((IDropListener)listeners).onPlayerItemDrop(event);
 		}
 	}
 	
@@ -144,7 +144,7 @@ public class PlayerAPI {
 	public static void itemEjected(EntityPlayer player, ItemStack items) {
 		if (!listeners.isEmpty(IDropListener.class)) {
 			DropEvent event = DropEvent.Eject(player, items);
-        	((IDropListener)listeners).dropAction(event);
+        	((IDropListener)listeners).onPlayerItemDrop(event);
 		}
 	}
 	
@@ -156,49 +156,49 @@ public class PlayerAPI {
 	public static void itemsDroppedAll(EntityPlayer player) {
 		if (!listeners.isEmpty(IDropListener.class)) {
 			DropEvent event = DropEvent.All(player);
-        	((IDropListener)listeners).dropAction(event);
+        	((IDropListener)listeners).onPlayerItemDrop(event);
 		}
 	}
 	
 	public static void itemTransfered(EntityPlayer player, Container container, int slotId, ItemStack original) {
 		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Transfer(player, container, slotId, original);
-        	((ISlotListener)listeners).slotAction(event);
+        	((ISlotListener)listeners).onSlotAction(event);
 		}
 	}
 	
 	public static void itemAddedToSlot(EntityPlayer player, Container container, Slot clickedSlot, int quantity) {
 		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Add(player, container, clickedSlot, quantity);
-        	((ISlotListener)listeners).slotAction(event);
+        	((ISlotListener)listeners).onSlotAction(event);
 		}
 	}
 	
 	public static void itemRemovedFromSlot(EntityPlayer player, Container container, Slot clickedSlot, int quantity) {
 		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Remove(player, container, clickedSlot, quantity);
-        	((ISlotListener)listeners).slotAction(event);
+        	((ISlotListener)listeners).onSlotAction(event);
 		}
 	}
 	
 	public static void itemSwitchedWithSlot(EntityPlayer player, Container container, Slot clickedSlot) {
 		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Switch(player, container, clickedSlot);
-        	((ISlotListener)listeners).slotAction(event);
+        	((ISlotListener)listeners).onSlotAction(event);
 		}
 	}
 	
 	public static void login(EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.Login(player);
-        	((IPlayerInstanceListener)listeners).instanceAction(event);
+        	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
 		}
 	}
 	
 	public static void logout(EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.Logout(player);
-        	((IPlayerInstanceListener)listeners).instanceAction(event);
+        	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
 		}
 	}
 
@@ -209,7 +209,7 @@ public class PlayerAPI {
 	public static RespawnPosition handleRespawn(EntityPlayer oldPlayerInstance) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.Respawn(oldPlayerInstance);
-        	((IPlayerInstanceListener)listeners).instanceAction(event);
+        	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
         	return event.getRespawnPosition();
 		}
 		
@@ -219,7 +219,7 @@ public class PlayerAPI {
 	public static boolean isPvPEnabled(EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.CheckMetadata(player, METADATA.IS_PVP);
-        	((IPlayerInstanceListener)listeners).instanceAction(event);
+        	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
         	if (event.isInterrupted()) {
         		return event.getMetadataBooleanValue();
         	}
@@ -231,14 +231,14 @@ public class PlayerAPI {
 	public static void readFromNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.ReadFromNBT(player, nbtTagCompound);
-        	((IPlayerInstanceListener)listeners).instanceAction(event);
+        	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
 		}
 	}
 	
 	public static void writeToNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.WriteToNBT(player, nbtTagCompound);
-        	((IPlayerInstanceListener)listeners).instanceAction(event);
+        	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
 		}
 	}
 
@@ -252,14 +252,14 @@ public class PlayerAPI {
 	public static void onPlayerMetadataChanged(EntityPlayer player, PlayerInstanceEvent.METADATA metadata) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.MetadataChanged(player, metadata);
-        	((IPlayerInstanceListener)listeners).instanceAction(event);
+        	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
 		}
 	}
 	
 	public static void onPlayerMetadataChanged(EntityPlayer player, PlayerInstanceEvent.METADATA metadata, Object newValue) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.MetadataChanged(player, metadata, newValue);
-        	((IPlayerInstanceListener)listeners).instanceAction(event);
+        	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
 		}
 	}
 }
