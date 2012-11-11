@@ -47,8 +47,8 @@ public class Settings {
 	}
 	
 	public boolean isBoolean(String key) {
-		if (settings.containsKey(key)) {
-			String setting = settings.get(key).trim().toLowerCase();
+		if (hasKey(key)) {
+			String setting = get(key).trim().toLowerCase();
 			return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true")|| setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on")
 					 || setting.equalsIgnoreCase("no") || setting.equalsIgnoreCase("false") || setting.equalsIgnoreCase("0") || setting.equalsIgnoreCase("off");
 		}
@@ -57,35 +57,35 @@ public class Settings {
 	
 	public boolean getBoolean(String key) {
 		if (!isBoolean(key)) throw new IllegalArgumentException("setting is not a valid boolean. check with isBoolean() first");
-		String setting = settings.get(key).trim().toLowerCase();
+		String setting = get(key).trim().toLowerCase();
 		return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on");
 	}
 	
 	public boolean isInt(String key) {
-		try { return settings.containsKey(key) && Integer.valueOf(settings.get(key)) != null; }
+		try { return hasKey(key) && Integer.valueOf(get(key)) != null; }
 		catch (NumberFormatException e) { return false; }
 	}
 	
 	public int getInt(String key) {
 		if (!isInt(key)) throw new IllegalArgumentException("setting is not a valid Integer. check with isInt() first");
-		return Integer.parseInt(settings.get(key));
+		return Integer.parseInt(get(key));
 	}
 	
 	public boolean isLong(String key) {
-		try { return settings.containsKey(key) && Long.valueOf(settings.get(key)) != null; }
+		try { return hasKey(key) && Long.valueOf(get(key)) != null; }
 		catch (NumberFormatException e) { return false; }
 	}
 	
 	public long getLong(String key) {
 		if (!isLong(key)) throw new IllegalArgumentException("setting is not a valid Long. check with isLong() first");
-		return Long.parseLong(settings.get(key));
+		return Long.parseLong(get(key));
 	}
 	
 	public boolean hasKey(String key) {
-		return settings.containsKey(key);
+		return settings.containsKey(key.toLowerCase());
 	}
 	
 	public String get(String key) {
-		return settings.get(key);
+		return settings.get(key.toLowerCase());
 	}
 }
