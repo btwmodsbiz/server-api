@@ -4,7 +4,7 @@ import net.minecraft.src.Block;
 import net.minecraft.src.Container;
 import net.minecraft.src.EntityPlayer;
 
-public class ContainerEvent extends AbstractBlockEvent {
+public class ContainerEvent extends PlayerBlockEventBase {
 	
 	public enum TYPE { OPENED, PLACED, REMOVED };
 
@@ -23,17 +23,13 @@ public class ContainerEvent extends AbstractBlockEvent {
 		ContainerEvent event = new ContainerEvent(TYPE.OPENED, player);
 		event.block = block;
 		event.container = container;
-		event.x = x;
-		event.y = y;
-		event.z = z;
+		event.setCoordinates(x, y, z);
 		return event;
 	}
 	
 	public static ContainerEvent Placed(EntityPlayer player, int x, int y, int z) {
 		ContainerEvent event = new ContainerEvent(TYPE.PLACED, player);
-		event.x = x;
-		event.y = y;
-		event.z = z;
+		event.setCoordinates(x, y, z);
 		return event;
 	}
 	
@@ -41,14 +37,12 @@ public class ContainerEvent extends AbstractBlockEvent {
 		ContainerEvent event = new ContainerEvent(TYPE.REMOVED, player);
 		event.block = block;
 		event.metadata = metadata;
-		event.x = x;
-		event.y = y;
-		event.z = z;
+		event.setCoordinates(x, y, z);
 		return event;
 	}
 	
 	private ContainerEvent(TYPE type, EntityPlayer player) {
-		super(player);
+		super(player, player.worldObj);
 		this.type = type;
 	}
 }

@@ -5,14 +5,12 @@ import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 
-public class BlockEvent extends AbstractBlockEvent implements IEventInterrupter {
+public class BlockEvent extends PlayerBlockEventBase implements IEventInterrupter {
 	
 	public static BlockEvent Activated(EntityPlayer player, Block block, int x, int y, int z) {
 		BlockEvent event = new BlockEvent(TYPE.ACTIVATED, player);
 		event.block = block;
-		event.x = x;
-		event.y = y;
-		event.z = z;
+		event.setCoordinates(x, y, z);
 		return event;
 	}
 
@@ -23,9 +21,7 @@ public class BlockEvent extends AbstractBlockEvent implements IEventInterrupter 
 		event.yOffset = yOffset;
 		event.zOffset = zOffset;
 		event.block = block;
-		event.x = x;
-		event.y = y;
-		event.z = z;
+		event.setCoordinates(x, y, z);
 		return event;
 	}
 	
@@ -36,9 +32,7 @@ public class BlockEvent extends AbstractBlockEvent implements IEventInterrupter 
 		event.xOffset = xOffset;
 		event.yOffset = yOffset;
 		event.zOffset = zOffset;
-		event.x = x;
-		event.y = y;
-		event.z = z;
+		event.setCoordinates(x, y, z);
 		return event;
 	}
 	
@@ -95,7 +89,7 @@ public class BlockEvent extends AbstractBlockEvent implements IEventInterrupter 
 	}
 	
 	private BlockEvent(TYPE type, EntityPlayer player) {
-		super(player);
+		super(player, player.worldObj);
 		this.type = type;
 	}
 
