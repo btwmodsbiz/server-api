@@ -290,6 +290,18 @@ public class PlayerAPI {
         	((IPlayerActionListener)listeners).onPlayerAction(event);
 		}
 	}
+
+	public static boolean onUseEntityAttempt(EntityPlayer player, Entity entity, boolean isLeftClick) {
+		if (!listeners.isEmpty(IPlayerActionListener.class)) {
+			PlayerActionEvent event = PlayerActionEvent.UseEntityAttempt(player, entity, isLeftClick);
+        	((IPlayerActionListener)listeners).onPlayerAction(event);
+			
+			if (!event.isAllowed())
+				return false;
+		}
+		
+		return true;
+	}
 	
 	public static void onPlayerMetadataChanged(EntityPlayer player, PlayerInstanceEvent.METADATA metadata) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
