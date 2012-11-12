@@ -23,8 +23,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.Container;
-import net.minecraft.src.DamageSource;
-import net.minecraft.src.EntityLiving;
+import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
@@ -282,9 +281,9 @@ public class PlayerAPI {
 		}
 	}
 
-	public static void onPlayerAttack(EntityLiving attackedEntity, DamageSource source) {
+	public static void onAttackedByPlayer(Entity attackedEntity, EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerActionListener.class)) {
-			PlayerActionEvent event = PlayerActionEvent.Attack(attackedEntity, source);
+			PlayerActionEvent event = PlayerActionEvent.AttackedByPlayer(attackedEntity, player);
         	((IPlayerActionListener)listeners).onPlayerAction(event);
 		}
 	}

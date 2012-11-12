@@ -1,39 +1,37 @@
 package btwmods.player;
 
 import java.util.EventObject;
-
-import net.minecraft.src.DamageSource;
-import net.minecraft.src.EntityLiving;
+import net.minecraft.src.Entity;
+import net.minecraft.src.EntityPlayer;
 
 public class PlayerActionEvent extends EventObject {
 	
-	public enum TYPE { ATTACK };
+	public enum TYPE { ATTACKED_BY_PLAYER };
 	
 	private TYPE type;
-	private EntityLiving attackTarget = null;
-	private DamageSource attackSource = null;
+	private Entity entity = null;
+	private EntityPlayer player = null;
 	
 	public TYPE getType() {
 		return type;
 	}
 	
-	public EntityLiving getAttackTarget() {
-		return attackTarget;
+	public Entity getEntity() {
+		return entity;
 	}
 	
-	public DamageSource getAttackSource() {
-		return attackSource;
+	public EntityPlayer getPlayer() {
+		return player;
 	}
 	
-	public static PlayerActionEvent Attack(EntityLiving targetEntity, DamageSource source) {
-		PlayerActionEvent event = new PlayerActionEvent(source.getEntity(), TYPE.ATTACK);
-		event.attackTarget = targetEntity;
-		event.attackSource = source;
+	public static PlayerActionEvent AttackedByPlayer(Entity entity, EntityPlayer player) {
+		PlayerActionEvent event = new PlayerActionEvent(player, TYPE.ATTACKED_BY_PLAYER);
+		event.entity = entity;
 		return event;
 	}
 	
-	private PlayerActionEvent(Object source, TYPE type) {
-		super(source);
+	private PlayerActionEvent(EntityPlayer player, TYPE type) {
+		super(player);
 		this.type = type;
 	}
 }
