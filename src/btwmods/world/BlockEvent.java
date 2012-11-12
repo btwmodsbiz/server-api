@@ -43,7 +43,7 @@ public class BlockEvent extends BlockEventBase implements IEventInterrupter {
 		return event;
 	}
 	
-	public static BlockEvent Exploded(World world, int blockId, int x, int y, int z) {
+	public static BlockEvent ExplodeAttempt(World world, int blockId, int x, int y, int z) {
 		BlockEvent event = new BlockEvent(TYPE.EXPLODE_ATTEMPT, world);
 		event.block = blockId > 0 ? Block.blocksList[blockId] : null;
 		event.setCoordinates(x, y, z);

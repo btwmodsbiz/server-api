@@ -97,7 +97,7 @@ public class WorldAPI {
 
 	public static boolean onBlockExplodeAttempt(World world, int blockId, int x, int y, int z) {
 		if (!listeners.isEmpty(IBlockListener.class)) {
-			BlockEvent event = BlockEvent.Exploded(world, blockId, x, y, z);
+			BlockEvent event = BlockEvent.ExplodeAttempt(world, blockId, x, y, z);
 			((IBlockListener)listeners).onBlockAction(event);
 			
 			if (!event.isAllowed())
