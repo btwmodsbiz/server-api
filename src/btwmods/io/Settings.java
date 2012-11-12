@@ -61,22 +61,8 @@ public class Settings {
 		return settings;
 	}
 	
-	private final Map<String, String> settings;
-	private final Map<String, String> lowercaseLookup;
-	
-	public Settings() {
-		this(new LinkedHashMap<String, String>());
-	}
-	
-	public Settings(Map<String, String> settings) {
-		this.settings = settings;
-		
-		// Create lowercase versions of the keys for lookup.
-		lowercaseLookup = new LinkedHashMap<String, String>();
-		for (Map.Entry<String, String> entry : settings.entrySet()) {
-			lowercaseLookup.put(entry.getKey().toLowerCase(), entry.getKey());
-		}
-	}
+	private final Map<String, String> settings = new LinkedHashMap<String, String>();
+	private final Map<String, String> lowercaseLookup = new LinkedHashMap<String, String>();
 	
 	public Map getSettings() {
 		return Collections.unmodifiableMap(settings);
