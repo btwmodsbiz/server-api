@@ -44,7 +44,7 @@ public class ServerAPI {
 	}
 	
 	public static void onStartTick(int tickCounter) {
-		StatsAPI.startTick(tickCounter);
+		StatsAPI.onStartTick(tickCounter);
 		
 		if (!listeners.isEmpty(ITickListener.class)) {
         	TickEvent event = TickEvent.StartTick(tickCounter);
@@ -58,6 +58,6 @@ public class ServerAPI {
         	((ITickListener)listeners).onTick(event);
 		}
 		
-		StatsAPI.endTick();
+		StatsAPI.onEndTick();
 	}
 }

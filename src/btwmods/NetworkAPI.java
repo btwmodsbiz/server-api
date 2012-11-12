@@ -127,7 +127,7 @@ public class NetworkAPI {
 		return false;
 	}
 
-	public static boolean handleCustomPayload(String channel, byte[] data, int length) {
+	public static boolean onHandleCustomPayload(String channel, byte[] data, int length) {
 		// Process any queued failures before invoking a method on a mod.
 		ModLoader.processFailureQueue();
 		
@@ -146,7 +146,7 @@ public class NetworkAPI {
 		return false;
 	}
 
-	public static void receivedPacket(Packet packet, NetHandler netHandler) {
+	public static void onReceivedPacket(Packet packet, NetHandler netHandler) {
 		EntityPlayerMP player = null;
 		
 		if (netHandler instanceof NetServerHandler && playerEntityField != null) {
@@ -168,7 +168,7 @@ public class NetworkAPI {
 		StatsAPI.recordNetworkIO(NetworkType.RECEIVED, packet.getPacketSize(), player);
 	}
 
-	public static void sentPacket(Packet packet, NetHandler netHandler) {
+	public static void onSentPacket(Packet packet, NetHandler netHandler) {
 		EntityPlayerMP player = null;
 		
 		if (netHandler instanceof NetServerHandler && playerEntityField != null) {

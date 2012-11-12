@@ -44,7 +44,7 @@ public class PlayerAPI {
 		listeners.removeListener(listener);
 	}
 
-	public static boolean blockActivationAttempt(int blockId, World world, int x, int y, int z, EntityPlayer player, int direction, float xOffset, float yOffset, float zOffset) {
+	public static boolean onBlockActivationAttempt(int blockId, World world, int x, int y, int z, EntityPlayer player, int direction, float xOffset, float yOffset, float zOffset) {
 		boolean isHandled = false;
 		boolean wasActivated = false;
 		
@@ -60,7 +60,7 @@ public class PlayerAPI {
 			wasActivated = Block.blocksList[blockId].onBlockActivated(world, x, y, z, player, direction, xOffset, yOffset, zOffset);
 		
 		if (wasActivated) {
-			blockActivated(player, Block.blocksList[blockId], x, y, z);
+			onBlockActivated(player, Block.blocksList[blockId], x, y, z);
 		}
 		
 		return wasActivated;
@@ -76,14 +76,14 @@ public class PlayerAPI {
 	 * @param z coordinate of the block
 	 * @see net.minecraft.src.ItemInWorldManager#activateBlockOrUseItem(EntityPlayer, World, ItemStack, int, int, int, int, float, float, float)
 	 */
-	public static void blockActivated(EntityPlayer player, Block block, int x, int y, int z) {
+	public static void onBlockActivated(EntityPlayer player, Block block, int x, int y, int z) {
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
 			PlayerBlockEvent event = PlayerBlockEvent.Activated(player, block, x, y, z);
 			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
 		}
 
 		if (block instanceof BlockContainer) {
-			containerOpened(player, block, player.craftingInventory, x, y, z);
+			onContainerOpened(player, block, player.craftingInventory, x, y, z);
 		}
 	}
 
@@ -102,7 +102,7 @@ public class PlayerAPI {
 	 * @param zOffset The Z offset the player is from where the item is being placed.
 	 * @return true is the attempt should be allowed; false otherwise.
 	 */
-	public static boolean blockPlaceAttempt(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
+	public static boolean onBlockPlaceAttempt(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
 			PlayerBlockEvent event = PlayerBlockEvent.PlaceAttempt(player, itemStack, x, y, z, direction, xOffset, yOffset, zOffset);
 			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
@@ -114,7 +114,7 @@ public class PlayerAPI {
 		return true;
 	}
 	
-	public static void blockRemoved(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
+	public static void onBlockRemoved(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
 		if (block instanceof BlockContainer && !listeners.isEmpty(IContainerListener.class)) {
 			ContainerEvent event = ContainerEvent.Removed(player, block, metadata, x, y, z);
 			((IContainerListener)listeners).onContainerAction(event);
@@ -133,7 +133,7 @@ public class PlayerAPI {
 	 * @param z The block Z coordinate.
 	 * @return true if the attempt should be allowed; false otherwise.
 	 */
-	public static boolean blockRemoveAttempt(EntityPlayer player, World world, Block block, int metadata, int x, int y, int z) {
+	public static boolean onBlockRemoveAttempt(EntityPlayer player, World world, Block block, int metadata, int x, int y, int z) {
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
 			PlayerBlockEvent event = PlayerBlockEvent.RemoveAttempt(player, block, metadata, x, y, z);
 			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
@@ -146,11 +146,11 @@ public class PlayerAPI {
 	}
 	
 	@SuppressWarnings("unused")
-	public static void containerPlaced(EntityPlayer player, Container container, World world, int x, int y, int z) {
+	public static void onContainerPlaced(EntityPlayer player, Container container, World world, int x, int y, int z) {
 		//TODO: this.items.containerPlaced(player, container, world, x, y, z);
 	}
 	
-	public static void containerOpened(EntityPlayer player, Block block, Container container, int x, int y, int z) {
+	public static void onContainerOpened(EntityPlayer player, Block block, Container container, int x, int y, int z) {
 		if (!listeners.isEmpty(IContainerListener.class)) {
 			ContainerEvent event = ContainerEvent.Open(player, block, container, x, y, z);
 			((IContainerListener)listeners).onContainerAction(event);
@@ -164,7 +164,7 @@ public class PlayerAPI {
 	 * @param itemStack The items that were dropped.
 	 * @param mouseButton The mouse button that was used: 0 for left, 1 for right.
 	 */
-	public static void itemDropped(EntityPlayer player, ItemStack itemStack, int mouseButton) {
+	public static void onItemDropped(EntityPlayer player, ItemStack itemStack, int mouseButton) {
 		if (!listeners.isEmpty(IDropListener.class)) {
 			DropEvent event;
 			
@@ -183,7 +183,7 @@ public class PlayerAPI {
 	 * @param player The player that ejected the items.
 	 * @param items The items ejected.
 	 */
-	public static void itemEjected(EntityPlayer player, ItemStack items) {
+	public static void onItemEjected(EntityPlayer player, ItemStack items) {
 		if (!listeners.isEmpty(IDropListener.class)) {
 			DropEvent event = DropEvent.Eject(player, items);
         	((IDropListener)listeners).onPlayerItemDrop(event);
@@ -195,49 +195,49 @@ public class PlayerAPI {
 	 * 
 	 * @param player The player that dropped the items.
 	 */
-	public static void itemsDroppedAll(EntityPlayer player) {
+	public static void onItemsDroppedAll(EntityPlayer player) {
 		if (!listeners.isEmpty(IDropListener.class)) {
 			DropEvent event = DropEvent.All(player);
         	((IDropListener)listeners).onPlayerItemDrop(event);
 		}
 	}
 	
-	public static void itemTransfered(EntityPlayer player, Container container, int slotId, ItemStack original) {
+	public static void onItemTransfered(EntityPlayer player, Container container, int slotId, ItemStack original) {
 		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Transfer(player, container, slotId, original);
         	((ISlotListener)listeners).onSlotAction(event);
 		}
 	}
 	
-	public static void itemAddedToSlot(EntityPlayer player, Container container, Slot clickedSlot, int quantity) {
+	public static void onItemAddedToSlot(EntityPlayer player, Container container, Slot clickedSlot, int quantity) {
 		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Add(player, container, clickedSlot, quantity);
         	((ISlotListener)listeners).onSlotAction(event);
 		}
 	}
 	
-	public static void itemRemovedFromSlot(EntityPlayer player, Container container, Slot clickedSlot, int quantity) {
+	public static void onItemRemovedFromSlot(EntityPlayer player, Container container, Slot clickedSlot, int quantity) {
 		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Remove(player, container, clickedSlot, quantity);
         	((ISlotListener)listeners).onSlotAction(event);
 		}
 	}
 	
-	public static void itemSwitchedWithSlot(EntityPlayer player, Container container, Slot clickedSlot) {
+	public static void onItemSwitchedWithSlot(EntityPlayer player, Container container, Slot clickedSlot) {
 		if (!listeners.isEmpty(ISlotListener.class)) {
         	SlotEvent event = SlotEvent.Switch(player, container, clickedSlot);
         	((ISlotListener)listeners).onSlotAction(event);
 		}
 	}
 	
-	public static void login(EntityPlayer player) {
+	public static void onLogin(EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.Login(player);
         	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
 		}
 	}
 	
-	public static void logout(EntityPlayer player) {
+	public static void onLogout(EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.Logout(player);
         	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
@@ -248,7 +248,7 @@ public class PlayerAPI {
 	 * @param oldPlayerInstance The old instance of {@link EntityPlayer} that is being recreated.
 	 * @return The position the player should respawn at, if set by a mod. <code>null</code> otherwise.
 	 */
-	public static RespawnPosition handleRespawn(EntityPlayer oldPlayerInstance) {
+	public static RespawnPosition onHandleRespawn(EntityPlayer oldPlayerInstance) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.Respawn(oldPlayerInstance);
         	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
@@ -258,7 +258,7 @@ public class PlayerAPI {
 		return null;
 	}
 	
-	public static boolean isPvPEnabled(EntityPlayer player) {
+	public static boolean onCheckPvPEnabled(EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.CheckMetadata(player, METADATA.IS_PVP);
         	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
@@ -270,14 +270,14 @@ public class PlayerAPI {
 		return MinecraftServer.getServer().isPVPEnabled();
 	}
 	
-	public static void readFromNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
+	public static void onReadFromNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.ReadFromNBT(player, nbtTagCompound);
         	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
 		}
 	}
 	
-	public static void writeToNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
+	public static void onWriteToNBT(EntityPlayer player, NBTTagCompound nbtTagCompound) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.WriteToNBT(player, nbtTagCompound);
         	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);

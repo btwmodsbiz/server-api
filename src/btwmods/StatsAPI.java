@@ -131,7 +131,7 @@ public class StatsAPI {
 		}
 	}
 
-	public static void startTick(int tickCounter) {
+	public static void onStartTick(int tickCounter) {
 		if (!isInitialized)
 			return;
 		
@@ -144,7 +144,7 @@ public class StatsAPI {
 		measurements.setEnabled(StatsProcessor.isRunning() && detailedMeasurementsEnabled);
 	}
 
-	public static void endTick() {
+	public static void onEndTick() {
 		if (!isInitialized)
 			return;
 		
@@ -202,7 +202,7 @@ public class StatsAPI {
 		measurements.record(measurement);
 	}
 	
-	public static void recordNetworkIO(NetworkType type, int bytes) {
+	public static void onRecordNetworkIO(NetworkType type, int bytes) {
 		recordNetworkIO(type, bytes, null);
 	}
 	
