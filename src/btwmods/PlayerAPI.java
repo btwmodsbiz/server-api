@@ -84,7 +84,22 @@ public class PlayerAPI {
 			containerOpened(player, block, player.craftingInventory, x, y, z);
 		}
 	}
-	
+
+	/**
+	 * Asks all mods if the attempt should be allowed. Mods can only say that it's not allowed.
+	 * 
+	 * @param itemStack The item being placed.
+	 * @param player The player making the attempt.
+	 * @param world The world in which the attempt is taking place.
+	 * @param x The X coordinate where the item is being placed.
+	 * @param y The Y coordinate where the item is being placed.
+	 * @param z The Z coordinate where the item is being placed.
+	 * @param direction The direction the player is facing.
+	 * @param xOffset The X offset the player is from where the item is being placed.
+	 * @param yOffset The Y offset the player is from where the item is being placed.
+	 * @param zOffset The Z offset the player is from where the item is being placed.
+	 * @return true is the attempt should be allowed; false otherwise.
+	 */
 	public static boolean blockPlaceAttempt(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
 			PlayerBlockEvent event = PlayerBlockEvent.PlaceAttempt(player, itemStack, x, y, z, direction, xOffset, yOffset, zOffset);
@@ -94,7 +109,7 @@ public class PlayerAPI {
 				return false;
 		}
 		
-		return itemStack.tryPlaceItemIntoWorld(player, world, x, y, z, direction, xOffset, yOffset, zOffset);
+		return true;
 	}
 	
 	public static void blockRemoved(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
