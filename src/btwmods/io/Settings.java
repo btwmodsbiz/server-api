@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Settings {
 	
@@ -63,6 +65,7 @@ public class Settings {
 	
 	private final Map<String, String> settings = new LinkedHashMap<String, String>();
 	private final Map<String, String> lowercaseLookup = new LinkedHashMap<String, String>();
+	private final Map<String, Set<String>> sectionKeys = new LinkedHashMap<String, Set<String>>();
 	
 	public Map getSettings() {
 		return Collections.unmodifiableMap(settings);
@@ -168,6 +171,14 @@ public class Settings {
 		return lookupKey == null ? null : settings.get(lookupKey);
 	}
 	
+	public Set<String> getSections() {
+		return sectionKeys.keySet();
+	}
+	
+	public Set<String> getSectionKeys(String section) {
+		return sectionKeys.containsKey(section) ? sectionKeys.get(section) : null;
+	}
+	
 	public void setBoolean(String key, boolean value) {
 		set(key, value ? "yes" : "no");
 	}
@@ -197,14 +208,19 @@ public class Settings {
 	}
 	
 	public void set(String section, String key, String value) {
-		if (section != null)
-			key = "[" + section + "]" + key;
+		String fullKey = section == null ? key : "[" + section + "]" + key;
 		
-		String lookupKey = lowercaseLookup.get(key.toLowerCase());
+		String lookupKey = lowercaseLookup.get(fullKey.toLowerCase());
 		if (lookupKey == null)
-			lowercaseLookup.put(lookupKey = key.toLowerCase(), key);
+			lowercaseLookup.put(lookupKey = fullKey.toLowerCase(), fullKey);
 		
-		settings.put(key, value);
+		Set<String> sectionSet = sectionKeys.get(section);
+		if (sectionSet == null)
+			sectionKeys.put(section, new LinkedHashSet<String>());
+		
+		sectionKeys.get(section).add(key);
+		
+		settings.put(fullKey, value);
 	}
 	
 	public void writeSettings(File file) throws IOException {
