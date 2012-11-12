@@ -31,7 +31,7 @@ import net.minecraft.src.Slot;
 import net.minecraft.src.World;
 
 public class PlayerAPI {
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IPlayerInstanceListener.class, IPlayerBlockListener.class, ISlotListener.class,
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IPlayerActionListener.class, IPlayerInstanceListener.class, IPlayerBlockListener.class, ISlotListener.class,
 			IContainerListener.class, IDropListener.class }, new PlayerEventInvocationWrapper());
 	
 	private PlayerAPI() {}
