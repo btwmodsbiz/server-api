@@ -1,3 +1,57 @@
+Version 4.33.1 (vMC 1.4.2 BTW 4.33)
+
+  - Added a block removal check to PlayerAPI so that mods can mark if a removal is not allowed.
+
+  - Added block explosion handling to WorldAPI.
+
+  - Added entity use (attacking or interacting with) handling to PlayerAPI.
+  
+  - Added set methods to Settings, which is no longer read only after being initialized.
+  
+  - Added helper methods to Settings for loading from a String and writing to a File or String.
+  
+  - Added methods to Settings to get section names and also keys by section name.
+  
+  - Added Kevin Dolan's IntervalTree package to btwmods.util.intervals for future use.
+  
+  - Added proper checks to ModLoader for the directory ("./btwmods") where mods and
+    settings are stored.
+  
+  - Added limit to the number of times error log writing failure messages will appear
+    before the error log is disabled.
+
+  - Changed (renamed) PlayerActionEvent's Attack method AttackedByPlayer and changed it to
+    just include the entity and player related to the event.
+
+  - Changed methods in Settings so the key is no longer case sensitive.
+  
+  - Changed ModLoader's outputInfo/Error methods to also log to a BTW-specific log.
+    Set using the errorLog setting in btwmods/BTWMods.txt
+    
+  - Changed (renamed and refactored) many player-specific event classes/interfaces
+    to be more clear on their use.
+    
+  - Changed (renamed) all event interface methods to use a 'onXXXXX' name format.
+  
+  - Changed getName() in IMod to not declare thrown Exceptions.
+  
+  - Changed PlayerAPI#blockPlaceAttempt to only return if a placement should be
+    allowed or not, and not handle the placement itself.
+    
+  - Changed PlayerAPI's blockActivationAttempt method to handle better.
+  
+  - Changed (renamed) methods in NetworkAPI, PlayerAPI, ServerAPI, StatsAPI and WorldAPI
+    to use a onXXXXX name format.
+  
+  - Fixed bug in PlayerBlockEventBase where assignment was missing.
+  
+  - Fixed bug in PlayerAPI where block was activated even if a mod handled it.
+  
+  - Fixed bug in PlayerAPI where blockPlaceAttempt() was not returning false only
+    if a mod marked the attempt as not allowed.
+
+  - Fixed bug with PlayerAPI where it was not handling IPlayerActionListener events.
+
 Version 4.33.0 (vMC 1.4.2 BTW 4.33)
 
   - Updated to BTW 4.33.
