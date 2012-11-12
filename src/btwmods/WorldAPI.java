@@ -8,6 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkProviderServer;
+import net.minecraft.src.Entity;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityTracker;
 import net.minecraft.src.ItemStack;
@@ -92,6 +93,22 @@ public class WorldAPI {
 	public static void blockBroken(World world, Chunk chunk, Block block, int x, int y, int z, @SuppressWarnings("unused") int blockID, int blockMetadata) {
 		BlockEvent event = BlockEvent.Broken(world, chunk, block, blockMetadata, x, y, z);
 		((IBlockListener)listeners).onBlockAction(event);
+	}
+
+	public static boolean onBlockExplodeAttempt(World world, int blockId, int x, int y, int z) {
+		if (!listeners.isEmpty(IBlockListener.class)) {
+			BlockEvent event = BlockEvent.Exploded(world, blockId, x, y, z);
+			((IBlockListener)listeners).onBlockAction(event);
+			
+			if (!event.isAllowed())
+				return false;
+		}
+		
+		return true;
+	}
+
+	public static boolean onEntityExplodeAttempt(World worldObj, Entity var31) {
+		return false;
 	}
 	
 	public static void sendEntityEquipmentUpdate(EntityLiving entity) {
