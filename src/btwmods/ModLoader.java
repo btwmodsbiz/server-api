@@ -30,11 +30,16 @@ import btwmods.io.Settings;
 public class ModLoader {
 	
 	private ModLoader() {}
+	
+	/**
+	 * Location of settings and mods.
+	 */
+	private static File btwmodsDir = new File(new File("."), "btwmods");
 
 	/**
 	 * Settings used by ModLoader.
 	 */
-	private static File errorLog = new File(new File("."), "btwmods/errors.log");
+	private static File errorLog = null;
 
 	/**
 	 * Settings used by ModLoader.
@@ -128,6 +133,27 @@ public class ModLoader {
 			
 			outputInfo("Version " + VERSION + " initializing...");
 			
+			// Make the BTWMods mod and settings directory if it does not exist.
+			if (!btwmodsDir.exists()) {
+				if (!btwmodsDir.mkdir()) {
+					outputError("Failed to create the '" + btwmodsDir.getName() + "' folder at: " + btwmodsDir.getPath(), Level.SEVERE);
+					outputError("Initialization aborted.", Level.SEVERE);
+					hasInit = true;
+					return;
+				}
+			}
+			
+			// Fail if the BTWMods mod and settings directory is not a directory.
+			if (!btwmodsDir.isDirectory()) {
+				outputError("The '" + btwmodsDir.getName() + "' directory does not exist or is not a directory: " + btwmodsDir.getPath(), Level.SEVERE);
+				outputError("Initialization aborted.", Level.SEVERE);
+				hasInit = true;
+				return;
+			}
+			
+			// Set the error log file.
+			errorLog = new File(btwmodsDir, "errors.log");
+			
 			// Attempt to get the URLClassLoader and its private addURL() method.
 			if (classLoader == null) {
 				classLoader = ModLoader.class.getClassLoader();
@@ -154,8 +180,10 @@ public class ModLoader {
 			}
 			
 			// Check that the error log is a valid path to write to.
-			if (errorLog.exists() && !errorLog.isFile()) {
-				outputError("The BTWMods errorLog exists but is not a file: " + errorLog, Level.SEVERE);
+			if (errorLog != null && errorLog.exists() && !errorLog.isFile()) {
+				String errorLogPath = errorLog.getPath();
+				errorLog = null;
+				outputError("The BTWMods errorLog exists but is not a file: " + errorLogPath, Level.SEVERE);
 			}
 
 			try {
@@ -217,7 +245,7 @@ public class ModLoader {
 			}
 			
 			findModsInClassPath();
-			findModsInFolder(new File(".", "btwmods"));
+			findModsInFolder(btwmodsDir);
 
 			outputInfo("Initialization complete.");
 		}
@@ -290,10 +318,6 @@ public class ModLoader {
 	}
 	
 	private static void findModsInFolder(File modsDir) {
-		if (!modsDir.exists()) {
-			modsDir.mkdir();
-		}
-		
 		if (modsDir.isDirectory()) {
 			
 			// Get a list of mod folders/files. The contents of these folders/files should be in package format.
@@ -449,7 +473,7 @@ public class ModLoader {
 	}
 	
 	private static Settings loadSettings(String name) {
-		File settingsFile = new File(new File("."), "btwmods/" + name + ".txt");
+		File settingsFile = new File(btwmodsDir, name + ".txt");
 		
 		if (settingsFile.isFile()) {
 			try {
