@@ -40,6 +40,16 @@ public class ModLoader {
 	 * Settings used by ModLoader.
 	 */
 	private static File errorLog = null;
+	
+	/**
+	 * Counter of times writing to the error log has failed, so it can be disabled if too many happen.
+	 */
+	private static int errorLogWriteFails = 0;
+	
+	/**
+	 * Counter of times writing to the error log has failed, so it can be disabled if too many happen.
+	 */
+	private final static int errorLogWriteFailsMax = 20;
 
 	/**
 	 * Settings used by ModLoader.
@@ -543,9 +553,18 @@ public class ModLoader {
 				writer = new BufferedWriter(new FileWriter(errorLog, true));
 				writer.write(message);
 				writer.newLine();
+				
+				if (errorLogWriteFails > 0)
+					errorLogWriteFails--;
 			}
 			catch (IOException e) {
 				MinecraftServer.logger.severe(LOGPREFIX + "Failed to write to the errorLog: " + e.getMessage());
+				errorLogWriteFails++;
+				
+				if (errorLogWriteFails >= errorLogWriteFailsMax) {
+					errorLog = null;
+					MinecraftServer.logger.severe(LOGPREFIX + "Failed to write to the errorLog " + errorLogWriteFails + " times. Disabled logging to error file.");
+				}
 			}
 			finally {
 				try {
