@@ -35,14 +35,22 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 		event.setCoordinates(x, y, z);
 		return event;
 	}
+
+	public static PlayerBlockEvent RemoveAttempt(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.REMOVE_ATTEMPT, player);
+		event.block = block;
+		event.metadata = metadata;
+		event.setCoordinates(x, y, z);
+		return event;
+	}
 	
-	public enum TYPE { ACTIVATED, ACTIVATION_ATTEMPT, PLACE_ATTEMPT };
+	public enum TYPE { ACTIVATED, ACTIVATION_ATTEMPT, PLACE_ATTEMPT, REMOVE_ATTEMPT };
 	
 	private TYPE type;
 	private boolean isHandled = false;
 	private boolean isAllowed = true;
 
-	protected ItemStack itemStack;
+	protected ItemStack itemStack = null;
 	protected int direction = -1;
 	protected float xOffset = -1F;
 	protected float yOffset = -1F;
@@ -53,7 +61,7 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 	}
 	
 	public boolean isHandled() {
-		return (type == TYPE.ACTIVATION_ATTEMPT || type == TYPE.PLACE_ATTEMPT) && isHandled;
+		return (type == TYPE.ACTIVATION_ATTEMPT || type == TYPE.PLACE_ATTEMPT || type == TYPE.REMOVE_ATTEMPT) && isHandled;
 	}
 	
 	public void markHandled() {

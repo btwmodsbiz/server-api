@@ -118,6 +118,30 @@ public class PlayerAPI {
 			((IContainerListener)listeners).onContainerAction(event);
 		}
 	}
+
+	/**
+	 * Asks all mods if the attempt should be allowed. Mods can only say that it's not allowed.
+	 * 
+	 * @param player The player making the attempt.
+	 * @param world The world in which the attempt is taking place.
+	 * @param block The block being removed.
+	 * @param metadata The block's metadata.
+	 * @param x The block X coordinate.
+	 * @param y The block Y coordinate.
+	 * @param z The block Z coordinate.
+	 * @return true if the attempt should be allowed; false otherwise.
+	 */
+	public static boolean blockRemoveAttempt(EntityPlayer player, World world, Block block, int metadata, int x, int y, int z) {
+		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
+			PlayerBlockEvent event = PlayerBlockEvent.RemoveAttempt(player, block, metadata, x, y, z);
+			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
+
+			if (!event.isAllowed())
+				return false;
+		}
+		
+		return true;
+	}
 	
 	@SuppressWarnings("unused")
 	public static void containerPlaced(EntityPlayer player, Container container, World world, int x, int y, int z) {
