@@ -90,8 +90,8 @@ public class PlayerAPI {
 			PlayerBlockEvent event = PlayerBlockEvent.PlaceAttempt(player, itemStack, x, y, z, direction, xOffset, yOffset, zOffset);
 			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
 			
-			if (event.isHandled())
-				return event.isAllowed();
+			if (!event.isAllowed())
+				return false;
 		}
 		
 		return itemStack.tryPlaceItemIntoWorld(player, world, x, y, z, direction, xOffset, yOffset, zOffset);
