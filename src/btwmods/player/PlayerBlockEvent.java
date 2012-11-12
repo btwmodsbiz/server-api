@@ -66,7 +66,6 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 	
 	public void markNotAllowed() {
 		isAllowed = false;
-		markHandled();
 	}
 	
 	public int getDirection() {
