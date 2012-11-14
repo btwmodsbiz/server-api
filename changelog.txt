@@ -1,3 +1,11 @@
+Version 4.34.0 (vMC 1.4.2 BTW 4.34)
+
+  - Updated to BTW 4.34.
+  
+  - Changed ServerAPI's event dispatcher to not incorrectly use PlayerEventInvocationWrapper.
+  
+  - Fixed bug where WorldAPI's event dispatcher was not handling IEntityListener.
+
 Version 4.33.1 (vMC 1.4.2 BTW 4.33)
 
   - Added a block removal check to PlayerAPI so that mods can mark if a removal is not allowed.
