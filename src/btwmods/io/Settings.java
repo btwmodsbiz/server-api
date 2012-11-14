@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -65,11 +64,9 @@ public class Settings {
 	
 	private final Map<String, String> settings = new LinkedHashMap<String, String>();
 	private final Map<String, String> lowercaseLookup = new LinkedHashMap<String, String>();
-	private final Map<String, Set<String>> sectionKeys = new LinkedHashMap<String, Set<String>>();
 	
-	public Map getSettings() {
-		return Collections.unmodifiableMap(settings);
-	}
+	private final Map<String, Set<String>> sectionKeys = new LinkedHashMap<String, Set<String>>();
+	private final Map<String, String> sectionCaseLookup = new LinkedHashMap<String, String>();
 	
 	public boolean isBoolean(String key) {
 		return isBoolean(null, key);
@@ -80,8 +77,8 @@ public class Settings {
 			key = "[" + section + "]" + key;
 		
 		if (hasKey(key)) {
-			String setting = get(key).trim().toLowerCase();
-			return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true")|| setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on")
+			String setting = get(key).trim();
+			return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on")
 					 || setting.equalsIgnoreCase("no") || setting.equalsIgnoreCase("false") || setting.equalsIgnoreCase("0") || setting.equalsIgnoreCase("off");
 		}
 		return false;
@@ -96,7 +93,7 @@ public class Settings {
 			key = "[" + section + "]" + key;
 		
 		if (!isBoolean(key)) throw new IllegalArgumentException("setting is not a valid boolean. check with isBoolean() first");
-		String setting = get(key).trim().toLowerCase();
+		String setting = get(key).trim();
 		return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on");
 	}
 	
@@ -159,6 +156,10 @@ public class Settings {
 		return lowercaseLookup.containsKey(key.toLowerCase());
 	}
 	
+	public boolean hasSection(String section) {
+		return sectionCaseLookup.containsKey(section == null ? null : section.toLowerCase());
+	}
+	
 	public String get(String key) {
 		return get(null, key);
 	}
@@ -176,7 +177,8 @@ public class Settings {
 	}
 	
 	public Set<String> getSectionKeys(String section) {
-		return sectionKeys.containsKey(section) ? sectionKeys.get(section) : null;
+		section = section == null ? null : section.toLowerCase();
+		return sectionCaseLookup.containsKey(section) ? sectionKeys.get(sectionCaseLookup.get(section)) : null;
 	}
 	
 	public void setBoolean(String key, boolean value) {
@@ -208,19 +210,54 @@ public class Settings {
 	}
 	
 	public void set(String section, String key, String value) {
+		if (section == null)
+			throw new NullPointerException();
+		
+		if (key == null)
+			throw new NullPointerException();
+		
+		if (value == null)
+			throw new NullPointerException();
+		
 		String fullKey = section == null ? key : "[" + section + "]" + key;
 		
-		String lookupKey = lowercaseLookup.get(fullKey.toLowerCase());
-		if (lookupKey == null)
-			lowercaseLookup.put(lookupKey = fullKey.toLowerCase(), fullKey);
+		// Make sure the full key is in the case-insensitive lookup.
+		if (!lowercaseLookup.containsKey(fullKey.toLowerCase()))
+			lowercaseLookup.put(fullKey.toLowerCase(), fullKey);
 		
-		Set<String> sectionSet = sectionKeys.get(section);
-		if (sectionSet == null)
+		// Make sure the section name is in the case-insensitive lookup.
+		if (!sectionCaseLookup.containsKey(section.toLowerCase()))
+			sectionCaseLookup.put(section.toLowerCase(), section);
+		
+		// Make sure we are maintaining a set of keys for the section.
+		if (!sectionKeys.containsKey(section))
 			sectionKeys.put(section, new LinkedHashSet<String>());
 		
+		// Add the key to the section key set.
 		sectionKeys.get(section).add(key);
 		
+		// Add the full key and value.
 		settings.put(fullKey, value);
+	}
+
+	public void removeSection(String section) {
+		Set<String> keys = getSectionKeys(section);
+		if (keys != null) {
+			for (String key : keys)
+				removeKey(section, key);
+		}
+	}
+
+	public void removeKey(String key) {
+		removeKey(null, key);
+	}
+
+	public void removeKey(String section, String key) {
+		if (section != null)
+			key = "[" + section + "]" + key;
+		
+		lowercaseLookup.remove(key.toLowerCase());
+		settings.remove(key);
 	}
 	
 	public void writeSettings(File file) throws IOException {
