@@ -26,7 +26,7 @@ import btwmods.world.IBlockListener;
 import btwmods.world.IEntityListener;
 
 public class WorldAPI {
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IBlockListener.class });
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IBlockListener.class, IEntityListener.class });
 	
 	private static MinecraftServer server;
 	
