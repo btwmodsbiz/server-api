@@ -14,6 +14,12 @@ import java.util.Set;
 
 public class Settings {
 	
+	public static Settings readSavableSettings(File file) throws IOException {
+		Settings settings = readSettings(file);
+		settings.setSaveTarget(file);
+		return settings;
+	}
+	
 	public static Settings readSettings(File file) throws IOException {
 		FileReader reader = null;
 		try {
@@ -67,6 +73,22 @@ public class Settings {
 	
 	private final Map<String, Set<String>> sectionKeys = new LinkedHashMap<String, Set<String>>();
 	private final Map<String, String> sectionCaseLookup = new LinkedHashMap<String, String>();
+	
+	private File saveTarget = null;
+	
+	public Settings() { }
+	
+	public Settings(File saveTarget) {
+		this.saveTarget = saveTarget;
+	}
+	
+	public boolean isSavable() {
+		return saveTarget != null;
+	}
+	
+	public void setSaveTarget(File file) {
+		saveTarget = file;
+	}
 	
 	public boolean isBoolean(String key) {
 		return isBoolean(null, key);
@@ -258,6 +280,13 @@ public class Settings {
 		
 		lowercaseLookup.remove(key.toLowerCase());
 		settings.remove(key);
+	}
+	
+	public void saveSettings() throws IOException, IllegalStateException {
+		if (saveTarget == null)
+			throw new IllegalStateException();
+		
+		writeSettings(saveTarget);
 	}
 	
 	public void writeSettings(File file) throws IOException {
