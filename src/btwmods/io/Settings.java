@@ -52,7 +52,7 @@ public class Settings {
 			
 			if (!line.startsWith("#")) {
 				if (line.trim().startsWith("[") && line.trim().endsWith("]")) {
-					section = line.trim().substring(1, line.trim().length() - 2);
+					section = line.trim().substring(1, line.trim().length() - 1);
 				}
 				else if ((equalsIndex = line.indexOf('=')) >= 0) {
 					settings.set(section, line.substring(0, equalsIndex), line.substring(equalsIndex + 1));
