@@ -35,6 +35,11 @@ public class ModLoader {
 	 * Location of settings and mods.
 	 */
 	private static File modsDir = new File(new File("."), "btwmods");
+	
+	/**
+	 * Location of data saved by mods.
+	 */
+	private static File modDataDir = new File(modsDir, "data");
 
 	/**
 	 * Settings used by ModLoader.
@@ -144,7 +149,7 @@ public class ModLoader {
 			outputInfo("Version " + VERSION + " initializing...");
 			
 			// Make sure required directory exist and are directories.
-			if (!requiredDirectory(modsDir)) {
+			if (!requiredDirectory(modsDir) || !requiredDirectory(modDataDir)) {
 				outputError("Initialization aborted.", Level.SEVERE);
 				hasInit = true;
 				return;
@@ -452,7 +457,7 @@ public class ModLoader {
 				String modName = modInstance.getName();
 				
 				try {
-					modInstance.init(loadModSettings(binaryName));
+					modInstance.init(loadModSettings(binaryName), loadModData(binaryName));
 				}
 				catch (Throwable e) {
 					outputError(e, "Failed (" + e.getClass().getSimpleName() + ") while running init for: " + binaryName);
@@ -488,6 +493,25 @@ public class ModLoader {
 	
 	private static Settings loadModSettings(String binaryName) {
 		return loadSettings(getModPackageName(binaryName));
+	}
+	
+	private static Settings loadData(String name) {
+		File dataFile = new File(modDataDir, name + ".dat");
+		
+		if (dataFile.isFile()) {
+			try {
+				return Settings.readSavableSettings(dataFile);
+			}
+			catch (IOException e) {
+				outputError(e, "Failed (" + e.getClass().getSimpleName() + ") to read the mod data file from " + dataFile.getPath());
+			}
+		}
+		
+		return new Settings(dataFile);
+	}
+	
+	private static Settings loadModData(String binaryName) {
+		return loadData(getModPackageName(binaryName));
 	}
 	
 	public static String getModPackageName(IMod mod) {

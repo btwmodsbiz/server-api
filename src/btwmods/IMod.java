@@ -10,7 +10,7 @@ public interface IMod {
 	 */
 	public String getName();
 	
-	public void init(Settings settings) throws Exception;
+	public void init(Settings settings, Settings data) throws Exception;
 	
 	/**
 	 * Cleanup and remove listeners.
