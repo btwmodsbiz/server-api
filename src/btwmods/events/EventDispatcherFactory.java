@@ -4,9 +4,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -76,7 +76,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 		return (EventDispatcher)dispatcher.proxy;
 	}
 	
-	private Map<Class, Set<IAPIListener>> lookup = new HashMap<Class, Set<IAPIListener>>();
+	private Map<Class, IAPIListener[]> lookup = new HashMap<Class, IAPIListener[]>();
 	private ConcurrentLinkedQueue<QueuedListener> listenerQueue = new ConcurrentLinkedQueue<QueuedListener>();
 	private Class[] listenerClasses;
 	private Object proxy;
@@ -96,22 +96,18 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	 * Creates the lookup entries for the listener classes.
 	 */
 	private void init(Class[] listenerClasses) {
-		for (int i = 0; i < listenerClasses.length; i++) {
-			if ((lookup.get(listenerClasses[i])) == null) {
-				lookup.put(listenerClasses[i], new HashSet<IAPIListener>());
-			}
-		}
+		for (int i = 0; i < listenerClasses.length; i++)
+			lookup.put(listenerClasses[i], null);
 	}
 	
 	public boolean isEmpty(Class listenerClass) {
-		Set<IAPIListener> listeners = listenerClass == null ? null : getListeners(listenerClass);
-		return listeners == null || listeners.size() == 0;
+		return getListeners(listenerClass) == null;
 	}
 	
 	// Note: If any other methods access 'lookup' then they should call processQueue() first.
-	private Set<IAPIListener> getListeners(Class listenerClass) {
+	private IAPIListener[] getListeners(Class listenerClass) {
 		processQueue();
-		return lookup.get(listenerClass);
+		return listenerClass == null ? null : lookup.get(listenerClass);
 	}
 	
 	/**
@@ -136,7 +132,22 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 
 	private boolean addListenerInternal(IAPIListener listener, Class listenerClass) {
-		return getListeners(listenerClass).add(listener);
+		// Create a set so an IAPIListener is not added twice.
+		Set<IAPIListener> listenerSet = new HashSet<IAPIListener>();
+		
+		// Add existing listeners.
+		IAPIListener[] listenerArray = getListeners(listenerClass);
+		if (listenerArray != null)
+			listenerSet.addAll(Arrays.asList(listenerArray));
+		
+		// Attempt to add the listener.
+		boolean added = listenerSet.add(listener);
+		
+		// Recreate the listener array.
+		lookup.put(listenerClass, listenerSet.toArray(new IAPIListener[listenerSet.size()]));
+		
+		// Return if the listener was added.
+		return added;
 	}
 	
 	/**
@@ -178,7 +189,27 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 
 	private boolean removeListenerInternal(IAPIListener listener, Class listenerClass) {
-		return getListeners(listenerClass).remove(listener);
+		// Create a set of IAPIListener.
+		Set<IAPIListener> listenerSet = new HashSet<IAPIListener>();
+		
+		IAPIListener[] listenerArray = getListeners(listenerClass);
+		
+		// Cannot remove from an empty list.
+		if (listenerArray == null)
+			return false;
+
+		// Add existing listeners.
+		listenerSet.addAll(Arrays.asList(listenerArray));
+		
+		// Attempt to remove the listener.
+		boolean removed = listenerSet.remove(listener);
+		
+		// Recreate the listener array if needed.
+		if (removed)
+			lookup.put(listenerClass, listenerSet.size() == 0 ? null : listenerSet.toArray(new IAPIListener[listenerSet.size()]));
+		
+		// Return if the listener was removed.
+		return removed;
 	}
 
 	/**
@@ -267,30 +298,31 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 			ModLoader.processFailureQueue();
 			
 			// Get the listeners for method's declaring class.
-			Iterator<IAPIListener> listeners = getListeners(method.getDeclaringClass()).iterator();
+			IAPIListener[] listeners = getListeners(method.getDeclaringClass());
 			
 			// Execute all the listeners.
-			while (listeners.hasNext()) {
-				IAPIListener listener = listeners.next();
-				
-				try {
-					if (invocationWrapper != null)
-						invocationWrapper.handleInvocation(new Invocation(listener, method, args));
-					else
-						method.invoke(listener, args);
+			if (listeners != null) {
+				for (int i = 0; i < listeners.length; i++) {
 					
-					// Stop processing events if there is an event argument that has flagged for the event handling to stop.
-					if (args.length > 0 && args[0] instanceof IEventInterrupter && ((IEventInterrupter)args[0]).isInterrupted())
-						break;
-				}
-				catch (InvocationTargetException e) {
-					listeners.remove();
-					removeListener(listener);
-					handleListenerFailure(e.getCause(), listener);
-				} catch (Throwable e) {
-					listeners.remove();
-					removeListener(listener);
-					handleListenerFailure(e.getCause(), listener);
+					try {
+						if (invocationWrapper != null)
+							invocationWrapper.handleInvocation(new Invocation(listeners[i], method, args));
+						else
+							method.invoke(listeners[i], args);
+						
+						// Stop processing events if there is an event argument that has flagged for the event handling to stop.
+						if (args.length > 0 && args[0] instanceof IEventInterrupter && ((IEventInterrupter)args[0]).isInterrupted())
+							break;
+					}
+					catch (InvocationTargetException e) {
+						//listeners.remove();
+						removeListener(listeners[i]);
+						handleListenerFailure(e.getCause(), listeners[i]);
+					} catch (Throwable e) {
+						//listeners.remove();
+						removeListener(listeners[i]);
+						handleListenerFailure(e.getCause(), listeners[i]);
+					}
 				}
 			}
 			
