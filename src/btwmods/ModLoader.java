@@ -34,7 +34,7 @@ public class ModLoader {
 	/**
 	 * Location of settings and mods.
 	 */
-	private static File btwmodsDir = new File(new File("."), "btwmods");
+	private static File modsDir = new File(new File("."), "btwmods");
 
 	/**
 	 * Settings used by ModLoader.
@@ -109,7 +109,7 @@ public class ModLoader {
 	private static ConcurrentLinkedQueue<SimpleEntry<Throwable, IAPIListener>> failedListenerQueue = new ConcurrentLinkedQueue<SimpleEntry<Throwable, IAPIListener>>();
 	
 	/**
-	 * File or folder names that will be ignored from the btwmods directory.
+	 * File or directory names that will be ignored from the btwmods directory.
 	 */
 	private static Set<String> ignoredMods = new HashSet<String>();
 	
@@ -143,26 +143,15 @@ public class ModLoader {
 			
 			outputInfo("Version " + VERSION + " initializing...");
 			
-			// Make the BTWMods mod and settings directory if it does not exist.
-			if (!btwmodsDir.exists()) {
-				if (!btwmodsDir.mkdir()) {
-					outputError("Failed to create the '" + btwmodsDir.getName() + "' folder at: " + btwmodsDir.getPath(), Level.SEVERE);
-					outputError("Initialization aborted.", Level.SEVERE);
-					hasInit = true;
-					return;
-				}
-			}
-			
-			// Fail if the BTWMods mod and settings directory is not a directory.
-			if (!btwmodsDir.isDirectory()) {
-				outputError("The '" + btwmodsDir.getName() + "' directory does not exist or is not a directory: " + btwmodsDir.getPath(), Level.SEVERE);
+			// Make sure required directory exist and are directories.
+			if (!requiredDirectory(modsDir)) {
 				outputError("Initialization aborted.", Level.SEVERE);
 				hasInit = true;
 				return;
 			}
 			
 			// Set the error log file.
-			errorLog = new File(btwmodsDir, "errors.log");
+			errorLog = new File(modsDir, "errors.log");
 			
 			// Attempt to get the URLClassLoader and its private addURL() method.
 			if (classLoader == null) {
@@ -255,7 +244,7 @@ public class ModLoader {
 			}
 			
 			findModsInClassPath();
-			findModsInFolder(btwmodsDir);
+			findModsInFolder(modsDir);
 
 			outputInfo("Initialization complete.");
 		}
@@ -483,7 +472,7 @@ public class ModLoader {
 	}
 	
 	private static Settings loadSettings(String name) {
-		File settingsFile = new File(btwmodsDir, name + ".txt");
+		File settingsFile = new File(modsDir, name + ".txt");
 		
 		if (settingsFile.isFile()) {
 			try {
@@ -507,6 +496,24 @@ public class ModLoader {
 	
 	private static String getModPackageName(String binaryName) {
 		return binaryName.replaceAll("^btwmod\\.([^.]+)\\..+$", "$1");
+	}
+	
+	public static boolean requiredDirectory(File dir) {
+		// Make the directory if it does not exist.
+		if (!dir.exists()) {
+			if (!dir.mkdir()) {
+				outputError("Failed to create a required directory at: " + dir.getPath(), Level.SEVERE);
+				return false;
+			}
+		}
+		
+		// Fail if the directory is not a directory.
+		if (!dir.isDirectory()) {
+			outputError("A required directory exists but is not a directory: " + dir.getPath(), Level.SEVERE);
+			return false;
+		}
+		
+		return true;
 	}
 	
 	public static void outputError(String message) {
