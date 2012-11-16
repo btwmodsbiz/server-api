@@ -13,6 +13,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import btwmods.ModLoader;
 
 public class EventDispatcherFactory implements InvocationHandler, EventDispatcher {
+	
+	private static long invocationCount = 0;
+	
+	public static long getInvocationCount() {
+		return invocationCount;
+	}
 
 	private enum QueueAction { ADD, REMOVE };
 	private class QueuedListener {
@@ -288,6 +294,8 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		invocationCount++;
+		
 		Class declaringClass = method.getDeclaringClass();
 		
 		if (declaringClass == EventDispatcher.class) {
