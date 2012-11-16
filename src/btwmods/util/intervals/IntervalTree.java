@@ -114,6 +114,13 @@ public class IntervalTree<Type> {
 		inSync = false;
 	}
 	
+	public void removeByData(Type data) {
+		for (int i = intervalList.size() - 1; i >= 0; i--) {
+			if (intervalList.get(i).getData().equals(data))
+				intervalList.remove(i);
+		}
+	}
+	
 	/**
 	 * Determine whether this interval tree is currently a reflection of all intervals in the interval list
 	 * @return true if no changes have been made since the last build
