@@ -167,6 +167,8 @@ public class StatsAPI {
 			stats.bytesReceived = bytesReceived;
 			stats.bytesSent = bytesSent;
 			
+			stats.handlerInvocations = EventDispatcherFactory.getInvocationCount();
+			
 			stats.worldTickTimes = new long[server.timeOfLastDimensionTick.length];
 			stats.loadedChunks = new int[stats.worldTickTimes.length];
 			stats.id2ChunkMap = new int[stats.worldTickTimes.length];

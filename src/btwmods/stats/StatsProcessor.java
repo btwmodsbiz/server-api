@@ -7,6 +7,7 @@ import net.minecraft.src.ChunkCoordIntPair;
 import btwmods.ModLoader;
 import btwmods.StatsAPI;
 import btwmods.events.EventDispatcher;
+import btwmods.events.EventDispatcherFactory;
 import btwmods.measure.Measurement;
 import btwmods.network.NetworkType;
 import btwmods.stats.data.BasicStats;
@@ -130,6 +131,8 @@ public class StatsProcessor implements Runnable {
 			
 			serverStats.bytesSent = stats.bytesSent;
 			serverStats.bytesReceived = stats.bytesReceived;
+			
+			serverStats.handlerInovcations = stats.handlerInvocations;
 			
 			for (int i = 0; i < worldStats.length; i++) {
 				worldStats[i].worldTickTime.record(stats.worldTickTimes[i]);

@@ -23,4 +23,5 @@ public class QueuedTickStats {
 	public ArrayDeque<Measurement> measurements;
 	public long bytesSent;
 	public long bytesReceived;
+	public long handlerInvocations;
 }

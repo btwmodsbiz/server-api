@@ -16,4 +16,5 @@ public class ServerStats {
 	public long bytesReceived = 0L;
 	public long bytesSentToPlayers = 0L;
 	public long bytesReceivedFromPlayers = 0L;
+	public long handlerInovcations = 0L;
 }
