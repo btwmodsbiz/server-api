@@ -282,9 +282,9 @@ public class Settings {
 		settings.remove(key);
 	}
 	
-	public void saveSettings() throws IOException, IllegalStateException {
+	public void saveSettings() throws IOException {
 		if (saveTarget == null)
-			throw new IllegalStateException();
+			throw new IOException("Save target has not been set");
 		
 		writeSettings(saveTarget);
 	}
