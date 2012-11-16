@@ -262,12 +262,18 @@ public class Settings {
 		settings.put(fullKey, value);
 	}
 
-	public void removeSection(String section) {
-		Set<String> keys = getSectionKeys(section);
-		if (keys != null) {
-			for (String key : keys)
-				removeKey(section, key);
+	public boolean removeSection(String section) {
+		section = section == null ? null : section.toLowerCase();
+		if (sectionCaseLookup.containsKey(section)) {
+			Set<String> keys = sectionKeys.get(sectionCaseLookup.get(section));
+			if (keys != null)
+				for (String key : keys)
+					removeKey(section, key);
+			
+			return true;
 		}
+		
+		return false;
 	}
 
 	public void removeKey(String key) {
