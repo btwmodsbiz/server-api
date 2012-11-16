@@ -232,9 +232,6 @@ public class Settings {
 	}
 	
 	public void set(String section, String key, String value) {
-		if (section == null)
-			throw new NullPointerException();
-		
 		if (key == null)
 			throw new NullPointerException();
 		
@@ -248,7 +245,7 @@ public class Settings {
 			lowercaseLookup.put(fullKey.toLowerCase(), fullKey);
 		
 		// Make sure the section name is in the case-insensitive lookup.
-		if (!sectionCaseLookup.containsKey(section.toLowerCase()))
+		if (section != null && !sectionCaseLookup.containsKey(section.toLowerCase()))
 			sectionCaseLookup.put(section.toLowerCase(), section);
 		
 		// Make sure we are maintaining a set of keys for the section.
@@ -270,6 +267,8 @@ public class Settings {
 				for (String key : keys)
 					removeKey(section, key);
 			
+			sectionCaseLookup.remove(section);
+			sectionKeys.remove(section);
 			return true;
 		}
 		
@@ -340,5 +339,7 @@ public class Settings {
 			
 			writer.newLine();
 		}
+		
+		writer.close();
 	}
 }
