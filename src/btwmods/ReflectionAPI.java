@@ -12,7 +12,6 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import btwmods.io.Settings;
 
@@ -36,20 +35,25 @@ public class ReflectionAPI {
 			lookupDir = new File(settings.get("[reflectionapi]reflectiondir"));
 		}
 		
+		boolean success = true;
+		
 		// Create the lookup if it does not exist.
 		if (lookupDir.exists() && !lookupDir.isDirectory()) {
 			ModLoader.outputError("The lookupDir specified for ReflectionAPI exists and is not a directory.");
+			success = false;
 		}
 		else {
-			if (!lookupDir.exists())
-				lookupDir.mkdir();
-			
-			if (!new File(lookupDir, "classes.txt").exists()) {
-				splitSRG();
+			if (!lookupDir.exists() && !lookupDir.mkdir()) {
+				ModLoader.outputError("The lookupDir specified for ReflectionAPI could not be created.");
+				success = false;
+			}
+			else if (!new File(lookupDir, "classes.txt").exists()) {
+				success = splitSRG();
 			}
 		}
 		
-		loadClassLookup();
+		if (success)
+			loadClassLookup();
 	}
 	
 	public static Field getPrivateField(Class cls, String fieldName) {
@@ -108,7 +112,7 @@ public class ReflectionAPI {
 			}
 		}
 		catch (IOException e) {
-			ModLoader.outputError(e, "ReflectionAPI threw an exception (" + e.getClass().getSimpleName() + ") while reading the class lookup for '" + cls.getName() + "': " + e.getMessage(), Level.SEVERE);
+			ModLoader.outputError(e, "ReflectionAPI threw an exception (" + e.getClass().getSimpleName() + ") while reading the class lookup for '" + cls.getName() + "': " + e.getMessage());
 		}
 		finally {
 			if (reader != null) {
@@ -169,7 +173,7 @@ public class ReflectionAPI {
 				}
 			}
 			catch (IOException e) {
-				ModLoader.outputError(e, "ReflectionAPI threw an exception (" + e.getClass().getSimpleName() + ") while reading the classes lookup: " + e.getMessage(), Level.SEVERE);
+				ModLoader.outputError(e, "ReflectionAPI threw an exception (" + e.getClass().getSimpleName() + ") while reading the classes lookup: " + e.getMessage());
 				return;
 			}
 			finally {
@@ -192,7 +196,7 @@ public class ReflectionAPI {
 		InputStream resourceStream = ReflectionAPI.class.getClassLoader().getResourceAsStream(srgResource);
 		
 		if (resourceStream == null) {
-			ModLoader.outputError("ReflectionAPI could not load the reobfuscation SRG.", Level.SEVERE);
+			ModLoader.outputError("ReflectionAPI could not load the reobfuscation SRG.");
 			return false;
 		}
 		
@@ -269,7 +273,7 @@ public class ReflectionAPI {
 			classLookup.newLine();
 
 		} catch (IOException e) {
-			ModLoader.outputError(e, "ReflectionAPI threw an exception (" + e.getClass().getSimpleName() + ") while reading the SRG :" + e.getMessage(), Level.SEVERE);
+			ModLoader.outputError(e, "ReflectionAPI threw an exception (" + e.getClass().getSimpleName() + ") while reading the SRG :" + e.getMessage());
 			return false;
 		}
 		finally {
