@@ -83,7 +83,7 @@ public class PlayerAPI {
 		}
 
 		if (block instanceof BlockContainer) {
-			onContainerOpened(player, block, player.craftingInventory, x, y, z);
+			onContainerOpened(player, block, player.openContainer, x, y, z);
 		}
 	}
 
