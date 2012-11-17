@@ -31,7 +31,7 @@ public class Zones<Type> {
 					if (intervals == null)
 						intervalsByRegion.put(coords, intervals = new IntervalTree<Area<Type>>());
 					
-					intervals.addInterval(area.x1, area.x2, area);
+					intervals.addInterval(area.x1 - 1, area.x2 + 1, area);
 				}
 			}
 		}
