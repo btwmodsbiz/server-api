@@ -12,6 +12,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import btwmods.util.CaselessKey;
+
 public class Settings {
 	
 	public static Settings readSavableSettings(File file) throws IOException {
@@ -68,11 +70,8 @@ public class Settings {
 		return settings;
 	}
 	
-	private final Map<String, String> settings = new LinkedHashMap<String, String>();
-	private final Map<String, String> lowercaseLookup = new LinkedHashMap<String, String>();
-	
-	private final Map<String, Set<String>> sectionKeys = new LinkedHashMap<String, Set<String>>();
-	private final Map<String, String> sectionCaseLookup = new LinkedHashMap<String, String>();
+	private final Map<SectionKeyPair, String> settings = new LinkedHashMap<SectionKeyPair, String>();
+	private final Map<CaselessKey, Set<CaselessKey>> sectionKeys = new LinkedHashMap<CaselessKey, Set<CaselessKey>>();
 	
 	private File saveTarget = null;
 	
@@ -172,14 +171,11 @@ public class Settings {
 	}
 	
 	public boolean hasKey(String section, String key) {
-		if (section != null)
-			key = "[" + section + "]" + key;
-		
-		return lowercaseLookup.containsKey(key.toLowerCase());
+		return settings.containsKey(new SectionKeyPair(section, key));
 	}
 	
 	public boolean hasSection(String section) {
-		return sectionCaseLookup.containsKey(section == null ? null : section.toLowerCase());
+		return sectionKeys.containsKey(section);
 	}
 	
 	public String get(String key) {
@@ -187,20 +183,15 @@ public class Settings {
 	}
 	
 	public String get(String section, String key) {
-		if (section != null)
-			key = "[" + section + "]" + key;
-		
-		String lookupKey = lowercaseLookup.get(key.toLowerCase());
-		return lookupKey == null ? null : settings.get(lookupKey);
+		return settings.get(new SectionKeyPair(section, key));
 	}
 	
-	public Set<String> getSections() {
+	public Set<CaselessKey> getSections() {
 		return sectionKeys.keySet();
 	}
 	
-	public Set<String> getSectionKeys(String section) {
-		section = section == null ? null : section.toLowerCase();
-		return sectionCaseLookup.containsKey(section) ? sectionKeys.get(sectionCaseLookup.get(section)) : null;
+	public Set<CaselessKey> getSectionKeys(String section) {
+		return sectionKeys.get(section);
 	}
 	
 	public void setBoolean(String key, boolean value) {
@@ -238,36 +229,25 @@ public class Settings {
 		if (value == null)
 			throw new NullPointerException();
 		
-		String fullKey = section == null ? key : "[" + section + "]" + key;
-		
-		// Make sure the full key is in the case-insensitive lookup.
-		if (!lowercaseLookup.containsKey(fullKey.toLowerCase()))
-			lowercaseLookup.put(fullKey.toLowerCase(), fullKey);
-		
-		// Make sure the section name is in the case-insensitive lookup.
-		if (section != null && !sectionCaseLookup.containsKey(section.toLowerCase()))
-			sectionCaseLookup.put(section.toLowerCase(), section);
-		
 		// Make sure we are maintaining a set of keys for the section.
-		if (!sectionKeys.containsKey(section))
-			sectionKeys.put(section, new LinkedHashSet<String>());
+		Set<CaselessKey> keys = sectionKeys.get(section);
+		if (section == null)
+			sectionKeys.put(section == null ? null : new CaselessKey(section), keys = new LinkedHashSet<CaselessKey>());
 		
 		// Add the key to the section key set.
-		sectionKeys.get(section).add(key);
+		keys.add(new CaselessKey(key));
 		
-		// Add the full key and value.
-		settings.put(fullKey, value);
+		// Add the section, key and value.
+		settings.put(new SectionKeyPair(section, key), value);
 	}
 
 	public boolean removeSection(String section) {
-		section = section == null ? null : section.toLowerCase();
-		if (sectionCaseLookup.containsKey(section)) {
-			Set<String> keys = sectionKeys.get(sectionCaseLookup.get(section));
+		if (sectionKeys.containsKey(section)) {
+			Set<CaselessKey> keys = sectionKeys.get(section);
 			if (keys != null)
-				for (String key : keys)
-					removeKey(section, key);
+				for (CaselessKey key : keys)
+					removeKey(section, key.key);
 			
-			sectionCaseLookup.remove(section);
 			sectionKeys.remove(section);
 			return true;
 		}
@@ -280,11 +260,10 @@ public class Settings {
 	}
 
 	public void removeKey(String section, String key) {
-		if (section != null)
-			key = "[" + section + "]" + key;
+		settings.remove(new SectionKeyPair(section, key));
 		
-		lowercaseLookup.remove(key.toLowerCase());
-		settings.remove(key);
+		Set<CaselessKey> keys = sectionKeys.get(section);
+		if (keys != null) keys.remove(key);
 	}
 	
 	public void saveSettings() throws IOException {
@@ -301,15 +280,9 @@ public class Settings {
 	public void writeSettings(BufferedWriter writer) throws IOException {
 		Map<String, Map<String, String>> sections = new LinkedHashMap<String, Map<String, String>>();
 		
-		for (Map.Entry<String, String> entry : settings.entrySet()) {
-			String section = null;
-			String key = entry.getKey();
-			
-			if (key.startsWith("[")) {
-				int endSectionIndex = key.indexOf(']', 1);
-				section = key.substring(1, endSectionIndex);
-				key = key.substring(endSectionIndex + 1);
-			}
+		for (Map.Entry<SectionKeyPair, String> entry : settings.entrySet()) {
+			String section = entry.getKey().section;
+			String key = entry.getKey().key;
 			
 			if (!sections.containsKey(section)) {
 				sections.put(section, new LinkedHashMap<String, String>());
@@ -341,5 +314,24 @@ public class Settings {
 		}
 		
 		writer.close();
+	}
+	
+	private static class SectionKeyPair {
+		public final String section;
+		public final String key;
+		
+		public SectionKeyPair(String section, String key) {
+			this.section = section;
+			this.key = key;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + key.toLowerCase().hashCode();
+			result = prime * result + ((section == null) ? 0 : section.toLowerCase().hashCode());
+			return result;
+		}
 	}
 }
