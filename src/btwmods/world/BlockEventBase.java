@@ -17,9 +17,10 @@ public abstract class BlockEventBase extends EventObject {
 	protected Block block = null;
 	protected int metadata = -1;
 	
-	private int x = -1;
-	private int y = -1;
-	private int z = -1;
+	private int x = 0;
+	private int y = 0;
+	private int z = 0;
+	private boolean coordsSet = false;
 	
 	private boolean checkedTileEntity = false;
 	protected TileEntity tileEntity = null;
@@ -62,15 +63,14 @@ public abstract class BlockEventBase extends EventObject {
 	}
 	
 	protected void setCoordinates(int x, int y, int z) {
-		if (x >= 0 && y >= 0 && z >= 0) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		coordsSet = true;
 	}
 	
 	public boolean hasCoordinatesSet() {
-		return x >= 0;
+		return coordsSet;
 	}
 	
 	public TileEntity getTileEntity() {
