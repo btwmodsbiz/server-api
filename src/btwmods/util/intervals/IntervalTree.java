@@ -116,8 +116,10 @@ public class IntervalTree<Type> {
 	
 	public void removeByData(Type data) {
 		for (int i = intervalList.size() - 1; i >= 0; i--) {
-			if (intervalList.get(i).getData().equals(data))
+			if (intervalList.get(i).getData() == data) {
 				intervalList.remove(i);
+				inSync = false;
+			}
 		}
 	}
 	
