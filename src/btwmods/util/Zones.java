@@ -10,14 +10,14 @@ import java.util.Set;
 import net.minecraft.src.ChunkCoordIntPair;
 import btwmods.util.intervals.IntervalTree;
 
-public class Zones {
+public class Zones<Type> {
 
 	private boolean hasAreas = false;
 	
-	private Set<Area> areas = new HashSet<Area>();
-	private Map<ChunkCoordIntPair, IntervalTree<Area>> intervalsByRegion = new HashMap<ChunkCoordIntPair, IntervalTree<Area>>();
+	private Set<Area<Type>> areas = new HashSet<Area<Type>>();
+	private Map<ChunkCoordIntPair, IntervalTree<Area<Type>>> intervalsByRegion = new HashMap<ChunkCoordIntPair, IntervalTree<Area<Type>>>();
 	
-	public boolean add(Area area) {
+	public boolean add(Area<Type> area) {
 		boolean added = areas.add(area);
 		
 		if (added) {
@@ -27,9 +27,9 @@ public class Zones {
 					
 					ChunkCoordIntPair coords = new ChunkCoordIntPair(regionX, regionZ);
 					
-					IntervalTree<Area> intervals = intervalsByRegion.get(coords);
+					IntervalTree<Area<Type>> intervals = intervalsByRegion.get(coords);
 					if (intervals == null)
-						intervalsByRegion.put(coords, intervals = new IntervalTree<Area>());
+						intervalsByRegion.put(coords, intervals = new IntervalTree<Area<Type>>());
 					
 					intervals.addInterval(area.x1, area.x2, area);
 				}
@@ -43,7 +43,7 @@ public class Zones {
 		return added;
 	}
 	
-	public boolean remove(Area area) {
+	public boolean remove(Area<Type> area) {
 		boolean removed = areas.remove(area);
 		if (removed) {
 			for (int regionX = area.x1 >> 9; regionX <= area.x2 >> 9; regionX++) {
@@ -51,7 +51,7 @@ public class Zones {
 
 					ChunkCoordIntPair coords = new ChunkCoordIntPair(regionX, regionZ);
 					
-					IntervalTree<Area> intervals = intervalsByRegion.get(coords);
+					IntervalTree<Area<Type>> intervals = intervalsByRegion.get(coords);
 					if (intervals != null)
 						intervals.removeByData(area);
 				}
@@ -65,28 +65,28 @@ public class Zones {
 		return removed;
 	}
 	
-	public List<Area> get(int x, int z) {
+	public List<Area<Type>> get(int x, int z) {
 		return get(x, 0, z, false);
 	}
 	
-	public List<Area> get(int x, int y, int z) {
+	public List<Area<Type>> get(int x, int y, int z) {
 		return get(x, y, z, true);
 	}
 	
-	private List<Area> get(int x, int y, int z, boolean checkY) {
-		ArrayList<Area> areas = new ArrayList<Area>();
+	private List<Area<Type>> get(int x, int y, int z, boolean checkY) {
+		ArrayList<Area<Type>> areas = new ArrayList<Area<Type>>();
 		
 		if (hasAreas) {
 			// Get areas for the region the X and Z are in.
 			IntervalTree tree = intervalsByRegion.get(new ChunkCoordIntPair(x >> 9, z >> 9));
 			
 			if (tree != null) {
-				List<Area> intervalAreas = tree.get(x);
+				List<Area<Type>> intervalAreas = tree.get(x);
 				int size = intervalAreas.size();
 				
 				// Check all the areas that matched X.
 				for (int i = 0; i < size; i++) {
-					Area area = intervalAreas.get(0);
+					Area<Type> area = intervalAreas.get(0);
 					
 					// Check if the Z matches.
 					if (z >= area.z1 && z <= area.z2) {
