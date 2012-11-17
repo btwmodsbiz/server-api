@@ -194,6 +194,21 @@ public class Settings {
 		return sectionKeys.get(section);
 	}
 	
+	public Settings getSectionAsSettings(String section) {
+		if (sectionKeys.containsKey(section)) {
+			Settings settings = new Settings();
+			
+			Set<CaselessKey> keys = sectionKeys.get(section);
+			if (keys != null)
+				for (CaselessKey key : keys)
+					settings.set(key.key, get(section, key.key));
+			
+			return settings;
+		}
+		
+		return null;
+	}
+	
 	public void setBoolean(String key, boolean value) {
 		set(key, value ? "yes" : "no");
 	}
