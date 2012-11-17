@@ -351,4 +351,9 @@ public class Settings {
 			return result;
 		}
 	}
+
+	public void clear() {
+		settings.clear();
+		sectionKeys.clear();
+	}
 }
