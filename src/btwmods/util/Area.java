@@ -1,34 +1,22 @@
 package btwmods.util;
 
-import btwmods.io.Settings;
-
-public class Area {
+public class Area<Type> {
 	public final int x1;
 	public final int x2;
 	public final int z1;
 	public final int z2;
-	public final String name;
-	public final Settings settings;
+	public final Type data;
 	
 	public Area(int x1, int z1 ,int x2, int z2) {
-		this(x1, z1, x2, z2, null, null);
+		this(x1, z1, x2, z2, null);
 	}
 	
-	public Area(int x1, int z1 ,int x2, int z2, String name) {
-		this(x1, z1, x2, z2, name, null);
-	}
-	
-	public Area(int x1, int z1 ,int x2, int z2, Settings settings) {
-		this(x1, z1, x2, z2, null, settings);
-	}
-	
-	public Area(int x1, int z1 ,int x2, int z2, String name, Settings settings) {
+	public Area(int x1, int z1, int x2, int z2, Type data) {
 		this.x1 = x1;
 		this.x2 = x2;
 		this.z1 = z1;
 		this.z2 = z2;
-		this.name = name;
-		this.settings = settings;
+		this.data = data;
 	}
 	
 	@Override
