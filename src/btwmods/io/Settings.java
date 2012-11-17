@@ -94,11 +94,8 @@ public class Settings {
 	}
 	
 	public boolean isBoolean(String section, String key) {
-		if (section != null)
-			key = "[" + section + "]" + key;
-		
-		if (hasKey(key)) {
-			String setting = get(key).trim();
+		if (hasKey(section, key)) {
+			String setting = get(section, key).trim();
 			return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on")
 					 || setting.equalsIgnoreCase("no") || setting.equalsIgnoreCase("false") || setting.equalsIgnoreCase("0") || setting.equalsIgnoreCase("off");
 		}
@@ -110,11 +107,8 @@ public class Settings {
 	}
 	
 	public boolean getBoolean(String section, String key) {
-		if (section != null)
-			key = "[" + section + "]" + key;
-		
-		if (!isBoolean(key)) throw new IllegalArgumentException("setting is not a valid boolean. check with isBoolean() first");
-		String setting = get(key).trim();
+		if (!isBoolean(section, key)) throw new IllegalArgumentException("setting is not a valid boolean. check with isBoolean() first");
+		String setting = get(section, key).trim();
 		return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on");
 	}
 	
@@ -123,10 +117,7 @@ public class Settings {
 	}
 	
 	public boolean isInt(String section, String key) {
-		if (section != null)
-			key = "[" + section + "]" + key;
-		
-		try { return hasKey(key) && Integer.valueOf(get(key)) != null; }
+		try { return hasKey(section, key) && Integer.valueOf(get(section, key)) != null; }
 		catch (NumberFormatException e) { return false; }
 	}
 	
@@ -135,11 +126,8 @@ public class Settings {
 	}
 	
 	public int getInt(String section, String key) {
-		if (section != null)
-			key = "[" + section + "]" + key;
-		
-		if (!isInt(key)) throw new IllegalArgumentException("setting is not a valid Integer. check with isInt() first");
-		return Integer.parseInt(get(key));
+		if (!isInt(section, key)) throw new IllegalArgumentException("setting is not a valid Integer. check with isInt() first");
+		return Integer.parseInt(get(section, key));
 	}
 	
 	public boolean isLong(String key) {
@@ -147,10 +135,7 @@ public class Settings {
 	}
 	
 	public boolean isLong(String section, String key) {
-		if (section != null)
-			key = "[" + section + "]" + key;
-		
-		try { return hasKey(key) && Long.valueOf(get(key)) != null; }
+		try { return hasKey(section, key) && Long.valueOf(get(section, key)) != null; }
 		catch (NumberFormatException e) { return false; }
 	}
 	
@@ -159,11 +144,8 @@ public class Settings {
 	}
 	
 	public long getLong(String section, String key) {
-		if (section != null)
-			key = "[" + section + "]" + key;
-		
-		if (!isLong(key)) throw new IllegalArgumentException("setting is not a valid Long. check with isLong() first");
-		return Long.parseLong(get(key));
+		if (!isLong(section, key)) throw new IllegalArgumentException("setting is not a valid Long. check with isLong() first");
+		return Long.parseLong(get(section, key));
 	}
 	
 	public boolean hasKey(String key) {
@@ -175,7 +157,7 @@ public class Settings {
 	}
 	
 	public boolean hasSection(String section) {
-		return sectionKeys.containsKey(section);
+		return sectionKeys.containsKey(section == null ? null : new CaselessKey(section));
 	}
 	
 	public String get(String key) {
@@ -191,17 +173,16 @@ public class Settings {
 	}
 	
 	public Set<CaselessKey> getSectionKeys(String section) {
-		return sectionKeys.get(section);
+		return sectionKeys.get(section == null ? null : new CaselessKey(section));
 	}
 	
 	public Settings getSectionAsSettings(String section) {
-		if (sectionKeys.containsKey(section)) {
+		Set<CaselessKey> keys = sectionKeys.get(section == null ? null : new CaselessKey(section));
+		if (keys != null) {
 			Settings settings = new Settings();
 			
-			Set<CaselessKey> keys = sectionKeys.get(section);
-			if (keys != null)
-				for (CaselessKey key : keys)
-					settings.set(key.key, get(section, key.key));
+			for (CaselessKey key : keys)
+				settings.set(key.key, get(section, key.key));
 			
 			return settings;
 		}
@@ -245,7 +226,7 @@ public class Settings {
 			throw new NullPointerException();
 		
 		// Make sure we are maintaining a set of keys for the section.
-		Set<CaselessKey> keys = sectionKeys.get(section);
+		Set<CaselessKey> keys = sectionKeys.get(section == null ? null : new CaselessKey(section));
 		if (keys == null)
 			sectionKeys.put(section == null ? null : new CaselessKey(section), keys = new LinkedHashSet<CaselessKey>());
 		
@@ -257,13 +238,12 @@ public class Settings {
 	}
 
 	public boolean removeSection(String section) {
-		if (sectionKeys.containsKey(section)) {
-			Set<CaselessKey> keys = sectionKeys.get(section);
-			if (keys != null)
-				for (CaselessKey key : keys)
-					removeKey(section, key.key);
+		Set<CaselessKey> keys = sectionKeys.get(section == null ? null : new CaselessKey(section));
+		if (keys != null) {
+			for (CaselessKey key : keys)
+				removeKey(section, key.key);
 			
-			sectionKeys.remove(section);
+			sectionKeys.remove(section == null ? null : new CaselessKey(section));
 			return true;
 		}
 		
@@ -277,7 +257,7 @@ public class Settings {
 	public void removeKey(String section, String key) {
 		settings.remove(new SectionKeyPair(section, key));
 		
-		Set<CaselessKey> keys = sectionKeys.get(section);
+		Set<CaselessKey> keys = sectionKeys.get(section == null ? null : new CaselessKey(section));
 		if (keys != null) keys.remove(key);
 	}
 	
@@ -349,6 +329,43 @@ public class Settings {
 			result = prime * result + key.toLowerCase().hashCode();
 			result = prime * result + ((section == null) ? 0 : section.toLowerCase().hashCode());
 			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			
+			if (obj == null)
+				return false;
+			
+			if (getClass() != obj.getClass())
+				return false;
+			
+			SectionKeyPair other = (SectionKeyPair)obj;
+			
+			if (key == null) {
+				if (other.key != null)
+					return false;
+			}
+			else if (!key.equals(other.key)) {
+				return false;
+			}
+			
+			if (section == null) {
+				if (other.section != null)
+					return false;
+			}
+			else if (!section.equals(other.section)) {
+				return false;
+			}
+			
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return (section == null ? "" : "[" + section + "]") + key;
 		}
 	}
 
