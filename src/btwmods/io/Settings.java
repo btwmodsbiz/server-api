@@ -246,7 +246,7 @@ public class Settings {
 		
 		// Make sure we are maintaining a set of keys for the section.
 		Set<CaselessKey> keys = sectionKeys.get(section);
-		if (section == null)
+		if (keys == null)
 			sectionKeys.put(section == null ? null : new CaselessKey(section), keys = new LinkedHashSet<CaselessKey>());
 		
 		// Add the key to the section key set.
@@ -317,15 +317,17 @@ public class Settings {
 		}
 		
 		for (Map.Entry<String, Map<String, String>> sectionEntry : sections.entrySet()) {
-			writer.write("[" + sectionEntry.getKey() + "]");
-			writer.newLine();
-			
-			for (Map.Entry<String, String> pairEntry : sectionEntry.getValue().entrySet()) {
-				writer.write("\t" + pairEntry.getKey() + "=" + pairEntry.getValue());
+			if (sectionEntry.getKey() != null) {
+				writer.write("[" + sectionEntry.getKey() + "]");
+				writer.newLine();
+				
+				for (Map.Entry<String, String> pairEntry : sectionEntry.getValue().entrySet()) {
+					writer.write("\t" + pairEntry.getKey() + "=" + pairEntry.getValue());
+					writer.newLine();
+				}
+				
 				writer.newLine();
 			}
-			
-			writer.newLine();
 		}
 		
 		writer.close();
