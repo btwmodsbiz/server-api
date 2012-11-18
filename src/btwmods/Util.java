@@ -4,6 +4,8 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Util {
 	public static final DecimalFormat DECIMAL_FORMAT_3 = new DecimalFormat("0.000");
@@ -59,5 +61,38 @@ public class Util {
 		printWriter.flush();
 		printWriter.close();
 		return stringWriter.toString();
+	}
+	
+	public static List<String> combineIntoMaxLengthMessages(List<String> parts, int maxMessageLength) {
+		return combineIntoMaxLengthMessages(parts, maxMessageLength, null, false);
+	}
+	
+	public static List<String> combineIntoMaxLengthMessages(List<String> parts, int maxMessageLength, String separator, boolean separatorBetweenPages) {
+		if (separator == null) separator = "";
+		
+		ArrayList<String> messages = new ArrayList<String>();
+		StringBuilder sb = new StringBuilder();
+		
+		for (int i = 0; i < parts.size(); i++) {
+			boolean lastHadSeparator = i - 1 < parts.size() - 1;
+			boolean addSeparator = separator.length() != 0 && i < parts.size() - 1;
+			
+			if (sb.length() != 0 && sb.length() + parts.get(i).length() + (addSeparator ? separator.length() : 0) > maxMessageLength) {
+				if (lastHadSeparator && !separatorBetweenPages)
+					messages.add(sb.toString().substring(0, sb.length() - separator.length()));
+				else
+					messages.add(sb.toString());
+				
+				sb.setLength(0);
+			}
+			
+			sb.append(parts.get(i));
+			if (addSeparator) sb.append(separator);
+		}
+		
+		if (sb.length() > 0)
+			messages.add(sb.toString());
+		
+		return messages;
 	}
 }
