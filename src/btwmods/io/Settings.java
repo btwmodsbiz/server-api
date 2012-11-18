@@ -94,22 +94,30 @@ public class Settings {
 	}
 	
 	public boolean isBoolean(String section, String key) {
-		if (hasKey(section, key)) {
-			String setting = get(section, key).trim();
+		String setting = get(section, key);
+		
+		if (setting != null) {
+			setting = setting.trim();
 			return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on")
 					 || setting.equalsIgnoreCase("no") || setting.equalsIgnoreCase("false") || setting.equalsIgnoreCase("0") || setting.equalsIgnoreCase("off");
 		}
+		
 		return false;
 	}
 	
-	public boolean getBoolean(String key) {
-		return getBoolean(null, key);
+	public boolean getBoolean(String key, boolean defaultValue) {
+		return getBoolean(null, key, defaultValue);
 	}
 	
-	public boolean getBoolean(String section, String key) {
-		if (!isBoolean(section, key)) throw new IllegalArgumentException("setting is not a valid boolean. check with isBoolean() first");
-		String setting = get(section, key).trim();
-		return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on");
+	public boolean getBoolean(String section, String key, boolean defaultValue) {
+		String setting = get(section, key);
+		
+		if (setting != null) {
+			setting = setting.trim();
+			return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on") ? true : defaultValue;
+		}
+		
+		return defaultValue;
 	}
 	
 	public boolean isInt(String key) {
@@ -117,17 +125,25 @@ public class Settings {
 	}
 	
 	public boolean isInt(String section, String key) {
-		try { return hasKey(section, key) && Integer.valueOf(get(section, key)) != null; }
-		catch (NumberFormatException e) { return false; }
+		try {
+			String setting = get(section, key);
+			return setting != null && Integer.valueOf(setting) != null;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 	
-	public int getInt(String key) {
-		return getInt(null, key);
+	public int getInt(String key, int defaultValue) {
+		return getInt(null, key, defaultValue);
 	}
 	
-	public int getInt(String section, String key) {
-		if (!isInt(section, key)) throw new IllegalArgumentException("setting is not a valid Integer. check with isInt() first");
-		return Integer.parseInt(get(section, key));
+	public int getInt(String section, String key, int defaultValue) {
+		try {
+			String setting = get(section, key);
+			return setting == null ? defaultValue : Integer.parseInt(setting);
+		} catch (NumberFormatException e) {
+			return defaultValue;
+		}
 	}
 	
 	public boolean isLong(String key) {
@@ -135,17 +151,25 @@ public class Settings {
 	}
 	
 	public boolean isLong(String section, String key) {
-		try { return hasKey(section, key) && Long.valueOf(get(section, key)) != null; }
-		catch (NumberFormatException e) { return false; }
+		try {
+			String setting = get(section, key);
+			return setting != null && Long.valueOf(setting) != null;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 	
-	public long getLong(String key) {
-		return getLong(null, key);
+	public long getLong(String key, long defaultValue) {
+		return getLong(null, key, defaultValue);
 	}
 	
-	public long getLong(String section, String key) {
-		if (!isLong(section, key)) throw new IllegalArgumentException("setting is not a valid Long. check with isLong() first");
-		return Long.parseLong(get(section, key));
+	public long getLong(String section, String key, long defaultValue) {
+		try {
+			String setting = get(section, key);
+			return setting == null ? defaultValue : Long.parseLong(setting);
+		} catch (NumberFormatException e) {
+			return defaultValue;
+		}
 	}
 	
 	public boolean hasKey(String key) {
