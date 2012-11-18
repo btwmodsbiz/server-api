@@ -40,12 +40,13 @@ public class EntityEvent extends EventObject implements IEventInterrupter {
 	}
 
 	public static EntityEvent ExplodeAttempt(Entity entity) {
-		EntityEvent event = new EntityEvent(entity);
+		EntityEvent event = new EntityEvent(TYPE.EXPLODE_ATTEMPT, entity);
 		return event;
 	}
 
-	private EntityEvent(Entity entity) {
+	private EntityEvent(TYPE type, Entity entity) {
 		super(entity);
+		this.type = type;
 		this.entity = entity;
 	}
 
