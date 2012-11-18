@@ -1,3 +1,13 @@
+Version 4.35.1 (vMC 1.4.4 BTW 4.35)
+
+   - Changed default values of ServerAPI's allowUnloadSpawnChunks and
+     preloadSpawnChunks setting so they do not change vMC behavior by default.
+
+   - Fixed bug in Settings that prevented keys with different case from matching.
+   
+   - Fixed calls to Settings in ModLoader and the APIs to use the correct
+     methods and the preferred case.
+
 Version 4.35.0 (vMC 1.4.4 BTW 4.35)
 
    - Updated to BTW 4.35 (now vMC 1.4.4).

@@ -91,7 +91,7 @@ public class ModLoader {
 	/**
 	 * Version label for BTWMods
 	 */
-	public static final String VERSION = "4.35.0 (vMC 1.4.4 BTW 4.35)";
+	public static final String VERSION = "4.35.1 (vMC 1.4.4 BTW 4.35)";
 	
 	/**
 	 * Pattern that IMod class files must match.
