@@ -295,8 +295,6 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		invocationCount++;
-		
 		Class declaringClass = method.getDeclaringClass();
 		
 		if (declaringClass == EventDispatcher.class) {
@@ -312,6 +310,9 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 			// Execute all the listeners.
 			if (listeners != null) {
 				for (int i = 0; i < listeners.length; i++) {
+					invocationCount++;
+					
+					// TODO: pass the Method to StatsAPI.
 					
 					try {
 						if (invocationWrapper != null)
