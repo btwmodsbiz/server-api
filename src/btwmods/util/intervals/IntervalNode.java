@@ -39,31 +39,34 @@ public class IntervalNode<Type> {
 			endpoints.add(interval.getEnd());
 		}
 		
-		long median = getMedian(endpoints);
-		center = median;
-		
-		List<Interval<Type>> left = new ArrayList<Interval<Type>>();
-		List<Interval<Type>> right = new ArrayList<Interval<Type>>();
-		
-		for(Interval<Type> interval : intervalList) {
-			if(interval.getEnd() < median)
-				left.add(interval);
-			else if(interval.getStart() > median)
-				right.add(interval);
-			else {
-				List<Interval<Type>> posting = intervals.get(interval);
-				if(posting == null) {
-					posting = new ArrayList<Interval<Type>>();
-					intervals.put(interval, posting);
+		Long medianCheck = getMedian(endpoints);
+		if (medianCheck != null) {
+			long median = medianCheck.longValue();
+			center = median;
+			
+			List<Interval<Type>> left = new ArrayList<Interval<Type>>();
+			List<Interval<Type>> right = new ArrayList<Interval<Type>>();
+			
+			for(Interval<Type> interval : intervalList) {
+				if(interval.getEnd() < median)
+					left.add(interval);
+				else if(interval.getStart() > median)
+					right.add(interval);
+				else {
+					List<Interval<Type>> posting = intervals.get(interval);
+					if(posting == null) {
+						posting = new ArrayList<Interval<Type>>();
+						intervals.put(interval, posting);
+					}
+					posting.add(interval);
 				}
-				posting.add(interval);
 			}
+	
+			if(left.size() > 0)
+				leftNode = new IntervalNode<Type>(left);
+			if(right.size() > 0)
+				rightNode = new IntervalNode<Type>(right);
 		}
-
-		if(left.size() > 0)
-			leftNode = new IntervalNode<Type>(left);
-		if(right.size() > 0)
-			rightNode = new IntervalNode<Type>(right);
 	}
 
 	/**
