@@ -21,7 +21,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 	}
 
 	private enum QueueAction { ADD, REMOVE };
-	private class QueuedListener {
+	private static class QueuedListener {
 		public final QueueAction action;
 		public final IAPIListener listener;
 		public final Class listenerClass;
@@ -33,7 +33,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 		}
 	}
 	
-	public class Invocation {
+	public static class Invocation {
 		public final IAPIListener listener;
 		public final Method method;
 		public final Object[] args;
