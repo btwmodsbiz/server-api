@@ -94,12 +94,14 @@ public class Settings {
 	}
 	
 	public boolean isBoolean(String section, String key) {
-		String setting = get(section, key);
-		
-		if (setting != null) {
-			setting = setting.trim();
-			return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on")
-					 || setting.equalsIgnoreCase("no") || setting.equalsIgnoreCase("false") || setting.equalsIgnoreCase("0") || setting.equalsIgnoreCase("off");
+		return isBooleanValue(get(section, key));
+	}
+	
+	public static boolean isBooleanValue(String value) {
+		if (value != null) {
+			value = value.trim();
+			return value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("true") || value.equalsIgnoreCase("1") || value.equalsIgnoreCase("on")
+					 || value.equalsIgnoreCase("no") || value.equalsIgnoreCase("false") || value.equalsIgnoreCase("0") || value.equalsIgnoreCase("off");
 		}
 		
 		return false;
@@ -110,11 +112,13 @@ public class Settings {
 	}
 	
 	public boolean getBoolean(String section, String key, boolean defaultValue) {
-		String setting = get(section, key);
-		
-		if (setting != null) {
-			setting = setting.trim();
-			return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on");
+		return getBooleanValue(get(section, key), defaultValue);
+	}
+	
+	public static boolean getBooleanValue(String value, boolean defaultValue) {
+		if (value != null) {
+			value = value.trim();
+			return value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("true") || value.equalsIgnoreCase("1") || value.equalsIgnoreCase("on");
 		}
 		
 		return defaultValue;
