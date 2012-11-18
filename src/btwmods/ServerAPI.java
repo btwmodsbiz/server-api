@@ -10,9 +10,9 @@ import btwmods.server.TickEvent;
 public class ServerAPI {
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { ITickListener.class });
 	
-	private static boolean allowUnloadSpawnChunks = true;
+	private static boolean allowUnloadSpawnChunks = false;
 	
-	private static boolean preloadSpawnChunks = false;
+	private static boolean preloadSpawnChunks = true;
 	
 	private ServerAPI() {}
 	
