@@ -240,12 +240,12 @@ public class ModLoader {
 				return;
 			}
 			
-			if (settings.hasKey("ignoredmodclasses")) {
-				ignoredModClasses.addAll(Arrays.asList(settings.get("ignoredmodclasses").split("[^A-Za-z0-9_\\.\\$]+")));
+			if (settings.hasKey("ignoredModClasses")) {
+				ignoredModClasses.addAll(Arrays.asList(settings.get("ignoredModClasses").split("[^A-Za-z0-9_\\.\\$]+")));
 			}
 			
-			if (settings.hasKey("ignoredmods")) {
-				ignoredMods.addAll(Arrays.asList(settings.get("ignoredmods").split("[\\s;,]+")));
+			if (settings.hasKey("ignoredMods")) {
+				ignoredMods.addAll(Arrays.asList(settings.get("ignoredMods").split("[\\s;,]+")));
 			}
 			
 			findModsInClassPath();

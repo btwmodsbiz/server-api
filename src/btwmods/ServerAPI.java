@@ -25,12 +25,12 @@ public class ServerAPI {
 	}
 	
 	static void init(Settings settings) {
-		if (settings.isBoolean("[serverapi]allowunloadspawnchunks")) {
-			allowUnloadSpawnChunks = settings.getBoolean("[serverapi]allowunloadspawnchunks");
+		if (settings.isBoolean("ServerAPI", "allowUnloadSpawnChunks")) {
+			allowUnloadSpawnChunks = settings.getBoolean("ServerAPI", "allowUnloadSpawnChunks");
 		}
 		
-		if (settings.isBoolean("[serverapi]preloadspawnchunks")) {
-			preloadSpawnChunks = settings.getBoolean("[serverapi]preloadspawnchunks");
+		if (settings.isBoolean("ServerAPI", "preloadSpawnChunks")) {
+			preloadSpawnChunks = settings.getBoolean("ServerAPI", "preloadSpawnChunks");
 		}
 	}
 

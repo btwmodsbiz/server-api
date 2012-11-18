@@ -28,11 +28,11 @@ public class ReflectionAPI {
 	public static void init(Settings settings) {
 		
 		// Load settings.
-		if (settings.hasKey("[reflectionapi]srgresource")) {
-			srgResource = settings.get("[reflectionapi]srgresource");
+		if (settings.hasKey("ReflectionAPI", "srgResource")) {
+			srgResource = settings.get("ReflectionAPI", "srgResource");
 		}
-		if (settings.hasKey("[reflectionapi]reflectiondir")) {
-			lookupDir = new File(settings.get("[reflectionapi]reflectiondir"));
+		if (settings.hasKey("ReflectionAPI", "reflectionDir")) {
+			lookupDir = new File(settings.get("ReflectionAPI", "reflectionDir"));
 		}
 		
 		boolean success = true;
