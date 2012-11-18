@@ -79,9 +79,7 @@ public class StatsAPI {
 		server = MinecraftServer.getServer();
 
 		// Load settings
-		if (settings.isBoolean("StatsAPI", "detailedMeasurements")) {
-			detailedMeasurementsEnabled = settings.getBoolean("StatsAPI", "detailedMeasurements");
-		}
+		detailedMeasurementsEnabled = settings.getBoolean("StatsAPI", "detailedMeasurements", detailedMeasurementsEnabled);
 		
 		((CommandHandler)server.getCommandManager()).registerCommand(new CommandStats());
 		
