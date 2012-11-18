@@ -149,8 +149,9 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 		// Attempt to add the listener.
 		boolean added = listenerSet.add(listener);
 		
-		// Recreate the listener array.
-		lookup.put(listenerClass, listenerSet.toArray(new IAPIListener[listenerSet.size()]));
+		// Recreate the listener array, if changed.
+		if (added)
+			lookup.put(listenerClass, listenerSet.toArray(new IAPIListener[listenerSet.size()]));
 		
 		// Return if the listener was added.
 		return added;
@@ -210,7 +211,7 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 		// Attempt to remove the listener.
 		boolean removed = listenerSet.remove(listener);
 		
-		// Recreate the listener array if needed.
+		// Recreate the listener array, if changed.
 		if (removed)
 			lookup.put(listenerClass, listenerSet.size() == 0 ? null : listenerSet.toArray(new IAPIListener[listenerSet.size()]));
 		
