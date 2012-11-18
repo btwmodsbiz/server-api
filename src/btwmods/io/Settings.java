@@ -348,7 +348,7 @@ public class Settings {
 				if (other.key != null)
 					return false;
 			}
-			else if (!key.equals(other.key)) {
+			else if (!key.equalsIgnoreCase(other.key)) {
 				return false;
 			}
 			
@@ -356,7 +356,7 @@ public class Settings {
 				if (other.section != null)
 					return false;
 			}
-			else if (!section.equals(other.section)) {
+			else if (!section.equalsIgnoreCase(other.section)) {
 				return false;
 			}
 			
