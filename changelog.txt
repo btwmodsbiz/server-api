@@ -1,3 +1,40 @@
+Version 4.35.0 (vMC 1.4.4 BTW 4.35)
+
+   - Updated to BTW 4.35 (now vMC 1.4.4).
+   
+   - Added ability to mark a file as the target of Settings if changes to it
+     need to be saved. This is done using saveSettings(), which will throw an
+     IOException if called without a save target set.
+   
+   - Added extra Setting argument to IMod that stores data saved by a mod.
+   
+   - Added a static invocation counter to EventDispatcherFactory.
+   
+   - Added event handler invocation count to StatsAPI.
+   
+   - Added removeByData to IntervalTree.
+   
+   - Added Zones helper class for handling areas of the map.
+   
+   - Added several helper methods to Settings: hasSection, removeSection, removeKey,
+     getSectionAsSettings, clear.
+   
+   - Changed Settings to make section helper methods case insensitive.
+     
+   - Changed (refactored) code in ModLoader for checking/creating required directories.
+   
+   - Changed ReflectionAPI so that it does not complain so much when its required files
+     cannot be found or generated.
+     
+   - Changed EventDispatcherFactory to store IAPIEvents as an array instead of a HashSet.
+     This prioritizes speed for iteration over adding/removing.
+     
+   - Changed removeSection in Settings to return a boolean if a section was actually removed.
+   
+   - Fixed bug in Settings where it was cropping off a character from the section name.
+   
+   - Fixed bug in BlockEventBase where it was not allowing negative coordinates.
+
 Version 4.34.0 (vMC 1.4.2 BTW 4.34)
 
   - Updated to BTW 4.34.
