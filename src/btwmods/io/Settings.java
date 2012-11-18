@@ -114,7 +114,7 @@ public class Settings {
 		
 		if (setting != null) {
 			setting = setting.trim();
-			return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on") ? true : defaultValue;
+			return setting.equalsIgnoreCase("yes") || setting.equalsIgnoreCase("true") || setting.equalsIgnoreCase("1") || setting.equalsIgnoreCase("on");
 		}
 		
 		return defaultValue;
