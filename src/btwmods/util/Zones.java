@@ -54,6 +54,9 @@ public class Zones<Type> {
 					IntervalTree<Area<Type>> intervals = intervalsByRegion.get(coords);
 					if (intervals != null)
 						intervals.removeByData(area);
+					
+					if (intervals.listSize() == 0)
+						intervalsByRegion.remove(coords);
 				}
 			}
 		}
