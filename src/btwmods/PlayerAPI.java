@@ -314,4 +314,16 @@ public class PlayerAPI {
         	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
 		}
 	}
+
+	public static boolean onCheckCanPlayerEdit(EntityPlayer player, int x, int y, int z, int direction, ItemStack itemStack) {
+		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
+			PlayerBlockEvent event = PlayerBlockEvent.CheckCanPlayerEdit(player, x, y, z, direction, itemStack);
+        	((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
+			
+			if (!event.isAllowed())
+				return false;
+		}
+		
+		return true;
+	}
 }

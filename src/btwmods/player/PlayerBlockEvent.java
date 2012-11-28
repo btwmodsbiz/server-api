@@ -41,8 +41,16 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 		event.setCoordinates(x, y, z);
 		return event;
 	}
+
+	public static PlayerBlockEvent CheckCanPlayerEdit(EntityPlayer player, int x, int y, int z, int direction, ItemStack itemStack) {
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.CHECK_PLAYEREDIT, player);
+		event.setCoordinates(x, y, z);
+		event.direction = direction;
+		event.itemStack = itemStack;
+		return event;
+	}
 	
-	public enum TYPE { ACTIVATED, ACTIVATION_ATTEMPT, PLACE_ATTEMPT, REMOVE_ATTEMPT };
+	public enum TYPE { ACTIVATED, ACTIVATION_ATTEMPT, PLACE_ATTEMPT, REMOVE_ATTEMPT, CHECK_PLAYEREDIT };
 	
 	private TYPE type;
 	private boolean isHandled = false;
