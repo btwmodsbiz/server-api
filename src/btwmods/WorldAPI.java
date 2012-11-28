@@ -130,4 +130,16 @@ public class WorldAPI {
 			}
 		}
 	}
+
+	public static boolean onCheckEntityIsInvulnerable(Entity entity) {
+		if (!listeners.isEmpty(IEntityListener.class)) {
+			EntityEvent event = EntityEvent.CheckIsEntityInvulnerable(entity);
+			((IEntityListener)listeners).onEntityAction(event);
+			
+			if (event.isInvulnerable())
+				return true;
+		}
+		
+		return false;
+	}
 }

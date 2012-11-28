@@ -7,13 +7,14 @@ import net.minecraft.src.Entity;
 
 public class EntityEvent extends EventObject implements IEventInterrupter {
 	
-	public enum TYPE { EXPLODE_ATTEMPT };
+	public enum TYPE { EXPLODE_ATTEMPT, IS_ENTITY_INVULNERABLE };
 
 	private TYPE type;
 	private Entity entity;
 	
 	private boolean isHandled = false;
 	private boolean isAllowed = true;
+	private boolean invulnerable = false;
 	
 	public TYPE getType() {
 		return type;
@@ -38,9 +39,23 @@ public class EntityEvent extends EventObject implements IEventInterrupter {
 	public void markNotAllowed() {
 		isAllowed = false;
 	}
+	
+	public boolean isInvulnerable() {
+		return invulnerable;
+	}
+	
+	public void markIsInvulnerable() {
+		if (type == TYPE.IS_ENTITY_INVULNERABLE)
+			invulnerable = true;
+	}
 
 	public static EntityEvent ExplodeAttempt(Entity entity) {
 		EntityEvent event = new EntityEvent(TYPE.EXPLODE_ATTEMPT, entity);
+		return event;
+	}
+
+	public static EntityEvent CheckIsEntityInvulnerable(Entity entity) {
+		EntityEvent event = new EntityEvent(TYPE.IS_ENTITY_INVULNERABLE, entity);
 		return event;
 	}
 
