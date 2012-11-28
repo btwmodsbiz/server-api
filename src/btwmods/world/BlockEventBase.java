@@ -16,6 +16,7 @@ public abstract class BlockEventBase extends EventObject {
 	protected Chunk chunk = null;
 	protected Block block = null;
 	protected int metadata = -1;
+	protected boolean metadataSet = false;
 	
 	private int x = 0;
 	private int y = 0;
@@ -47,6 +48,10 @@ public abstract class BlockEventBase extends EventObject {
 	}
 	
 	public int getMetadata() {
+		if (!metadataSet && hasCoordinatesSet()) {
+			metadata = world.getBlockMetadata(x, y, z);
+		}
+		
 		return metadata;
 	}
 	
