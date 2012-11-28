@@ -36,10 +36,8 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 		return event;
 	}
 
-	public static PlayerBlockEvent RemoveAttempt(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
+	public static PlayerBlockEvent RemoveAttempt(EntityPlayer player, int x, int y, int z) {
 		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.REMOVE_ATTEMPT, player);
-		event.block = block;
-		event.metadata = metadata;
 		event.setCoordinates(x, y, z);
 		return event;
 	}
