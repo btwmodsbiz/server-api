@@ -51,6 +51,28 @@ public class Util {
 		return 0;
 	}
 	
+	public static int getWorldDimensionFromName(String name) {
+		if (name.equalsIgnoreCase("Overworld"))
+			return 0;
+		else if (name.equalsIgnoreCase("Nether"))
+			return -1;
+		else if (name.equalsIgnoreCase("TheEnd") || name.equalsIgnoreCase("End"))
+			return 1;
+		else
+			throw new IllegalArgumentException(name + " is not a valid dimension name.");
+	}
+	
+	public static String getWorldNameFromDimension(int dimension) {
+		if (dimension == 0)
+			return "Overworld";
+		if (dimension == -1)
+			return "Nether";
+		else if (dimension == 1)
+			return "TheEnd";
+		else
+			return null;
+	}
+	
 	public static String convertStackTrace(StackTraceElement[] elements) {
 		StringWriter stringWriter = new StringWriter();
 		PrintWriter printWriter = new PrintWriter(stringWriter);
