@@ -8,43 +8,38 @@ import net.minecraft.src.ItemStack;
 public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInterrupter {
 	
 	public static PlayerBlockEvent Activated(EntityPlayer player, Block block, int x, int y, int z) {
-		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ACTIVATED, player);
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ACTIVATED, player, x, y, z);
 		event.block = block;
-		event.setCoordinates(x, y, z);
 		return event;
 	}
 
 	public static PlayerBlockEvent ActivationAttempt(EntityPlayer player, Block block, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
-		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ACTIVATION_ATTEMPT, player);
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ACTIVATION_ATTEMPT, player, x, y, z);
 		event.direction = direction;
 		event.xOffset = xOffset;
 		event.yOffset = yOffset;
 		event.zOffset = zOffset;
 		event.block = block;
-		event.setCoordinates(x, y, z);
 		return event;
 	}
 	
 	public static PlayerBlockEvent PlaceAttempt(EntityPlayer player, ItemStack itemStack, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
-		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.PLACE_ATTEMPT, player);
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.PLACE_ATTEMPT, player, x, y, z);
 		event.itemStack = itemStack;
 		event.direction = direction;
 		event.xOffset = xOffset;
 		event.yOffset = yOffset;
 		event.zOffset = zOffset;
-		event.setCoordinates(x, y, z);
 		return event;
 	}
 
 	public static PlayerBlockEvent RemoveAttempt(EntityPlayer player, int x, int y, int z) {
-		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.REMOVE_ATTEMPT, player);
-		event.setCoordinates(x, y, z);
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.REMOVE_ATTEMPT, player, x, y, z);
 		return event;
 	}
 
 	public static PlayerBlockEvent CheckCanPlayerEdit(EntityPlayer player, int x, int y, int z, int direction, ItemStack itemStack) {
-		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.CHECK_PLAYEREDIT, player);
-		event.setCoordinates(x, y, z);
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.CHECK_PLAYEREDIT, player, x, y, z);
 		event.direction = direction;
 		event.itemStack = itemStack;
 		return event;
@@ -102,8 +97,8 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 		return itemStack;
 	}
 	
-	private PlayerBlockEvent(TYPE type, EntityPlayer player) {
-		super(player, player.worldObj);
+	private PlayerBlockEvent(TYPE type, EntityPlayer player, int x, int y, int z) {
+		super(player, player.worldObj, x, y, z);
 		this.type = type;
 	}
 

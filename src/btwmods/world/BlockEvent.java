@@ -35,23 +35,21 @@ public class BlockEvent extends BlockEventBase implements IEventInterrupter {
 	}
 	
 	public static BlockEvent Broken(World world, Chunk chunk, Block block, int metadata, int x, int y, int z) {
-		BlockEvent event = new BlockEvent(TYPE.BROKEN, world);
+		BlockEvent event = new BlockEvent(TYPE.BROKEN, world, x, y, z);
 		event.chunk = chunk;
 		event.block = block;
 		event.metadata = metadata;
-		event.setCoordinates(x, y, z);
 		return event;
 	}
 	
 	public static BlockEvent ExplodeAttempt(World world, int blockId, int x, int y, int z) {
-		BlockEvent event = new BlockEvent(TYPE.EXPLODE_ATTEMPT, world);
+		BlockEvent event = new BlockEvent(TYPE.EXPLODE_ATTEMPT, world, x, y, z);
 		event.block = blockId > 0 ? Block.blocksList[blockId] : null;
-		event.setCoordinates(x, y, z);
 		return event;
 	}
 	
-	private BlockEvent(TYPE type, World world) {
-		super(world, world);
+	private BlockEvent(TYPE type, World world, int x, int y, int z) {
+		super(world, world, x, y, z);
 		this.type = type;
 	}
 

@@ -1,45 +1,24 @@
 package btwmods.world;
 
-import btwmods.events.APIEvent;
+import btwmods.events.PositionedEvent;
 import net.minecraft.src.Block;
-import net.minecraft.src.Chunk;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 
-public abstract class BlockEventBase extends APIEvent {
+public abstract class BlockEventBase extends PositionedEvent {
 
-	private World world;
-	
-	protected Chunk chunk = null;
 	protected Block block = null;
 	protected int metadata = -1;
 	protected boolean metadataSet = false;
-	
-	private int x = 0;
-	private int y = 0;
-	private int z = 0;
-	private boolean coordsSet = false;
 	
 	private boolean checkedTileEntity = false;
 	protected TileEntity tileEntity = null;
 	protected ItemStack[] contents = null;
 	
-	public World getWorld() {
-		return world;
-	}
-	
-	public Chunk getChunk() {
-		if (chunk == null && hasCoordinatesSet()) {
-			chunk = world.getChunkFromBlockCoords(x, z);
-		}
-		
-		return chunk;
-	}
-	
 	public Block getBlock() {
-		if (block == null && hasCoordinatesSet()) {
+		if (block == null) {
 			block = Block.blocksList[world.getBlockId(x, y, z)];
 		}
 		
@@ -47,38 +26,15 @@ public abstract class BlockEventBase extends APIEvent {
 	}
 	
 	public int getMetadata() {
-		if (!metadataSet && hasCoordinatesSet()) {
+		if (!metadataSet) {
 			metadata = world.getBlockMetadata(x, y, z);
 		}
 		
 		return metadata;
 	}
 	
-	public int getX() {
-		return x;
-	}
-	
-	public int getY() {
-		return y;
-	}
-	
-	public int getZ() {
-		return z;
-	}
-	
-	protected void setCoordinates(int x, int y, int z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		coordsSet = true;
-	}
-	
-	public boolean hasCoordinatesSet() {
-		return coordsSet;
-	}
-	
 	public TileEntity getTileEntity() {
-		if (tileEntity == null && !checkedTileEntity && hasCoordinatesSet()) {
+		if (tileEntity == null && !checkedTileEntity) {
 			tileEntity = world.getBlockTileEntity(x, y, z);
 			checkedTileEntity = true;
 		}
@@ -103,8 +59,7 @@ public abstract class BlockEventBase extends APIEvent {
 		return contents;
 	}
 	
-	protected BlockEventBase(Object source, World world) {
-		super(source);
-		this.world = world;
+	protected BlockEventBase(Object source, World world, int x, int y, int z) {
+		super(source, world, x, y, z);
 	}
 }

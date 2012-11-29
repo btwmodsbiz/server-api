@@ -20,29 +20,26 @@ public class ContainerEvent extends PlayerBlockEventBase {
 	}
 	
 	public static ContainerEvent Open(EntityPlayer player, Block block, Container container, int x, int y, int z) {
-		ContainerEvent event = new ContainerEvent(TYPE.OPENED, player);
+		ContainerEvent event = new ContainerEvent(TYPE.OPENED, player, x, y, z);
 		event.block = block;
 		event.container = container;
-		event.setCoordinates(x, y, z);
 		return event;
 	}
 	
 	public static ContainerEvent Placed(EntityPlayer player, int x, int y, int z) {
-		ContainerEvent event = new ContainerEvent(TYPE.PLACED, player);
-		event.setCoordinates(x, y, z);
+		ContainerEvent event = new ContainerEvent(TYPE.PLACED, player, x, y, z);
 		return event;
 	}
 	
 	public static ContainerEvent Removed(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
-		ContainerEvent event = new ContainerEvent(TYPE.REMOVED, player);
+		ContainerEvent event = new ContainerEvent(TYPE.REMOVED, player, x, y, z);
 		event.block = block;
 		event.metadata = metadata;
-		event.setCoordinates(x, y, z);
 		return event;
 	}
 	
-	private ContainerEvent(TYPE type, EntityPlayer player) {
-		super(player, player.worldObj);
+	private ContainerEvent(TYPE type, EntityPlayer player, int x, int y, int z) {
+		super(player, player.worldObj, x, y, z);
 		this.type = type;
 	}
 }
