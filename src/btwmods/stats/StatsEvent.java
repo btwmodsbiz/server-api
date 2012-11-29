@@ -1,12 +1,11 @@
 package btwmods.stats;
 
-import java.util.EventObject;
-
+import btwmods.events.APIEvent;
 import btwmods.stats.data.ServerStats;
 import btwmods.stats.data.WorldStats;
 import net.minecraft.server.MinecraftServer;
 
-public class StatsEvent extends EventObject {
+public class StatsEvent extends APIEvent {
 	
 	public final int tickCounter;
 	public final ServerStats serverStats;

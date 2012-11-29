@@ -1,10 +1,10 @@
 package btwmods.player;
 
-import java.util.EventObject;
+import btwmods.events.APIEvent;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 
-public class DropEvent extends EventObject {
+public class DropEvent extends APIEvent {
 	
 	public enum TYPE { ONE, STACK, EJECT, ALL };
 

@@ -1,12 +1,11 @@
 package btwmods.network;
 
-import java.util.EventObject;
-
+import btwmods.events.APIEvent;
 import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.NetServerHandler;
 import net.minecraft.src.Packet;
 
-public class PacketEvent extends EventObject {
+public class PacketEvent extends APIEvent {
 
 	private EntityPlayerMP player = null;
 	private NetServerHandler netServerHandler = null;

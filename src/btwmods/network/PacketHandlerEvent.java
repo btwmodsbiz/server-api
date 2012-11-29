@@ -1,13 +1,12 @@
 package btwmods.network;
 
-import java.util.EventObject;
-
+import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
 
 import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.Packet;
 
-public class PacketHandlerEvent extends EventObject implements IEventInterrupter {
+public class PacketHandlerEvent extends APIEvent implements IEventInterrupter {
 	
 	private EntityPlayerMP player = null;
 	private Packet packet;

@@ -1,11 +1,11 @@
 package btwmods.player;
 
-import java.util.EventObject;
+import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
 
-public class PlayerActionEvent extends EventObject implements IEventInterrupter {
+public class PlayerActionEvent extends APIEvent implements IEventInterrupter {
 	
 	public enum TYPE { ATTACKED_BY_PLAYER, PLAYER_USE_ENTITY_ATTEMPT };
 	

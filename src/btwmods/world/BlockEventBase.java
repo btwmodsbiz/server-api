@@ -1,7 +1,6 @@
 package btwmods.world;
 
-import java.util.EventObject;
-
+import btwmods.events.APIEvent;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.IInventory;
@@ -9,7 +8,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 
-public abstract class BlockEventBase extends EventObject {
+public abstract class BlockEventBase extends APIEvent {
 
 	private World world;
 	

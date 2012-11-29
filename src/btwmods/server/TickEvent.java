@@ -1,9 +1,9 @@
 package btwmods.server;
 
-import java.util.EventObject;
+import btwmods.events.APIEvent;
 import net.minecraft.server.MinecraftServer;
 
-public class TickEvent extends EventObject {
+public class TickEvent extends APIEvent {
 	
 	private static MinecraftServer server;
 	

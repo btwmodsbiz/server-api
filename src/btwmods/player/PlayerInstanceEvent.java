@@ -1,15 +1,15 @@
 package btwmods.player;
 
-import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 
 import btwmods.IMod;
+import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.NBTTagCompound;
 
-public class PlayerInstanceEvent extends EventObject implements IEventInterrupter {
+public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 	
 	public enum TYPE { LOGIN, LOGOUT, RESPAWN, READ_NBT, WRITE_NBT, CHECK_METADATA, METADATA_CHANGED };
 	public enum METADATA { IS_PVP };

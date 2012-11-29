@@ -1,8 +1,8 @@
 package btwmods.network;
 
-import java.util.EventObject;
+import btwmods.events.APIEvent;
 
-public class CustomPacketEvent extends EventObject {
+public class CustomPacketEvent extends APIEvent {
 	
 	private String channel;
 	private byte[] data;

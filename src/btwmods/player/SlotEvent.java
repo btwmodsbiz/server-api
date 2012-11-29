@@ -1,6 +1,6 @@
 package btwmods.player;
 
-import java.util.EventObject;
+import btwmods.events.APIEvent;
 import net.minecraft.src.Container;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
@@ -9,7 +9,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
 import net.minecraft.src.TileEntity;
 
-public class SlotEvent extends EventObject {
+public class SlotEvent extends APIEvent {
 	
 	public enum TYPE { ADD, REMOVE, SWITCH, TRANSFER };
 

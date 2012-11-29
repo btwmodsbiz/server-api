@@ -1,11 +1,10 @@
 package btwmods.world;
 
-import java.util.EventObject;
-
+import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
 import net.minecraft.src.Entity;
 
-public class EntityEvent extends EventObject implements IEventInterrupter {
+public class EntityEvent extends APIEvent implements IEventInterrupter {
 	
 	public enum TYPE { EXPLODE_ATTEMPT, IS_ENTITY_INVULNERABLE };
 
