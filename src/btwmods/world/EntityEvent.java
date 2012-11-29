@@ -7,7 +7,7 @@ import net.minecraft.src.MathHelper;
 
 public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 	
-	public enum TYPE { EXPLODE_ATTEMPT, IS_ENTITY_INVULNERABLE };
+	public enum TYPE { IS_ENTITY_INVULNERABLE };
 
 	private TYPE type;
 	private Entity entity;
@@ -25,7 +25,7 @@ public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 	}
 	
 	public boolean isHandled() {
-		return (type == TYPE.EXPLODE_ATTEMPT) && isHandled;
+		return isHandled;
 	}
 	
 	public void markHandled() {
@@ -47,11 +47,6 @@ public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 	public void markIsInvulnerable() {
 		if (type == TYPE.IS_ENTITY_INVULNERABLE)
 			invulnerable = true;
-	}
-
-	public static EntityEvent ExplodeAttempt(Entity entity) {
-		EntityEvent event = new EntityEvent(TYPE.EXPLODE_ATTEMPT, entity);
-		return event;
 	}
 
 	public static EntityEvent CheckIsEntityInvulnerable(Entity entity) {

@@ -108,18 +108,6 @@ public class WorldAPI {
 		
 		return true;
 	}
-
-	public static boolean onEntityExplodeAttempt(Entity entity) {
-		if (!listeners.isEmpty(IEntityListener.class)) {
-			EntityEvent event = EntityEvent.ExplodeAttempt(entity);
-			((IEntityListener)listeners).onEntityAction(event);
-			
-			if (!event.isAllowed())
-				return false;
-		}
-		
-		return true;
-	}
 	
 	public static void sendEntityEquipmentUpdate(EntityLiving entity) {
 		if (entity.worldObj instanceof WorldServer) {
