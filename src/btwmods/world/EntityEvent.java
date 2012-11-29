@@ -1,10 +1,11 @@
 package btwmods.world;
 
-import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
+import btwmods.events.PositionedEvent;
 import net.minecraft.src.Entity;
+import net.minecraft.src.MathHelper;
 
-public class EntityEvent extends APIEvent implements IEventInterrupter {
+public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 	
 	public enum TYPE { EXPLODE_ATTEMPT, IS_ENTITY_INVULNERABLE };
 
@@ -59,7 +60,7 @@ public class EntityEvent extends APIEvent implements IEventInterrupter {
 	}
 
 	private EntityEvent(TYPE type, Entity entity) {
-		super(entity);
+		super(entity, entity.worldObj, MathHelper.floor_double(entity.posX), MathHelper.floor_double(entity.posY), MathHelper.floor_double(entity.posZ));
 		this.type = type;
 		this.entity = entity;
 	}
