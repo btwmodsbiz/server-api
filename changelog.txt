@@ -1,77 +1,108 @@
+Version 3.47b.1 (vMC 1.4.5 BTW 4.37b)
+
+  - Added getWorldDimensionFromName and getWorldNameFromDimension helper
+    methods to Util.
+     
+  - Added hook to WorldAPI to allow entities to be marked as invulnerable
+    by mods without actually changing it's NBT invulnerable setting.
+     
+  - Added hook to PlayerAPI to allow the "can edit" player capability to be
+    determined by mods without actually changing the player's capability setting.
+     
+  - Changed (Moved) PlayerAPI#onBlockRemoveAttempt call in
+    ItemInWorldManager so that it prevents unnecessary code from being run
+    before possibly preventing the attempt.
+     
+  - Changed (Moved) the PlayerAPI#onBlockRemoved call to be in the same
+    method as the onBlockRemoveAttempt call for simplicity.
+     
+  - Changed PlayerAPI#onBlockRemoveAttempt so that it does not require the
+    Block and its metadata.
+
+  - Changed events to extend an APIEvent class (which extends EventObject).
+   
+  - Created (Refactored) events' position data to PositionedEvent.
+   
+  - Changed EntityEvent to use PositionedEvent to use it's getX/Y/Z methods.
+
+  - Removed the now unnecessary entity explosion handling.
+   
+  - Fixed BlockEventBase so that it handles unset metadata properly.
+
 Version 4.37b.0 (vMC 1.4.5 BTW 4.37b)
 
-   - Updated to BTW 4.37b (now vMC 1.4.5).
+  - Updated to BTW 4.37b (now vMC 1.4.5).
    
-   - Added static isBooleanValue and getBooleanValue to Settings.
+  - Added static isBooleanValue and getBooleanValue to Settings.
    
-   - Added combineIntoMaxLengthMessages helper methods to Util to split
-     strings into messages that each have a maximum length.
+  - Added combineIntoMaxLengthMessages helper methods to Util to split
+    strings into messages that each have a maximum length.
    
-   - Changed inner classes in EventDispatcherFactory to static.
+  - Changed inner classes in EventDispatcherFactory to static.
    
-   - Changed addListenerInternal in EventDispatcherFactory to not recreate
-     the array unless it was actually changed.
+  - Changed addListenerInternal in EventDispatcherFactory to not recreate
+    the array unless it was actually changed.
      
-   - Changed Zones to remove empty IntervalTrees for regions.
+  - Changed Zones to remove empty IntervalTrees for regions.
    
-   - Changed isXXX and getXXX methods in Settings to take a default value
-     and no longer throw Exceptions.
+  - Changed isXXX and getXXX methods in Settings to take a default value
+    and no longer throw Exceptions.
      
-   - Changed StatsAPI and ServerAPI for Settings' new getXXX methods.
+  - Changed StatsAPI and ServerAPI for Settings' new getXXX methods.
      
-   - Fixed location of handler incrementing in EventDispatcherFactory.
+  - Fixed location of handler incrementing in EventDispatcherFactory.
    
-   - Fixed bug in IntervalNode where an empty interval list would cause a
-     NullPointerException.
+  - Fixed bug in IntervalNode where an empty interval list would cause a
+    NullPointerException.
      
-   - Fixed bug in EntityEvent where the TYPE was not being set.
+  - Fixed bug in EntityEvent where the TYPE was not being set.
 
 Version 4.35.1 (vMC 1.4.4 BTW 4.35)
 
-   - Changed default values of ServerAPI's allowUnloadSpawnChunks and
-     preloadSpawnChunks setting so they do not change vMC behavior by default.
+  - Changed default values of ServerAPI's allowUnloadSpawnChunks and
+    preloadSpawnChunks setting so they do not change vMC behavior by default.
 
-   - Fixed bug in Settings that prevented keys with different case from matching.
+  - Fixed bug in Settings that prevented keys with different case from matching.
    
-   - Fixed calls to Settings in ModLoader and the APIs to use the correct
-     methods and the preferred case.
+  - Fixed calls to Settings in ModLoader and the APIs to use the correct
+    methods and the preferred case.
 
 Version 4.35.0 (vMC 1.4.4 BTW 4.35)
 
-   - Updated to BTW 4.35 (now vMC 1.4.4).
+  - Updated to BTW 4.35 (now vMC 1.4.4).
    
-   - Added ability to mark a file as the target of Settings if changes to it
-     need to be saved. This is done using saveSettings(), which will throw an
-     IOException if called without a save target set.
+  - Added ability to mark a file as the target of Settings if changes to it
+    need to be saved. This is done using saveSettings(), which will throw an
+    IOException if called without a save target set.
    
-   - Added extra Setting argument to IMod that stores data saved by a mod.
+  - Added extra Setting argument to IMod that stores data saved by a mod.
    
-   - Added a static invocation counter to EventDispatcherFactory.
+  - Added a static invocation counter to EventDispatcherFactory.
    
-   - Added event handler invocation count to StatsAPI.
+  - Added event handler invocation count to StatsAPI.
    
-   - Added removeByData to IntervalTree.
+  - Added removeByData to IntervalTree.
    
-   - Added Zones helper class for handling areas of the map.
+  - Added Zones helper class for handling areas of the map.
    
-   - Added several helper methods to Settings: hasSection, removeSection, removeKey,
-     getSectionAsSettings, clear.
+  - Added several helper methods to Settings: hasSection, removeSection, removeKey,
+    getSectionAsSettings, clear.
    
-   - Changed Settings to make section helper methods case insensitive.
+  - Changed Settings to make section helper methods case insensitive.
      
-   - Changed (refactored) code in ModLoader for checking/creating required directories.
+  - Changed (refactored) code in ModLoader for checking/creating required directories.
    
-   - Changed ReflectionAPI so that it does not complain so much when its required files
-     cannot be found or generated.
+  - Changed ReflectionAPI so that it does not complain so much when its required files
+    cannot be found or generated.
      
-   - Changed EventDispatcherFactory to store IAPIEvents as an array instead of a HashSet.
-     This prioritizes speed for iteration over adding/removing.
+  - Changed EventDispatcherFactory to store IAPIEvents as an array instead of a HashSet.
+    This prioritizes speed for iteration over adding/removing.
      
-   - Changed removeSection in Settings to return a boolean if a section was actually removed.
+  - Changed removeSection in Settings to return a boolean if a section was actually removed.
    
-   - Fixed bug in Settings where it was cropping off a character from the section name.
+  - Fixed bug in Settings where it was cropping off a character from the section name.
    
-   - Fixed bug in BlockEventBase where it was not allowing negative coordinates.
+  - Fixed bug in BlockEventBase where it was not allowing negative coordinates.
 
 Version 4.34.0 (vMC 1.4.2 BTW 4.34)
 
