@@ -7,7 +7,7 @@ import net.minecraft.src.World;
 
 public class BlockEvent extends BlockEventBase implements IEventInterrupter {
 	
-	public enum TYPE { BROKEN, EXPLODE_ATTEMPT };
+	public enum TYPE { BROKEN, EXPLODE_ATTEMPT, BURN_ATTEMPT };
 
 	private TYPE type;
 	
@@ -44,6 +44,12 @@ public class BlockEvent extends BlockEventBase implements IEventInterrupter {
 	
 	public static BlockEvent ExplodeAttempt(World world, int blockId, int x, int y, int z) {
 		BlockEvent event = new BlockEvent(TYPE.EXPLODE_ATTEMPT, world, x, y, z);
+		event.block = blockId > 0 ? Block.blocksList[blockId] : null;
+		return event;
+	}
+
+	public static BlockEvent BurnAttempt(World world, int blockId, int x, int y, int z) {
+		BlockEvent event = new BlockEvent(TYPE.BURN_ATTEMPT, world, x, y, z);
 		event.block = blockId > 0 ? Block.blocksList[blockId] : null;
 		return event;
 	}
