@@ -130,4 +130,16 @@ public class WorldAPI {
 		
 		return false;
 	}
+
+	public static boolean onDestroyBlockWithFireAttempt(World world, int blockId, int x, int y, int z) {
+		if (!listeners.isEmpty(IBlockListener.class)) {
+			BlockEvent event = BlockEvent.BurnAttempt(world, blockId, x, y, z);
+			((IBlockListener)listeners).onBlockAction(event);
+			
+			if (!event.isAllowed())
+				return false;
+		}
+		
+		return true;
+	}
 }
