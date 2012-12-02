@@ -1,3 +1,8 @@
+Version 4.38.3 (vMC 1.4.5 BTW 4.38)
+
+  - Fixed bug with Zones#get only checking the first matching area
+    from an interval tree.
+
 Version 4.38.2 (vMC 1.4.5 BTW 4.38)
 
   - Added hooks to WorldAPI for intercepting fire's ability to destroy blocks,
