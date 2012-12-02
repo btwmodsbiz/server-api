@@ -89,7 +89,7 @@ public class Zones<Type> {
 				
 				// Check all the areas that matched X.
 				for (int i = 0; i < size; i++) {
-					Area<Type> area = intervalAreas.get(0);
+					Area<Type> area = intervalAreas.get(i);
 					
 					// Check if the Z matches.
 					if (z >= area.z1 && z <= area.z2) {
