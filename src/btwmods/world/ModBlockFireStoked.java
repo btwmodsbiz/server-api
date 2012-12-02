@@ -13,8 +13,14 @@ public class ModBlockFireStoked extends FCBlockFireStoked {
 	}
 
 	@Override
-	public boolean canBlockCatchFire(IBlockAccess var1, int var2, int var3, int var4) {
-		return super.canBlockCatchFire(var1, var2, var3, var4);
+	protected int GetChanceOfNeighborsEncouragingFireCustom(World world, int x, int y, int z) {
+		int chance = super.GetChanceOfNeighborsEncouragingFireCustom(world, x, y, z);
+		return chance != 0 && ModBlockFire.chanceOfNeighborsEncouragingFireAllowed(world, x, y, z) ? chance : 0;
+	}
+
+	@Override
+	public boolean canBlockCatchFire(IBlockAccess blockAccess, int x, int y, int z) {
+		return super.canBlockCatchFire(blockAccess, x, y, z) && (!(blockAccess instanceof World) || ModBlockFire.blockCanCatchFire((World)blockAccess, x, y, z));
 	}
 
 	@Override

@@ -142,4 +142,28 @@ public class WorldAPI {
 		
 		return true;
 	}
+
+	public static boolean onGetChanceOfNeighborsEncouragingFireAllowed(World world, int x, int y, int z) {
+		if (!listeners.isEmpty(IBlockListener.class)) {
+			BlockEvent event = BlockEvent.FireSpreadAttempt(world, x, y, z);
+			((IBlockListener)listeners).onBlockAction(event);
+			
+			if (!event.isAllowed())
+				return false;
+		}
+		
+		return true;
+	}
+
+	public static boolean onIsFlammableBlock(World world, int x, int y, int z) {
+		if (!listeners.isEmpty(IBlockListener.class)) {
+			BlockEvent event = BlockEvent.IsFlammableBlock(world, x, y, z);
+			((IBlockListener)listeners).onBlockAction(event);
+			
+			if (!event.isFlammable())
+				return false;
+		}
+		
+		return true;
+	}
 }
