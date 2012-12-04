@@ -34,12 +34,12 @@ public class ModLoader {
 	/**
 	 * Location of settings and mods.
 	 */
-	private static File modsDir = new File(new File("."), "btwmods");
+	public final static File modsDir = new File(new File("."), "btwmods");
 	
 	/**
 	 * Location of data saved by mods.
 	 */
-	private static File modDataDir = new File(modsDir, "data");
+	public final static File modDataDir = new File(modsDir, "data");
 
 	/**
 	 * Settings used by ModLoader.
