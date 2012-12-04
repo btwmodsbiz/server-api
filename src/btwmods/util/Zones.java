@@ -90,20 +90,8 @@ public class Zones<Type> {
 				// Check all the areas that matched X.
 				for (int i = 0; i < size; i++) {
 					Area<Type> area = intervalAreas.get(i);
-					
-					// Check if the Z matches.
-					if (z >= area.z1 && z <= area.z2) {
-						
-						// Also check the Y if is a cube and checking Y
-						if (checkY && area instanceof Cube) {
-							Cube cube = (Cube)area;
-							if (y >= cube.y1 && y <= cube.y2) {
-								areas.add(area);
-							}
-						}
-						else {
-							areas.add(area);
-						}
+					if ((checkY && area.isWithin(x, y, z)) || (!checkY && area.isWithin(x, z))) {
+						areas.add(area);
 					}
 				}
 			}
