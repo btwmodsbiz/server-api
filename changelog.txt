@@ -1,3 +1,11 @@
+Version 4.38.4 (vMC 1.4.5 BTW 4.38)
+
+  - Added hook to WorldAPI to allow mods to set if a block can be pushed.
+  
+  - Added isWithin helper methods to Area and Cube.
+  
+  - Changed Zones to use isWithin Area methods.
+
 Version 4.38.3 (vMC 1.4.5 BTW 4.38)
 
   - Fixed bug with Zones#get only checking the first matching area
@@ -10,7 +18,7 @@ Version 4.38.2 (vMC 1.4.5 BTW 4.38)
 
 Version 4.38.1 (vMC 1.4.5 BTW 4.38)
 
-  - Fixed bug introduced by MCP decomplation issue.
+  - Fixed bug introduced by MCP decompilation issue.
 
 Version 4.38.0 (vMC 1.4.5 BTW 4.38)
 
