@@ -7,13 +7,18 @@ import net.minecraft.src.World;
 
 public class BlockEvent extends BlockEventBase implements IEventInterrupter {
 	
-	public enum TYPE { BROKEN, EXPLODE_ATTEMPT, BURN_ATTEMPT, FIRE_SPREAD_ATTEMPT, IS_FLAMMABLE_BLOCK };
+	public enum TYPE { BROKEN, EXPLODE_ATTEMPT, BURN_ATTEMPT, FIRE_SPREAD_ATTEMPT, IS_FLAMMABLE_BLOCK, CAN_PUSH_BLOCK };
 
 	private TYPE type;
 	
 	private boolean isHandled = false;
 	private boolean isAllowed = true;
 	private boolean isFlammable = true;
+	
+	private int pistonOrientation = 0;
+	private int pistonX = 0;
+	private int pistonY = 0;
+	private int pistonZ = 0;
 	
 	public TYPE getType() {
 		return type;
@@ -43,6 +48,22 @@ public class BlockEvent extends BlockEventBase implements IEventInterrupter {
 		isFlammable = false;
 	}
 	
+	public int getPistonOrientation() {
+		return pistonOrientation;
+	}
+	
+	public int getPistonX() {
+		return pistonX;
+	}
+	
+	public int getPistonY() {
+		return pistonY;
+	}
+	
+	public int getPistonZ() {
+		return pistonZ;
+	}
+	
 	public static BlockEvent Broken(World world, Chunk chunk, Block block, int metadata, int x, int y, int z) {
 		BlockEvent event = new BlockEvent(TYPE.BROKEN, world, x, y, z);
 		event.chunk = chunk;
@@ -70,6 +91,15 @@ public class BlockEvent extends BlockEventBase implements IEventInterrupter {
 
 	public static BlockEvent IsFlammableBlock(World world, int x, int y, int z) {
 		BlockEvent event = new BlockEvent(TYPE.IS_FLAMMABLE_BLOCK, world, x, y, z);
+		return event;
+	}
+
+	public static BlockEvent CanPushBlock(World world, int pistonOrientation, int pistonX, int pistonY, int pistonZ, int blockX, int blockY, int blockZ) {
+		BlockEvent event = new BlockEvent(TYPE.CAN_PUSH_BLOCK, world, blockX, blockY, blockZ);
+		event.pistonOrientation = pistonOrientation;
+		event.pistonX = pistonX;
+		event.pistonY = pistonY;
+		event.pistonZ = pistonZ;
 		return event;
 	}
 	

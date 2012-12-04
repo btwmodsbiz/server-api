@@ -9,6 +9,8 @@ import net.minecraft.src.World;
 
 public abstract class BlockEventBase extends PositionedEvent {
 
+	private boolean checkedBlockId = false;
+	protected int blockId = 0;
 	protected Block block = null;
 	protected int metadata = -1;
 	protected boolean metadataSet = false;
@@ -17,10 +19,26 @@ public abstract class BlockEventBase extends PositionedEvent {
 	protected TileEntity tileEntity = null;
 	protected ItemStack[] contents = null;
 	
-	public Block getBlock() {
-		if (block == null) {
-			block = Block.blocksList[world.getBlockId(x, y, z)];
+	public int getBlockId() {
+		if (!checkedBlockId) {
+			checkedBlockId = true;
+			
+			if (block != null) {
+				blockId = block.blockID;
+			}
+			else {
+				blockId = world.getBlockId(x, y, z);
+				if (blockId > 0)
+					block = Block.blocksList[blockId];
+			}
 		}
+		
+		return blockId;
+	}
+	
+	public Block getBlock() {
+		if (!checkedBlockId)
+			getBlockId();
 		
 		return block;
 	}

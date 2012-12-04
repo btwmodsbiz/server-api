@@ -166,4 +166,16 @@ public class WorldAPI {
 		
 		return true;
 	}
+
+	public static boolean onCanPushBlock(World world, int orientation, int pistonX, int pistonY, int pistonZ, int blockX, int blockY, int blockZ) {
+		if (!listeners.isEmpty(IBlockListener.class)) {
+			BlockEvent event = BlockEvent.CanPushBlock(world, orientation, pistonX, pistonY, pistonZ, blockX, blockY, blockZ);
+			((IBlockListener)listeners).onBlockAction(event);
+			
+			if (!event.isAllowed())
+				return false;
+		}
+		
+		return true;
+	}
 }
