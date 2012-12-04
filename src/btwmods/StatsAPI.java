@@ -46,8 +46,6 @@ public class StatsAPI {
 	
 	private static MinecraftServer server;
 	
-	private static volatile int tickCounter = -1;
-	
 	/**
 	 * The detailed measurements that have been take this tick. 
 	 */
@@ -85,15 +83,6 @@ public class StatsAPI {
 		
 		isInitialized = true;
 	}
-	
-	/**
-	 * Get the current tick counter.
-	 * 
-	 * @return The tick counter value.
-	 */
-	public static int getTickCounter() {
-		return tickCounter;
-	}
 
 	/**
 	 * Add a listener supported by this API.
@@ -129,11 +118,9 @@ public class StatsAPI {
 		}
 	}
 
-	public static void onStartTick(int tickCounter) {
+	public static void onStartTick() {
 		if (!isInitialized)
 			return;
-		
-		StatsAPI.tickCounter = tickCounter;
 		
 		// Process any failures that may be queued from the last tick.
 		ModLoader.processFailureQueue();
@@ -143,6 +130,8 @@ public class StatsAPI {
 	}
 
 	public static void onEndTick() {
+		int tickCounter = ServerAPI.getTickCounter();
+		
 		if (!isInitialized)
 			return;
 		

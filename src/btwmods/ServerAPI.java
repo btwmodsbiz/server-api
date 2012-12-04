@@ -14,6 +14,8 @@ public class ServerAPI {
 	
 	private static boolean preloadSpawnChunks = true;
 	
+	private static volatile int tickCounter = -1;
+	
 	private ServerAPI() {}
 	
 	public static void addListener(IAPIListener listener) {
@@ -28,6 +30,15 @@ public class ServerAPI {
 		allowUnloadSpawnChunks = settings.getBoolean("ServerAPI", "allowUnloadSpawnChunks", allowUnloadSpawnChunks);
 		preloadSpawnChunks = settings.getBoolean("ServerAPI", "preloadSpawnChunks", preloadSpawnChunks);
 	}
+	
+	/**
+	 * Get the current tick counter.
+	 * 
+	 * @return The tick counter value.
+	 */
+	public static int getTickCounter() {
+		return tickCounter;
+	}
 
 	public static boolean doInitialChunkLoad() {
 		return preloadSpawnChunks;
@@ -38,7 +49,8 @@ public class ServerAPI {
 	}
 	
 	public static void onStartTick(int tickCounter) {
-		StatsAPI.onStartTick(tickCounter);
+		ServerAPI.tickCounter = tickCounter;
+		StatsAPI.onStartTick();
 		
 		if (!listeners.isEmpty(ITickListener.class)) {
         	TickEvent event = TickEvent.StartTick(tickCounter);
