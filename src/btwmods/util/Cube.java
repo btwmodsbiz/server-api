@@ -15,4 +15,9 @@ public class Cube<Type> extends Area<Type> {
 		this.y1 = y1;
 		this.y2 = y2;
 	}
+	
+	@Override
+	public boolean isWithin(int x, int y, int z) {
+		return super.isWithin(x, y, z) && y >= y1 && y <= y2;
+	}
 }

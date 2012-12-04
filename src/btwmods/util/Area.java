@@ -19,6 +19,20 @@ public class Area<Type> {
 		this.data = data;
 	}
 	
+	public boolean isWithin(int x, int z) {
+		return x >= x1 && x <= x2 && z >= z1 && z <= z2;
+	}
+	
+	/**
+	 * @param x The X coordinate to check.
+	 * @param y The Y coordinate to check.
+	 * @param z The Z coordinate to check.
+	 * @return true if within the Area (or Cube); false otherwise.
+	 */
+	public boolean isWithin(int x, int y, int z) {
+		return isWithin(x, z);
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
