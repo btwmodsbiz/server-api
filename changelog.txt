@@ -1,3 +1,26 @@
+Version 4.38.5 (vMC 1.4.5 BTW 4.38)
+
+  - Added chat color constants to Util.
+  
+  - Added hooks to WorldAPI for when a world's tick starts and ends.
+  
+  - Added helper method to Util to send message parts in as few messages as possible.
+  
+  - Added getPlayersWatchingChunk helper method to PlayerManager.
+
+  - Changed (Moved) StatAPI's getTickCounter to ServerAPI.
+  
+  - Changed ModLoader's modsDir and modDataDir from private to public final.
+  
+  - Fixed bug where WorldAPI's removeListener was not calling the right
+    method in the event handler.
+    
+  - Fixed ModLoader's reportListenerFailure not calling ServerAPI's
+    removeListener.
+    
+  - Fixed bug with call to PlayerAPI's onItemAddedToSlot where it was only
+    being called when the held stack was reduced to 0 size.
+
 Version 4.38.4 (vMC 1.4.5 BTW 4.38)
 
   - Added hook to WorldAPI to allow mods to set if a block can be pushed.
