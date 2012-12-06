@@ -24,9 +24,11 @@ import btwmods.world.BlockEvent;
 import btwmods.world.EntityEvent;
 import btwmods.world.IBlockListener;
 import btwmods.world.IEntityListener;
+import btwmods.world.IWorldTickListener;
+import btwmods.world.WorldTickEvent;
 
 public class WorldAPI {
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IBlockListener.class, IEntityListener.class });
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IBlockListener.class, IEntityListener.class, IWorldTickListener.class });
 	
 	private static MinecraftServer server;
 	
@@ -90,6 +92,16 @@ public class WorldAPI {
 
 	public static void removeListener(IAPIListener listener) {
 		listeners.addListener(listener);
+	}
+
+	public static void onStartTick(int worldIndex) {
+		WorldTickEvent event = WorldTickEvent.StartTick(worldIndex);
+		((IWorldTickListener)listeners).onWorldTick(event);
+	}
+
+	public static void onEndTick(int worldIndex) {
+		WorldTickEvent event = WorldTickEvent.EndTick(worldIndex);
+		((IWorldTickListener)listeners).onWorldTick(event);
 	}
 	
 	public static void onBlockBroken(World world, Chunk chunk, Block block, int x, int y, int z, @SuppressWarnings("unused") int blockID, int blockMetadata) {
