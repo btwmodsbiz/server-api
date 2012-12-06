@@ -289,6 +289,13 @@ public class PlayerAPI {
 		}
 	}
 
+	public static void onUseEntity(EntityPlayer player, Entity entity, boolean isLeftClick) {
+		if (!listeners.isEmpty(IPlayerActionListener.class)) {
+			PlayerActionEvent event = PlayerActionEvent.UseEntity(player, entity, isLeftClick);
+        	((IPlayerActionListener)listeners).onPlayerAction(event);
+		}
+	}
+
 	public static boolean onUseEntityAttempt(EntityPlayer player, Entity entity, boolean isLeftClick) {
 		if (!listeners.isEmpty(IPlayerActionListener.class)) {
 			PlayerActionEvent event = PlayerActionEvent.UseEntityAttempt(player, entity, isLeftClick);

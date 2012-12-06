@@ -7,7 +7,7 @@ import net.minecraft.src.EntityPlayer;
 
 public class PlayerActionEvent extends APIEvent implements IEventInterrupter {
 	
-	public enum TYPE { ATTACKED_BY_PLAYER, PLAYER_USE_ENTITY_ATTEMPT };
+	public enum TYPE { ATTACKED_BY_PLAYER, PLAYER_USE_ENTITY_ATTEMPT, PLAYER_USE_ENTITY };
 	
 	private TYPE type;
 	private Entity entity = null;
@@ -57,6 +57,13 @@ public class PlayerActionEvent extends APIEvent implements IEventInterrupter {
 
 	public static PlayerActionEvent UseEntityAttempt(EntityPlayer player, Entity entity, boolean isLeftClick) {
 		PlayerActionEvent event = new PlayerActionEvent(player, TYPE.PLAYER_USE_ENTITY_ATTEMPT);
+		event.entity = entity;
+		event.isLeftClick = isLeftClick;
+		return event;
+	}
+
+	public static PlayerActionEvent UseEntity(EntityPlayer player, Entity entity, boolean isLeftClick) {
+		PlayerActionEvent event = new PlayerActionEvent(player, TYPE.PLAYER_USE_ENTITY);
 		event.entity = entity;
 		event.isLeftClick = isLeftClick;
 		return event;
