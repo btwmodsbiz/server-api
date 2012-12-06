@@ -633,6 +633,7 @@ public class ModLoader {
 		WorldAPI.removeListener(listener);
 		NetworkAPI.unregisterCustomChannels(listener);
 		PlayerAPI.removeListener(listener);
+		ServerAPI.removeListener(listener);
 		
 		IMod mod = null;
 		String name = listener.getClass().getName();
