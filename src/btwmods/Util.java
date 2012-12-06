@@ -7,6 +7,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.src.ICommandSender;
+import net.minecraft.src.Packet3Chat;
+
 public class Util {
 	public static final String COLOR_BLACK  = "\u00a70";
 	public static final String COLOR_NAVY   = "\u00a71";
@@ -132,5 +135,11 @@ public class Util {
 			messages.add(sb.toString());
 		
 		return messages;
+	}
+	
+	public static void sendInMinimumMessages(ICommandSender sender, List<String> parts, String separator) {
+		for (String message : Util.combineIntoMaxLengthMessages(parts, Packet3Chat.maxChatLength, separator, false)) {
+			sender.sendChatToPlayer(message);
+		}
 	}
 }
