@@ -91,7 +91,7 @@ public class WorldAPI {
 	}
 
 	public static void removeListener(IAPIListener listener) {
-		listeners.addListener(listener);
+		listeners.removeListener(listener);
 	}
 
 	public static void onStartTick(int worldIndex) {
