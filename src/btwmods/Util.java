@@ -8,6 +8,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Util {
+	public static final String COLOR_BLACK  = "\u00a70";
+	public static final String COLOR_NAVY   = "\u00a71";
+	public static final String COLOR_GREEN  = "\u00a72";
+	public static final String COLOR_TEAL   = "\u00a73";
+	public static final String COLOR_MAROON = "\u00a74";
+	public static final String COLOR_PURPLE = "\u00a75";
+	public static final String COLOR_GOLD   = "\u00a76";
+	public static final String COLOR_SILVER = "\u00a77";
+	public static final String COLOR_GREY   = "\u00a78";
+	public static final String COLOR_BLUE   = "\u00a79";
+	public static final String COLOR_LIME   = "\u00a7a";
+	public static final String COLOR_AQUA   = "\u00a7b";
+	public static final String COLOR_RED    = "\u00a7c";
+	public static final String COLOR_PINK   = "\u00a7d";
+	public static final String COLOR_YELLOW = "\u00a7e";
+	public static final String COLOR_WHITE  = "\u00a7f";
 	public static final DecimalFormat DECIMAL_FORMAT_3 = new DecimalFormat("0.000");
 	public static final DecimalFormat DECIMAL_FORMAT_2 = new DecimalFormat("0.00");
 	public static final DecimalFormat DECIMAL_FORMAT_1 = new DecimalFormat("0.0");
