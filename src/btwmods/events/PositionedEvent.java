@@ -3,18 +3,13 @@ package btwmods.events;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.World;
 
-public abstract class PositionedEvent extends APIEvent {
+public abstract class PositionedEvent extends WorldEvent {
 	
-	protected final World world;
 	protected Chunk chunk = null;
 	
 	protected final int x;
 	protected final int y;
 	protected final int z;
-	
-	public World getWorld() {
-		return world;
-	}
 	
 	public int getX() {
 		return x;
@@ -37,15 +32,15 @@ public abstract class PositionedEvent extends APIEvent {
 	}
 	
 	protected PositionedEvent(Object source, World world, int x, int y, int z) {
-		super(source);
-		
-		if (world == null)
-			throw new NullPointerException("world cannot be null.");
-		
-		this.world = world;
+		super(source, world);
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+	
+	protected PositionedEvent(Object source, World world, Chunk chunk, int x, int y, int z) {
+		this(source, world, x, y, z);
+		this.chunk = chunk;
 	}
 
 }
