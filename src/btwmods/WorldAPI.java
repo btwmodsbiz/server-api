@@ -21,14 +21,16 @@ import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
 import btwmods.io.Settings;
 import btwmods.world.BlockEvent;
+import btwmods.world.ChunkEvent;
 import btwmods.world.EntityEvent;
 import btwmods.world.IBlockListener;
+import btwmods.world.IChunkListener;
 import btwmods.world.IEntityListener;
 import btwmods.world.IWorldTickListener;
 import btwmods.world.WorldTickEvent;
 
 public class WorldAPI {
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IBlockListener.class, IEntityListener.class, IWorldTickListener.class });
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IBlockListener.class, IEntityListener.class, IWorldTickListener.class, IChunkListener.class });
 	
 	private static MinecraftServer server;
 	
@@ -189,5 +191,10 @@ public class WorldAPI {
 		}
 		
 		return true;
+	}
+
+	public static void onUnloadedChunk(World world, Chunk chunk) {
+		ChunkEvent event = ChunkEvent.Unloaded(world, chunk);
+		((IChunkListener)listeners).onChunkAction(event);
 	}
 }
