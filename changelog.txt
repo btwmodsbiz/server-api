@@ -1,3 +1,17 @@
+Version 4.40.0 (vMC 1.4.5 BTW 4.40)
+
+  - Updated to BTW 4.40.
+
+  - Added hook to PlayerAPI for after an entity has been used (attacked or
+    right clicked) by a player.
+    
+  - Added abstract ChunkEvent.
+  
+  - Added hook to WorldAPI for when chunks are unloaded, allowing for the
+    now unused Chunk data to be processed by a separate thread.
+  
+  - Changed (Refactored) World data from PositionedEvent to WorldEvent.
+
 Version 4.38.5 (vMC 1.4.5 BTW 4.38)
 
   - Added chat color constants to Util.
