@@ -242,6 +242,16 @@ public class PlayerAPI {
 		}
 	}
 
+	public static SpawnPosition onGetDefaultLocation(EntityPlayer entityPlayer) {
+		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
+			PlayerInstanceEvent event = PlayerInstanceEvent.GetDefaultLocation(entityPlayer);
+        	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
+        	return event.getSpawnPosition();
+		}
+		
+		return null;
+	}
+
 	/**
 	 * @param oldPlayerInstance The old instance of {@link EntityPlayer} that is being recreated.
 	 * @return The position the player should respawn at, if set by a mod. <code>null</code> otherwise.
