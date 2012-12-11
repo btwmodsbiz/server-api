@@ -16,7 +16,7 @@ public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 
 	private TYPE type;
 	private EntityPlayer playerInstance = null;
-	private RespawnPosition respawnPosition = null;
+	private SpawnPosition spawnPosition = null;
 	private NBTTagCompound tagCompound = null;
 	private NBTTagCompound modTagCompound = null;
 	
@@ -44,16 +44,16 @@ public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 		return playerInstance;
 	}
 	
-	public RespawnPosition getRespawnPosition() {
-		return respawnPosition;
+	public SpawnPosition getSpawnPosition() {
+		return spawnPosition;
 	}
 	
 	public NBTTagCompound getNBTTagCompound() {
 		return modTagCompound == null ? tagCompound : modTagCompound;
 	}
 	
-	public void setRespawnPosition(RespawnPosition respawnPosition) {
-		this.respawnPosition = respawnPosition;
+	public void setSpawnLocation(SpawnPosition spawnPosition) {
+		this.spawnPosition = spawnPosition;
 	}
 	
 	public METADATA getMetadata() {
@@ -174,7 +174,7 @@ public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 
 	@Override
 	public boolean isInterrupted() {
-		return (type == TYPE.RESPAWN && respawnPosition != null) ||
+		return (type == TYPE.RESPAWN && spawnPosition != null) ||
 				(type == TYPE.CHECK_METADATA && isMetadataValueSet);
 	}
 	

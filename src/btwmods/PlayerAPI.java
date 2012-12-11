@@ -16,7 +16,7 @@ import btwmods.player.PlayerInstanceEvent;
 import btwmods.player.PlayerInstanceEvent.METADATA;
 import btwmods.player.PlayerEventInvocationWrapper;
 import btwmods.player.PlayerActionEvent;
-import btwmods.player.RespawnPosition;
+import btwmods.player.SpawnPosition;
 import btwmods.player.SlotEvent;
 
 import net.minecraft.server.MinecraftServer;
@@ -246,11 +246,11 @@ public class PlayerAPI {
 	 * @param oldPlayerInstance The old instance of {@link EntityPlayer} that is being recreated.
 	 * @return The position the player should respawn at, if set by a mod. <code>null</code> otherwise.
 	 */
-	public static RespawnPosition onHandleRespawn(EntityPlayer oldPlayerInstance) {
+	public static SpawnPosition onHandleRespawn(EntityPlayer oldPlayerInstance) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.Respawn(oldPlayerInstance);
         	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
-        	return event.getRespawnPosition();
+        	return event.getSpawnPosition();
 		}
 		
 		return null;
