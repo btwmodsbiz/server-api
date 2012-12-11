@@ -1,3 +1,19 @@
+Version 4.40.1 (vMC 1.4.5 BTW 4.40)
+
+  - Added yaw and pitch to SpawnPosition.
+  
+  - Added hook to PlayerAPI to allow mods to set the default location of
+    EntityPlayerMPs when they are initialized.
+    
+  - Added float and double methods to Settings.
+
+  - Changed names in PlayerInstanceEvent and related from 'respawn' to 'spawn'.
+  
+  - Changed PlayerInstanceEvent's TYPE and playerInstance to be final.
+  
+  - EntityPlayerMP's recreatePlayerEntity now uses the spawnPosition's yaw
+    and pitch.
+
 Version 4.40.0 (vMC 1.4.5 BTW 4.40)
 
   - Updated to BTW 4.40.
