@@ -176,6 +176,58 @@ public class Settings {
 		}
 	}
 	
+	public boolean isFloat(String key) {
+		return isFloat(null, key);
+	}
+	
+	public boolean isFloat(String section, String key) {
+		try {
+			String setting = get(section, key);
+			return setting != null && Float.valueOf(setting) != null;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+	
+	public float getFloat(String key, float defaultValue) {
+		return getFloat(null, key, defaultValue);
+	}
+	
+	public float getFloat(String section, String key, float defaultValue) {
+		try {
+			String setting = get(section, key);
+			return setting == null ? defaultValue : Float.parseFloat(setting);
+		} catch (NumberFormatException e) {
+			return defaultValue;
+		}
+	}
+	
+	public boolean isDouble(String key) {
+		return isDouble(null, key);
+	}
+	
+	public boolean isDouble(String section, String key) {
+		try {
+			String setting = get(section, key);
+			return setting != null && Double.valueOf(setting) != null;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+	
+	public double getDouble(String key, double defaultValue) {
+		return getDouble(null, key, defaultValue);
+	}
+	
+	public double getDouble(String section, String key, double defaultValue) {
+		try {
+			String setting = get(section, key);
+			return setting == null ? defaultValue : Double.parseDouble(setting);
+		} catch (NumberFormatException e) {
+			return defaultValue;
+		}
+	}
+	
 	public boolean hasKey(String key) {
 		return hasKey(null, key);
 	}
@@ -240,6 +292,10 @@ public class Settings {
 	
 	public void setLong(String section, String key, long value) {
 		set(section, key, Long.toString(value));
+	}
+	
+	public void setFloat(String section, String key, float value) {
+		set(section, key, Float.toString(value));
 	}
 	
 	public void set(String key, String value) {
