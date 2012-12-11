@@ -14,8 +14,9 @@ public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 	public enum TYPE { LOGIN, LOGOUT, RESPAWN, READ_NBT, WRITE_NBT, CHECK_METADATA, METADATA_CHANGED };
 	public enum METADATA { IS_PVP };
 
-	private TYPE type;
-	private EntityPlayer playerInstance = null;
+	private final TYPE type;
+	private final EntityPlayer playerInstance;
+	
 	private SpawnPosition spawnPosition = null;
 	private NBTTagCompound tagCompound = null;
 	private NBTTagCompound modTagCompound = null;
@@ -48,12 +49,12 @@ public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 		return spawnPosition;
 	}
 	
-	public NBTTagCompound getNBTTagCompound() {
-		return modTagCompound == null ? tagCompound : modTagCompound;
-	}
-	
 	public void setSpawnLocation(SpawnPosition spawnPosition) {
 		this.spawnPosition = spawnPosition;
+	}
+	
+	public NBTTagCompound getNBTTagCompound() {
+		return modTagCompound == null ? tagCompound : modTagCompound;
 	}
 	
 	public METADATA getMetadata() {
@@ -114,54 +115,43 @@ public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 	}
 	
 	public static PlayerInstanceEvent Login(EntityPlayer playerInstance) {
-		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.LOGIN, playerInstance);
-		event.playerInstance = playerInstance;
-		return event;
+		return new PlayerInstanceEvent(TYPE.LOGIN, playerInstance);
 	}
 	
 	public static PlayerInstanceEvent Logout(EntityPlayer playerInstance) {
-		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.LOGOUT, playerInstance);
-		event.playerInstance = playerInstance;
-		return event;
+		return new PlayerInstanceEvent(TYPE.LOGOUT, playerInstance);
 	}
 	
 	public static PlayerInstanceEvent Respawn(EntityPlayer playerInstance) {
-		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.RESPAWN, playerInstance);
-		event.playerInstance = playerInstance;
-		return event;
+		return new PlayerInstanceEvent(TYPE.RESPAWN, playerInstance);
 	}
 
 	public static PlayerInstanceEvent ReadFromNBT(EntityPlayer playerInstance, NBTTagCompound nbtTagCompound) {
 		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.READ_NBT, playerInstance);
-		event.playerInstance = playerInstance;
 		event.tagCompound = nbtTagCompound;
 		return event;
 	}
 
 	public static PlayerInstanceEvent WriteToNBT(EntityPlayer playerInstance, NBTTagCompound nbtTagCompound) {
 		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.WRITE_NBT, playerInstance);
-		event.playerInstance = playerInstance;
 		event.tagCompound = nbtTagCompound;
 		return event;
 	}
 	
 	public static PlayerInstanceEvent CheckMetadata(EntityPlayer playerInstance, METADATA metadata) {
 		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.CHECK_METADATA, playerInstance);
-		event.playerInstance = playerInstance;
 		event.metadata = metadata;
 		return event;
 	}
 	
 	public static PlayerInstanceEvent MetadataChanged(EntityPlayer playerInstance, METADATA metadata) {
 		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.METADATA_CHANGED, playerInstance);
-		event.playerInstance = playerInstance;
 		event.metadata = metadata;
 		return event;
 	}
 	
 	public static PlayerInstanceEvent MetadataChanged(EntityPlayer playerInstance, METADATA metadata, Object newValue) {
 		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.METADATA_CHANGED, playerInstance);
-		event.playerInstance = playerInstance;
 		event.metadata = metadata;
 		event.setMetadataValue(newValue);
 		return event;
@@ -169,6 +159,7 @@ public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 	
 	private PlayerInstanceEvent(TYPE type, EntityPlayer playerInstance) {
 		super(playerInstance);
+		this.playerInstance = playerInstance;
 		this.type = type;
 	}
 
