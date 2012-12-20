@@ -129,9 +129,12 @@ public class Settings {
 	}
 	
 	public boolean isInt(String section, String key) {
+		return isIntValue(get(section, key));
+	}
+	
+	public static boolean isIntValue(String value) {
 		try {
-			String setting = get(section, key);
-			return setting != null && Integer.valueOf(setting) != null;
+			return value != null && Integer.valueOf(value) != null;
 		} catch (NumberFormatException e) {
 			return false;
 		}
@@ -155,9 +158,12 @@ public class Settings {
 	}
 	
 	public boolean isLong(String section, String key) {
+		return isLongValue(get(section, key));
+	}
+	
+	public static boolean isLongValue(String value) {
 		try {
-			String setting = get(section, key);
-			return setting != null && Long.valueOf(setting) != null;
+			return value != null && Long.valueOf(value) != null;
 		} catch (NumberFormatException e) {
 			return false;
 		}
@@ -181,9 +187,12 @@ public class Settings {
 	}
 	
 	public boolean isFloat(String section, String key) {
+		return isFloatValue(get(section, key));
+	}
+	
+	public static boolean isFloatValue(String value) {
 		try {
-			String setting = get(section, key);
-			return setting != null && Float.valueOf(setting) != null;
+			return value != null && Float.valueOf(value) != null;
 		} catch (NumberFormatException e) {
 			return false;
 		}
@@ -207,9 +216,12 @@ public class Settings {
 	}
 	
 	public boolean isDouble(String section, String key) {
+		return isDoubleValue(get(section, key));
+	}
+	
+	public static boolean isDoubleValue(String value) {
 		try {
-			String setting = get(section, key);
-			return setting != null && Double.valueOf(setting) != null;
+			return value != null && Double.valueOf(value) != null;
 		} catch (NumberFormatException e) {
 			return false;
 		}
