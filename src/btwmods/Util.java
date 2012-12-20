@@ -70,7 +70,18 @@ public class Util {
 		return 0;
 	}
 	
-	public static int getWorldDimensionFromName(String name) {
+	public static int getWorldIndexFromName(String name) throws IllegalArgumentException {
+		if (name.equalsIgnoreCase("Overworld"))
+			return 0;
+		else if (name.equalsIgnoreCase("Nether"))
+			return 1;
+		else if (name.equalsIgnoreCase("TheEnd") || name.equalsIgnoreCase("End"))
+			return 2;
+		else
+			throw new IllegalArgumentException(name + " is not a valid dimension name.");
+	}
+	
+	public static int getWorldDimensionFromName(String name) throws IllegalArgumentException {
 		if (name.equalsIgnoreCase("Overworld"))
 			return 0;
 		else if (name.equalsIgnoreCase("Nether"))
@@ -87,6 +98,17 @@ public class Util {
 		if (dimension == -1)
 			return "Nether";
 		else if (dimension == 1)
+			return "TheEnd";
+		else
+			return null;
+	}
+	
+	public static String getWorldNameFromIndex(int index) {
+		if (index == 0)
+			return "Overworld";
+		if (index == 1)
+			return "Nether";
+		else if (index == 2)
 			return "TheEnd";
 		else
 			return null;
