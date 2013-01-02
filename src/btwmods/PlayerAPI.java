@@ -3,6 +3,7 @@ package btwmods;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
+import btwmods.player.IPlayerChatListener;
 import btwmods.player.PlayerBlockEvent;
 import btwmods.player.ContainerEvent;
 import btwmods.player.DropEvent;
@@ -12,6 +13,7 @@ import btwmods.player.IContainerListener;
 import btwmods.player.IDropListener;
 import btwmods.player.IPlayerInstanceListener;
 import btwmods.player.ISlotListener;
+import btwmods.player.PlayerChatEvent;
 import btwmods.player.PlayerInstanceEvent;
 import btwmods.player.PlayerInstanceEvent.METADATA;
 import btwmods.player.PlayerEventInvocationWrapper;
@@ -27,12 +29,13 @@ import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.NetServerHandler;
 import net.minecraft.src.Slot;
 import net.minecraft.src.World;
 
 public class PlayerAPI {
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IPlayerActionListener.class, IPlayerInstanceListener.class, IPlayerBlockListener.class, ISlotListener.class,
-			IContainerListener.class, IDropListener.class }, new PlayerEventInvocationWrapper());
+			IContainerListener.class, IDropListener.class, IPlayerChatListener.class }, new PlayerEventInvocationWrapper());
 	
 	private PlayerAPI() {}
 	
@@ -338,6 +341,18 @@ public class PlayerAPI {
         	((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
 			
 			if (!event.isAllowed())
+				return false;
+		}
+		
+		return true;
+	}
+
+	public static boolean onHandleGlobalChat(NetServerHandler handler, EntityPlayer player, String message) {
+		if (!listeners.isEmpty(IPlayerChatListener.class)) {
+			PlayerChatEvent event = PlayerChatEvent.GlobalChat(handler, player, message);
+        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+			
+			if (event.isHandled())
 				return false;
 		}
 		
