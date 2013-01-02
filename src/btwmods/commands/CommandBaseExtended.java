@@ -2,7 +2,9 @@ package btwmods.commands;
 
 import btwmods.Util;
 import btwmods.io.Settings;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.CommandBase;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ICommandSender;
 import net.minecraft.src.WrongUsageException;
 
@@ -46,5 +48,11 @@ public abstract class CommandBaseExtended extends CommandBase {
 		catch (IllegalArgumentException e) {
 			return false;
 		}
+	}
+	
+	public static boolean isFullUsageAllowed(ICommandSender sender) {
+		return sender instanceof EntityPlayer
+				? MinecraftServer.getServer().getConfigurationManager().areCommandsAllowed(sender.getCommandSenderName())
+				: true;
 	}
 }
