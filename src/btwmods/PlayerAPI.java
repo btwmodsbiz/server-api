@@ -25,6 +25,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.Container;
+import net.minecraft.src.DamageSource;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
@@ -241,6 +242,13 @@ public class PlayerAPI {
 	public static void onLogout(EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
         	PlayerInstanceEvent event = PlayerInstanceEvent.Logout(player);
+        	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
+		}
+	}
+
+	public static void onDeath(EntityPlayer player, DamageSource source, String deathMessage) {
+		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
+        	PlayerInstanceEvent event = PlayerInstanceEvent.Death(player, source, deathMessage);
         	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
 		}
 	}

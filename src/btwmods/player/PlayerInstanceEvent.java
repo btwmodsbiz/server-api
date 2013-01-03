@@ -6,12 +6,13 @@ import java.util.Map;
 import btwmods.IMod;
 import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
+import net.minecraft.src.DamageSource;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.NBTTagCompound;
 
 public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 	
-	public enum TYPE { LOGIN, LOGOUT, RESPAWN, READ_NBT, WRITE_NBT, CHECK_METADATA, METADATA_CHANGED, GET_DEFAULT_LOCATION };
+	public enum TYPE { LOGIN, LOGOUT, DEATH, RESPAWN, READ_NBT, WRITE_NBT, CHECK_METADATA, METADATA_CHANGED, GET_DEFAULT_LOCATION };
 	public enum METADATA { IS_PVP };
 
 	private final TYPE type;
@@ -24,6 +25,9 @@ public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 	private METADATA metadata = null;
 	private Object metadataValue = null;
 	private boolean isMetadataValueSet = false;
+
+	private DamageSource damageSource = null;
+	private String deathMessage = null;
 	
 	private final static Map<METADATA, Class> metadataReturnTypes = new HashMap<METADATA, Class>();
 	
@@ -114,6 +118,14 @@ public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 			throw new IllegalStateException("Metadata value is set to " + (metadataValue == null ? "null" : metadataValue.getClass().getSimpleName()) + " but should be " + Double.class.getSimpleName());
 	}
 	
+	public DamageSource getDamageSource() {
+		return damageSource;
+	}
+	
+	public String getDeathMessage() {
+		return deathMessage;
+	}
+	
 	public static PlayerInstanceEvent Login(EntityPlayer playerInstance) {
 		return new PlayerInstanceEvent(TYPE.LOGIN, playerInstance);
 	}
@@ -159,6 +171,13 @@ public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 
 	public static PlayerInstanceEvent GetDefaultLocation(EntityPlayer entityPlayer) {
 		return new PlayerInstanceEvent(TYPE.GET_DEFAULT_LOCATION, entityPlayer);
+	}
+
+	public static PlayerInstanceEvent Death(EntityPlayer player, DamageSource damageSource, String deathMessage) {
+		PlayerInstanceEvent event = new PlayerInstanceEvent(TYPE.DEATH, player);
+		event.damageSource = damageSource;
+		event.deathMessage = deathMessage;
+		return event;
 	}
 	
 	private PlayerInstanceEvent(TYPE type, EntityPlayer playerInstance) {
