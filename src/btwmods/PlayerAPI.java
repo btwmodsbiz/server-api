@@ -365,4 +365,11 @@ public class PlayerAPI {
 		
 		return true;
 	}
+	
+	public static void onGlobalChat(EntityPlayer player, String message) {
+		if (!listeners.isEmpty(IPlayerChatListener.class)) {
+			PlayerChatEvent event = PlayerChatEvent.GlobalChat(player, message);
+        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+		}
+	}
 }

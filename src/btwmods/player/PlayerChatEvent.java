@@ -1,5 +1,6 @@
 package btwmods.player;
 
+import btwmods.PlayerAPI;
 import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
 import net.minecraft.server.MinecraftServer;
@@ -8,7 +9,7 @@ import net.minecraft.src.Packet3Chat;
 
 public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	
-	public enum TYPE { HANDLE_GLOBAL };
+	public enum TYPE { HANDLE_GLOBAL, GLOBAL };
 	
 	public final TYPE type;
 	public final EntityPlayer player;
@@ -43,8 +44,14 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 		if (type == TYPE.HANDLE_GLOBAL && message != null) {
 			MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(message, false));
 			MinecraftServer.getServer().logger.info(message);
+			PlayerAPI.onGlobalChat(player, message);
 			markHandled();
 		}
+	}
+
+	public static PlayerChatEvent GlobalChat(EntityPlayer player, String message) {
+		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.GLOBAL, message);
+		return event;
 	}
 
 	public static PlayerChatEvent HandleGlobalChat(EntityPlayer player, String message) {
