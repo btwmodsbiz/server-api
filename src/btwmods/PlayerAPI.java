@@ -30,7 +30,6 @@ import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.NetServerHandler;
 import net.minecraft.src.Slot;
 import net.minecraft.src.World;
 
@@ -355,9 +354,9 @@ public class PlayerAPI {
 		return true;
 	}
 
-	public static boolean onHandleGlobalChat(NetServerHandler handler, EntityPlayer player, String message) {
+	public static boolean onHandleGlobalChat(EntityPlayer player, String message) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
-			PlayerChatEvent event = PlayerChatEvent.GlobalChat(handler, player, message);
+			PlayerChatEvent event = PlayerChatEvent.HandleGlobalChat(player, message);
         	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 			
 			if (event.isHandled())

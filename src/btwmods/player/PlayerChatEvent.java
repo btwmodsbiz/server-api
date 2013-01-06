@@ -4,15 +4,13 @@ import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.NetServerHandler;
 import net.minecraft.src.Packet3Chat;
 
 public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	
-	public enum TYPE { GLOBAL };
+	public enum TYPE { HANDLE_GLOBAL };
 	
 	public final TYPE type;
-	public final NetServerHandler handler;
 	public final EntityPlayer player;
 	public final String originalMessage;
 	
@@ -20,11 +18,12 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	private boolean isHandled = false;
 	
 	public boolean isHandled() {
-		return message != null && isHandled;
+		return isHandled;
 	}
 	
 	public void markHandled() {
-		isHandled = true;
+		if (type == TYPE.HANDLE_GLOBAL)
+			isHandled = true;
 	}
 	
 	public String getMessage() {
@@ -36,26 +35,26 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	}
 	
 	public void setMessage(String message) {
-		this.message = message;
+		if (type == TYPE.HANDLE_GLOBAL)
+			this.message = message;
 	}
 	
 	public void sendAsGlobalMessage() {
-		if (message != null) {
-			MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(getMessage(), false));
-			MinecraftServer.getServer().logger.info(getMessage());
+		if (type == TYPE.HANDLE_GLOBAL && message != null) {
+			MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(message, false));
+			MinecraftServer.getServer().logger.info(message);
 			markHandled();
 		}
 	}
 
-	public static PlayerChatEvent GlobalChat(NetServerHandler handler, EntityPlayer player, String message) {
-		PlayerChatEvent event = new PlayerChatEvent(handler, player, TYPE.GLOBAL, message);
+	public static PlayerChatEvent HandleGlobalChat(EntityPlayer player, String message) {
+		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.HANDLE_GLOBAL, message);
 		return event;
 	}
 	
-	private PlayerChatEvent(NetServerHandler handler, EntityPlayer player, TYPE type, String message) {
+	private PlayerChatEvent(EntityPlayer player, TYPE type, String message) {
 		super(player);
 		this.type = type;
-		this.handler = handler;
 		this.player = player;
 		this.originalMessage = message;
 	}
