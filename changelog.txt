@@ -1,3 +1,20 @@
+Version 4.41.3 (vMC 1.4.6 BTW 4.41)
+    
+  - Added onGlobalChat hook to PlayerAPI to catch messages sent by either
+    vMC or PlayerChatEvent.
+    
+  - Added utility ValuePair class.
+
+  - Changed PlayerAPI's onHandleGlobalChat and PlayerChatEvent to use
+    more consistent naming and to remove the unnecessary NetServerHandler.
+    
+  - Fixed (temporarily) fireworks crash.
+  
+  - Fixed (temporarily) enchantment thorn crash.
+  
+  - Fixed bug in WorldServer#obtainEntitySkin where the skin is obtained
+    before adding the key to the entity map.
+
 Version 4.41.2 (vMC 1.4.6 BTW 4.41)
 
   - Added hook to PlayerAPI to monitor player deaths with the death message.
