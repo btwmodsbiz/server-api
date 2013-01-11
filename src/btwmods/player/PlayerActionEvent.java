@@ -4,15 +4,20 @@ import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.ItemStack;
 
 public class PlayerActionEvent extends APIEvent implements IEventInterrupter {
 	
-	public enum TYPE { ATTACKED_BY_PLAYER, PLAYER_USE_ENTITY_ATTEMPT, PLAYER_USE_ENTITY };
+	public enum TYPE { ATTACKED_BY_PLAYER, PLAYER_USE_ENTITY_ATTEMPT, PLAYER_USE_ENTITY, USE_ITEM_ATTEMPT, USE_ITEM };
 	
 	private TYPE type;
 	private Entity entity = null;
 	private EntityPlayer player = null;
 	private boolean isLeftClick = false;
+	private ItemStack itemStack = null;
+	private ItemStack originalItemStack;
+	private int originalQuantity;
+	private int originalDamage;
 	
 	private boolean isHandled = false;
 	private boolean isAllowed = true;
@@ -49,6 +54,22 @@ public class PlayerActionEvent extends APIEvent implements IEventInterrupter {
 		return isLeftClick;
 	}
 	
+	public ItemStack getItemStack() {
+		return itemStack;
+	}
+	
+	public ItemStack getOriginalItemStack() {
+		return originalItemStack;
+	}
+	
+	public int getOriginalItemStackQuantity() {
+		return originalQuantity;
+	}
+	
+	public int getOriginalItemStackDamage() {
+		return originalDamage;
+	}
+	
 	public static PlayerActionEvent AttackedByPlayer(Entity entity, EntityPlayer player) {
 		PlayerActionEvent event = new PlayerActionEvent(player, TYPE.ATTACKED_BY_PLAYER);
 		event.entity = entity;
@@ -66,6 +87,21 @@ public class PlayerActionEvent extends APIEvent implements IEventInterrupter {
 		PlayerActionEvent event = new PlayerActionEvent(player, TYPE.PLAYER_USE_ENTITY);
 		event.entity = entity;
 		event.isLeftClick = isLeftClick;
+		return event;
+	}
+
+	public static PlayerActionEvent ItemUseAttempt(EntityPlayer player, ItemStack itemStack) {
+		PlayerActionEvent event = new PlayerActionEvent(player, TYPE.USE_ITEM_ATTEMPT);
+		event.itemStack = itemStack;
+		return event;
+	}
+
+	public static PlayerActionEvent ItemUse(EntityPlayer player, ItemStack itemStack, ItemStack originalItemStack, int originalQuantity, int originalDamage) {
+		PlayerActionEvent event = new PlayerActionEvent(player, TYPE.USE_ITEM);
+		event.itemStack = itemStack;
+		event.originalItemStack = originalItemStack;
+		event.originalQuantity = originalQuantity;
+		event.originalDamage = originalDamage;
 		return event;
 	}
 	

@@ -372,4 +372,23 @@ public class PlayerAPI {
         	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 		}
 	}
+
+	public static boolean onItemUseAttempt(EntityPlayer player, ItemStack itemStack) {
+		if (!listeners.isEmpty(IPlayerActionListener.class)) {
+			PlayerActionEvent event = PlayerActionEvent.ItemUseAttempt(player, itemStack);
+			((IPlayerActionListener)listeners).onPlayerAction(event);
+			
+			if (!event.isAllowed())
+				return false;
+		}
+		
+		return true;
+	}
+
+	public static void onItemUse(EntityPlayer player, ItemStack itemStack, ItemStack originalItemStack, int originalQuantity, int originalDamage) {
+		if (!listeners.isEmpty(IPlayerActionListener.class)) {
+			PlayerActionEvent event = PlayerActionEvent.ItemUse(player, itemStack, originalItemStack, originalQuantity, originalDamage);
+			((IPlayerActionListener)listeners).onPlayerAction(event);
+		}
+	}
 }
