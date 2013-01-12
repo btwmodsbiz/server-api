@@ -1,3 +1,7 @@
+Version 4.42.0 (vMC 1.4.7 BTW 4.42)
+
+  - Updated to BTW 4.42.
+
 Version 4.41.4 (vMC 1.4.6 BTW 4.41)
 
   - Added PlayerAPI hook for item use attempts and successful item uses.
