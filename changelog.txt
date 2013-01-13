@@ -1,3 +1,7 @@
+Version 4.42.1 (vMC 1.4.7 BTW 4.42)
+
+  - Fixed bug with code being removed possibly by accident.
+
 Version 4.42.0 (vMC 1.4.7 BTW 4.42)
 
   - Updated to BTW 4.42.
