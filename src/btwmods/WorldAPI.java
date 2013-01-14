@@ -6,6 +6,7 @@ import java.util.Set;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
+import net.minecraft.src.BlockDoor;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkProviderServer;
 import net.minecraft.src.Entity;
@@ -26,11 +27,13 @@ import btwmods.world.EntityEvent;
 import btwmods.world.IBlockListener;
 import btwmods.world.IChunkListener;
 import btwmods.world.IEntityListener;
+import btwmods.world.IMobListener;
 import btwmods.world.IWorldTickListener;
+import btwmods.world.MobEvent;
 import btwmods.world.WorldTickEvent;
 
 public class WorldAPI {
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IBlockListener.class, IEntityListener.class, IWorldTickListener.class, IChunkListener.class });
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IBlockListener.class, IEntityListener.class, IWorldTickListener.class, IChunkListener.class, IMobListener.class });
 	
 	private static MinecraftServer server;
 	
@@ -196,5 +199,17 @@ public class WorldAPI {
 	public static void onUnloadedChunk(World world, Chunk chunk) {
 		ChunkEvent event = ChunkEvent.Unloaded(world, chunk);
 		((IChunkListener)listeners).onChunkAction(event);
+	}
+
+	public static boolean onCanAIBreakDoor(EntityLiving theEntity, BlockDoor targetDoor, int entityPosX, int entityPosY, int entityPosZ) {
+		if (!listeners.isEmpty(IMobListener.class)) {
+			MobEvent event = MobEvent.CanBreakDoor(theEntity, targetDoor, entityPosX, entityPosY, entityPosZ);
+			((IMobListener)listeners).onMobAction(event);
+			
+			if (!event.isAllowed())
+				return false;
+		}
+		
+		return true;
 	}
 }
