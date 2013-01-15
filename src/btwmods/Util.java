@@ -164,4 +164,37 @@ public class Util {
 			sender.sendChatToPlayer(message);
 		}
 	}
+	
+	public static String formatSeconds(long seconds) {
+		return formatSeconds(seconds, false);
+	}
+	
+	public static String formatSeconds(long seconds, boolean useShortFormat) {
+		StringBuilder sb = new StringBuilder();
+		
+		if (seconds >= 60L) {
+			sb.append(seconds / 60L).append(useShortFormat ? "m" : " minute");
+			if (!useShortFormat && seconds / 60L != 1)
+				sb.append("s");
+		}
+		
+		if (seconds % 60L != 0) {
+			if (!useShortFormat && sb.length() > 0) sb.append(" ");
+			
+			sb.append(seconds % 60L).append(useShortFormat ? "s" : " second");
+			if (!useShortFormat && seconds % 60L != 1)
+				sb.append("s");
+		}
+		
+		if (sb.length() == 0) {
+			sb.append(seconds);
+			
+			if (useShortFormat)
+				sb.append(seconds == 0 ? "seconds" : "second");
+			else
+				sb.append("s");
+		}
+		
+		return sb.toString();
+	}
 }
