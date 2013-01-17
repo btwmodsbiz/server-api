@@ -263,7 +263,7 @@ public class StatsAPI {
 		String name;
 		
 		if (entity instanceof EntityItem) {
-			name = ((EntityItem)entity).func_92014_d().getItemName();
+			name = ((EntityItem)entity).func_92059_d().getItemName();
 		}
 		else if (entity instanceof EntityPlayer) {
 			name = entity.getClass().getSimpleName();
