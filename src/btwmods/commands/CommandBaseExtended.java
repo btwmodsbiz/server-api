@@ -28,6 +28,18 @@ public abstract class CommandBaseExtended extends CommandBase {
 	public static boolean isStringMatch(String[] args, int index, String match) {
 		return index < args.length && args[index].equalsIgnoreCase(match);
 	}
+	
+	public static boolean isStringMatch(String[] args, int index, String[] matches) {
+		if (index >= args.length)
+			return false;
+		
+		for (String match : matches) {
+			if (args[index].equalsIgnoreCase(match))
+				return true;
+		}
+		
+		return false;
+	}
 
 	public static boolean isInt(String[] args, int index) {
 		return index < args.length && Settings.isIntValue(args[index]);
