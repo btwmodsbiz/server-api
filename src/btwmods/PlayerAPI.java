@@ -202,6 +202,13 @@ public class PlayerAPI {
         	((IDropListener)listeners).onPlayerItemDrop(event);
 		}
 	}
+
+	public static void onItemPickup(EntityPlayer player, ItemStack itemStack, int oldStackSize) {
+		if (!listeners.isEmpty(IDropListener.class)) {
+			DropEvent event = DropEvent.Pickup(player, itemStack, oldStackSize);
+        	((IDropListener)listeners).onPlayerItemDrop(event);
+		}
+	}
 	
 	public static void onItemTransfered(EntityPlayer player, Container container, int slotId, ItemStack original) {
 		if (!listeners.isEmpty(ISlotListener.class)) {

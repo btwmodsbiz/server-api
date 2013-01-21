@@ -6,7 +6,7 @@ import net.minecraft.src.ItemStack;
 
 public class DropEvent extends APIEvent {
 	
-	public enum TYPE { ONE, STACK, EJECT, ALL };
+	public enum TYPE { ONE, STACK, EJECT, ALL, PICKUP };
 
 	private TYPE type;
 	private EntityPlayer player;
@@ -48,6 +48,12 @@ public class DropEvent extends APIEvent {
 	
 	public static DropEvent All(EntityPlayer player) {
 		DropEvent event = new DropEvent(TYPE.ALL, player, null);
+		return event;
+	}
+
+	public static DropEvent Pickup(EntityPlayer player, ItemStack itemStack, int oldStackSize) {
+		DropEvent event = new DropEvent(TYPE.PICKUP, player, itemStack);
+		event.reduceTo = oldStackSize - itemStack.stackSize;
 		return event;
 	}
 	
