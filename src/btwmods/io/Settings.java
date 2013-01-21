@@ -240,6 +240,56 @@ public class Settings {
 		}
 	}
 	
+	public boolean isEnum(Enum e, String key) {
+		return isEnum(e, null, key);
+	}
+	
+	public boolean isEnum(Enum e, String section, String key) {
+		return isEnumValue(e, get(section, key));
+	}
+	
+	public static boolean isEnumValue(Enum e, String value) {
+		try {
+			e.valueOf(e.getClass(), value);
+			return true;
+		}
+		catch (IllegalArgumentException x) {
+			return false;
+		}
+	}
+	
+	public <T extends Enum<T>> T getEnum(Class<T> cls, String key) {
+		return getEnum(cls, null, key, null);
+	}
+	
+	public <T extends Enum<T>> T getEnum(Class<T> cls, String section, String key) {
+		return getEnum(cls, section, key, null);
+	}
+	
+	public <T extends Enum<T>> T getEnum(Class<T> cls, String key, T defaultValue) {
+		return getEnum(cls, null, key, defaultValue);
+	}
+	
+	public <T extends Enum<T>> T getEnum(Class<T> cls, String section, String key, T defaultValue) {
+		return getEnumValue(cls, get(section, key), defaultValue);
+	}
+	
+	public static <T extends Enum<T>> T getEnumValue(Class<T> cls, String value) {
+		return getEnumValue(cls, value, null);
+	}
+	
+	public static <T extends Enum<T>> T getEnumValue(Class<T> cls, String value, T defaultValue) {
+		try {
+			return Enum.valueOf(cls, value);
+		}
+		catch (NullPointerException x) {
+			return defaultValue;
+		}
+		catch (IllegalArgumentException x) {
+			return defaultValue;
+		}
+	}
+	
 	public boolean hasKey(String key) {
 		return hasKey(null, key);
 	}
