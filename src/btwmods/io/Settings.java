@@ -240,17 +240,17 @@ public class Settings {
 		}
 	}
 	
-	public boolean isEnum(Enum e, String key) {
-		return isEnum(e, null, key);
+	public <T extends Enum<T>> boolean isEnum(Class<T> cls, String key) {
+		return isEnum(cls, null, key);
 	}
 	
-	public boolean isEnum(Enum e, String section, String key) {
-		return isEnumValue(e, get(section, key));
+	public <T extends Enum<T>> boolean isEnum(Class<T> cls, String section, String key) {
+		return isEnumValue(cls, get(section, key));
 	}
 	
-	public static boolean isEnumValue(Enum e, String value) {
+	public static <T extends Enum<T>> boolean isEnumValue(Class<T> cls, String value) {
 		try {
-			e.valueOf(e.getClass(), value);
+			Enum.valueOf(cls, value);
 			return true;
 		}
 		catch (IllegalArgumentException x) {
