@@ -1,3 +1,14 @@
+Version 4.51.2 (vMC 1.4.7 BTW 4.51)
+
+  - Added Enum is/get methods to Settings.
+  
+  - Added variation of CommandBaseExtended's isStringMatch that takes an
+    array of possible matches.
+    
+  - Added hook to ServerAPI to allow bred wolves to be wild.
+
+  - Changed wolves so they cannot be retamed after being fed wolf chops.
+
 Version 4.51.1 (vMC 1.4.7 BTW 4.51)
 
   - Added hook to PlayerAPI for when players pickup floating items.
