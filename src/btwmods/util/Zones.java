@@ -16,7 +16,7 @@ public class Zones<Type> extends HashSet<Area<Type>> {
 	
 	@Override
 	public boolean add(Area<Type> area) {
-		if (add(area)) {
+		if (super.add(area)) {
 			addIntervals(area);
 			return true;
 		}
@@ -47,8 +47,8 @@ public class Zones<Type> extends HashSet<Area<Type>> {
 		return o instanceof Area && remove((Area)o);
 	}
 	
-	public boolean remove(Area area) {
-		if (remove(area)) {
+	protected boolean remove(Area area) {
+		if (super.remove(area)) {
 			removeIntervals(area);
 			return true;
 		}
