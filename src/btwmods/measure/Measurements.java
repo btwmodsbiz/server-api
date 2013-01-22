@@ -49,6 +49,7 @@ public class Measurements {
 	
 	public void begin(TimeMeasurement data) {
 		if (enabled) {
+			data.setParent(timeStack.peekLast());
 			timeStack.push(data);
 			data.start();
 		}
