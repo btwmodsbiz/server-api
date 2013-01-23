@@ -6,11 +6,13 @@ import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
 import btwmods.io.Settings;
+import btwmods.server.IServerStopListener;
 import btwmods.server.ITickListener;
+import btwmods.server.ServerStopEvent;
 import btwmods.server.TickEvent;
 
 public class ServerAPI {
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { ITickListener.class });
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { ITickListener.class, IServerStopListener.class });
 	
 	private static boolean allowUnloadSpawnChunks = false;
 	private static boolean preloadSpawnChunks = true;
@@ -74,5 +76,15 @@ public class ServerAPI {
 
 	public static boolean onIsBabyWolfWild() {
 		return chanceForWildWolf > 0 && rand.nextInt(chanceForWildWolf) == 0;
+	}
+
+	public static void onStopServerPre() {
+    	ServerStopEvent event = ServerStopEvent.Pre();
+    	((IServerStopListener)listeners).onServerStop(event);
+	}
+
+	public static void onStopServerPost() {
+    	ServerStopEvent event = ServerStopEvent.Post();
+    	((IServerStopListener)listeners).onServerStop(event);
 	}
 }
