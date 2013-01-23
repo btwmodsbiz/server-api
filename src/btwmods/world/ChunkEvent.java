@@ -5,11 +5,14 @@ import net.minecraft.src.World;
 
 public class ChunkEvent extends btwmods.events.ChunkEvent {
 	
-	public enum TYPE { UNLOADED };
+	public enum TYPE { PREUNLOAD, UNLOADED };
 
 	public static ChunkEvent Unloaded(World world, Chunk chunk) {
-		ChunkEvent event = new ChunkEvent(chunk, TYPE.UNLOADED, world, chunk);
-		return event;
+		return new ChunkEvent(chunk, TYPE.UNLOADED, world, chunk);
+	}
+
+	public static ChunkEvent PreUnload(World world, Chunk chunk) {
+		return new ChunkEvent(chunk, TYPE.PREUNLOAD, world, chunk);
 	}
 	
 	protected final TYPE type;
