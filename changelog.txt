@@ -1,3 +1,9 @@
+Version 4.51.3 (vMC 1.4.7 BTW 4.51)
+
+  - Changed wolves so they can only be bred by their owner.
+  
+  - Changed feral baby wolves so they howl instead of growl on birth.
+
 Version 4.51.2 (vMC 1.4.7 BTW 4.51)
 
   - Added Enum is/get methods to Settings.
