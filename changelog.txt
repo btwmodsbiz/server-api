@@ -1,3 +1,16 @@
+Version 4.52.0 (vMC 1.4.7 BTW 4.52)
+
+  - Updated to BTW 4.52.
+
+  - Added hook to WorldAPI to catch chunks just before they are unloaded and
+    saved to disk.
+  
+  - Added hook to ServerAPI to allow code to be run just before and after
+    the server initiates a shutdown.
+    
+  - Added boolean btwmod_canSaveToDisk property to Entity so it can be
+    prevented from saving to disk.
+
 Version 4.51.3 (vMC 1.4.7 BTW 4.51)
 
   - Changed wolves so they can only be bred by their owner.
