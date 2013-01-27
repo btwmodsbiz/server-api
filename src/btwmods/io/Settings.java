@@ -396,15 +396,15 @@ public class Settings {
 		return false;
 	}
 
-	public void removeKey(String key) {
-		removeKey(null, key);
+	public boolean removeKey(String key) {
+		return removeKey(null, key);
 	}
 
-	public void removeKey(String section, String key) {
-		settings.remove(new SectionKeyPair(section, key));
-		
+	public boolean removeKey(String section, String key) {
 		Set<CaselessKey> keys = sectionKeys.get(section == null ? null : new CaselessKey(section));
 		if (keys != null) keys.remove(key);
+		
+		return settings.remove(new SectionKeyPair(section, key)) != null;
 	}
 	
 	public void saveSettings() throws IOException {
