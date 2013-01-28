@@ -367,10 +367,10 @@ public class PlayerAPI {
         	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 			
 			if (event.isHandled())
-				return false;
+				return true;
 		}
 		
-		return true;
+		return false;
 	}
 
 	public static boolean onHandleGlobalChat(EntityPlayer player, String message) {
