@@ -1,3 +1,9 @@
+Version 4.53.1 (vMC 1.4.7 BTW 4.53)
+
+  - Added option to ServerAPI to allow "softcore" ender chests.
+
+  - Fixed bug with PlayerAPI's onHandleChat returning the wrong value.
+
 Version 4.53.0 (vMC 1.4.7 BTW 4.53)
 
   - Updated to BTW 4.53.
