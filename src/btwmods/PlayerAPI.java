@@ -361,6 +361,18 @@ public class PlayerAPI {
 		return true;
 	}
 
+	public static boolean onHandleChat(EntityPlayer player, String message) {
+		if (!listeners.isEmpty(IPlayerChatListener.class)) {
+			PlayerChatEvent event = PlayerChatEvent.HandleChat(player, message);
+        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+			
+			if (event.isHandled())
+				return false;
+		}
+		
+		return true;
+	}
+
 	public static boolean onHandleGlobalChat(EntityPlayer player, String message) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
 			PlayerChatEvent event = PlayerChatEvent.HandleGlobalChat(player, message);

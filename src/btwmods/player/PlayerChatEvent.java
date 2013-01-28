@@ -9,7 +9,7 @@ import net.minecraft.src.Packet3Chat;
 
 public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	
-	public enum TYPE { HANDLE_GLOBAL, GLOBAL };
+	public enum TYPE { HANDLE_CHAT, HANDLE_GLOBAL, GLOBAL };
 	
 	public final TYPE type;
 	public final EntityPlayer player;
@@ -56,6 +56,11 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 
 	public static PlayerChatEvent HandleGlobalChat(EntityPlayer player, String message) {
 		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.HANDLE_GLOBAL, message);
+		return event;
+	}
+
+	public static PlayerChatEvent HandleChat(EntityPlayer player, String message) {
+		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.HANDLE_CHAT, message);
 		return event;
 	}
 	
