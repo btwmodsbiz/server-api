@@ -1,3 +1,11 @@
+Version 4.53.0 (vMC 1.4.7 BTW 4.53)
+
+  - Updated to BTW 4.53.
+
+  - Added hook to PlayerAPI so chat packets can be entirely handled by mods.
+
+  - Changed the removeKey methods in Settings to return if the key existed.
+
 Version 4.52.0 (vMC 1.4.7 BTW 4.52)
 
   - Updated to BTW 4.52.
