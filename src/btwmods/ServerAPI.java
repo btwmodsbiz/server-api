@@ -14,6 +14,7 @@ import btwmods.server.TickEvent;
 public class ServerAPI {
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { ITickListener.class, IServerStopListener.class });
 	
+	public static boolean softcoreEnderChests = false;
 	private static boolean allowUnloadSpawnChunks = false;
 	private static boolean preloadSpawnChunks = true;
 	private static int chanceForWildWolf = 0;
@@ -36,6 +37,7 @@ public class ServerAPI {
 		allowUnloadSpawnChunks = settings.getBoolean("ServerAPI", "allowUnloadSpawnChunks", allowUnloadSpawnChunks);
 		preloadSpawnChunks = settings.getBoolean("ServerAPI", "preloadSpawnChunks", preloadSpawnChunks);
 		chanceForWildWolf = settings.getInt("ServerAPI", "chanceForWildWolf", chanceForWildWolf);
+		softcoreEnderChests = settings.getBoolean("ServerAPI", "softcoreEnderChests", softcoreEnderChests);
 	}
 	
 	/**
