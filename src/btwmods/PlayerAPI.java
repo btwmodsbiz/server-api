@@ -28,6 +28,7 @@ import net.minecraft.src.Container;
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.InventoryEnderChest;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Slot;
@@ -409,5 +410,16 @@ public class PlayerAPI {
 			PlayerActionEvent event = PlayerActionEvent.ItemUse(player, itemStack, originalItemStack, originalQuantity, originalDamage);
 			((IPlayerActionListener)listeners).onPlayerAction(event);
 		}
+	}
+
+	public static InventoryEnderChest onEnderChestActivate(int x, int y, int z, EntityPlayer player, int direction, float xOffset, float yOffset, float zOffset) {
+		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
+			PlayerBlockEvent event = PlayerBlockEvent.GetEnderChestInventory(player, x, y, z, direction, xOffset, yOffset, zOffset);
+			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
+			
+			return event.getEnderChestInventory();
+		}
+		
+		return null;
 	}
 }

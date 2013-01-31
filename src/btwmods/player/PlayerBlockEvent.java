@@ -3,6 +3,7 @@ package btwmods.player;
 import btwmods.events.IEventInterrupter;
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.InventoryEnderChest;
 import net.minecraft.src.ItemStack;
 
 public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInterrupter {
@@ -44,8 +45,34 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 		event.itemStack = itemStack;
 		return event;
 	}
+
+	public static PlayerBlockEvent GetEnderChestInventory(EntityPlayer player, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.GET_ENDERCHEST_INVENTORY, player, x, y, z);
+		event.direction = direction;
+		event.xOffset = xOffset;
+		event.yOffset = yOffset;
+		event.zOffset = zOffset;
+		return event;
+	}
 	
-	public enum TYPE { ACTIVATED, ACTIVATION_ATTEMPT, PLACE_ATTEMPT, REMOVE_ATTEMPT, CHECK_PLAYEREDIT };
+	public enum TYPE {
+		ACTIVATED,
+		ACTIVATION_ATTEMPT(true),
+		PLACE_ATTEMPT(true),
+		REMOVE_ATTEMPT(true),
+		CHECK_PLAYEREDIT,
+		GET_ENDERCHEST_INVENTORY(true);
+		
+		public final boolean allowHandle;
+		
+		private TYPE() {
+			this(false);
+		}
+		
+		private TYPE(boolean allowHandle) {
+			this.allowHandle = allowHandle;
+		}
+	};
 	
 	private TYPE type;
 	private boolean isHandled = false;
@@ -57,16 +84,19 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 	protected float yOffset = -1F;
 	protected float zOffset = -1F;
 	
+	protected InventoryEnderChest enderChestInventory = null;
+	
 	public TYPE getType() {
 		return type;
 	}
 	
 	public boolean isHandled() {
-		return (type == TYPE.ACTIVATION_ATTEMPT || type == TYPE.PLACE_ATTEMPT || type == TYPE.REMOVE_ATTEMPT) && isHandled;
+		return isHandled;
 	}
 	
 	public void markHandled() {
-		isHandled = true;
+		if (type.allowHandle)
+			isHandled = true;
 	}
 	
 	public boolean isAllowed() {
@@ -95,6 +125,15 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 	
 	public ItemStack getItemStack() {
 		return itemStack;
+	}
+	
+	public InventoryEnderChest getEnderChestInventory() {
+		return enderChestInventory;
+	}
+	
+	public void setEnderChestInventory(InventoryEnderChest inventory) {
+		enderChestInventory = inventory;
+		markHandled();
 	}
 	
 	private PlayerBlockEvent(TYPE type, EntityPlayer player, int x, int y, int z) {
