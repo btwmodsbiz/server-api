@@ -5,11 +5,10 @@ import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.Packet3Chat;
 
 public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	
-	public enum TYPE { HANDLE_CHAT, HANDLE_GLOBAL, GLOBAL };
+	public enum TYPE { HANDLE_CHAT, HANDLE_GLOBAL, GLOBAL, HANDLE_EMOTE, SEND_TO_PLAYER_ATTEMPT };
 	
 	public final TYPE type;
 	public final EntityPlayer player;
@@ -17,13 +16,15 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	
 	private String message = null;
 	private boolean isHandled = false;
+	private boolean isAllowed = true;
+	private EntityPlayer targetPlayer = null;
 	
 	public boolean isHandled() {
 		return isHandled;
 	}
 	
 	public void markHandled() {
-		if (type == TYPE.HANDLE_GLOBAL)
+		if (type == TYPE.HANDLE_CHAT || type == TYPE.HANDLE_GLOBAL || type == TYPE.HANDLE_EMOTE)
 			isHandled = true;
 	}
 	
@@ -36,31 +37,55 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	}
 	
 	public void setMessage(String message) {
-		if (type == TYPE.HANDLE_GLOBAL)
+		if (canChangeMessage())
 			this.message = message;
 	}
 	
+	public EntityPlayer getTargetPlayer() {
+		return targetPlayer;
+	}
+
+	public boolean isAllowed() {
+		return isAllowed;
+	}
+	
+	public void markNotAllowed() {
+		isAllowed = false;
+		isHandled = true;
+	}
+	
 	public void sendAsGlobalMessage() {
-		if (type == TYPE.HANDLE_GLOBAL && message != null) {
-			MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(message, false));
+		if (message != null && canChangeMessage()) {
+			PlayerAPI.sendChatToAllPlayers(player, message);
 			MinecraftServer.getServer().logger.info(message);
 			PlayerAPI.onGlobalChat(player, message);
 			markHandled();
 		}
 	}
+	
+	private boolean canChangeMessage() {
+		return type == TYPE.HANDLE_CHAT || type == TYPE.HANDLE_GLOBAL || type == TYPE.HANDLE_EMOTE;
+	}
 
 	public static PlayerChatEvent GlobalChat(EntityPlayer player, String message) {
-		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.GLOBAL, message);
-		return event;
+		return new PlayerChatEvent(player, TYPE.GLOBAL, message);
 	}
 
 	public static PlayerChatEvent HandleGlobalChat(EntityPlayer player, String message) {
-		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.HANDLE_GLOBAL, message);
-		return event;
+		return new PlayerChatEvent(player, TYPE.HANDLE_GLOBAL, message);
+	}
+
+	public static PlayerChatEvent HandleEmote(EntityPlayer player, String message) {
+		return new PlayerChatEvent(player, TYPE.HANDLE_EMOTE, message);
 	}
 
 	public static PlayerChatEvent HandleChat(EntityPlayer player, String message) {
-		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.HANDLE_CHAT, message);
+		return new PlayerChatEvent(player, TYPE.HANDLE_CHAT, message);
+	}
+
+	public static PlayerChatEvent SendChatToPlayerAttempt(EntityPlayer player, EntityPlayer target, String message) {
+		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.SEND_TO_PLAYER_ATTEMPT, message);
+		event.targetPlayer = target;
 		return event;
 	}
 	
