@@ -17,6 +17,7 @@ public class ServerAPI {
 	public static boolean softcoreEnderChests = false;
 	private static boolean allowUnloadSpawnChunks = false;
 	private static boolean preloadSpawnChunks = true;
+	private static boolean sendConnectedMessages = true;
 	private static int chanceForWildWolf = 0;
 	
 	private static volatile int tickCounter = -1;
@@ -38,6 +39,7 @@ public class ServerAPI {
 		preloadSpawnChunks = settings.getBoolean("ServerAPI", "preloadSpawnChunks", preloadSpawnChunks);
 		chanceForWildWolf = settings.getInt("ServerAPI", "chanceForWildWolf", chanceForWildWolf);
 		softcoreEnderChests = settings.getBoolean("ServerAPI", "softcoreEnderChests", softcoreEnderChests);
+		sendConnectedMessages = settings.getBoolean("ServerAPI", "sendConnectedMessages", sendConnectedMessages);
 	}
 	
 	/**
@@ -55,6 +57,10 @@ public class ServerAPI {
 
 	public static boolean doUnloadSpawnChunks() {
 		return allowUnloadSpawnChunks;
+	}
+	
+	public static boolean doConnectedMessages() {
+		return sendConnectedMessages;
 	}
 	
 	public static void onStartTick(int tickCounter) {
