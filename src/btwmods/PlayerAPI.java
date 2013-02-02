@@ -1,5 +1,7 @@
 package btwmods;
 
+import java.util.List;
+
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
@@ -28,8 +30,11 @@ import net.minecraft.src.Container;
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.InventoryEnderChest;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.Packet3Chat;
 import net.minecraft.src.Slot;
 import net.minecraft.src.World;
 
@@ -45,6 +50,26 @@ public class PlayerAPI {
 
 	public static void removeListener(IAPIListener listener) {
 		listeners.removeListener(listener);
+	}
+	
+	public static void sendChatToAllPlayers(EntityPlayer sender, String message) {
+		sendChatToAllPlayers(sender, new Packet3Chat(message, false));
+	}
+	
+	public static void sendChatToAllPlayers(EntityPlayer sender, Packet3Chat packet) {
+		for (EntityPlayerMP player : (List<EntityPlayerMP>)MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+			sendChatToPlayer(sender, player, packet);
+		}
+	}
+	
+	public static void sendChatToPlayer(EntityPlayer sender, EntityPlayerMP target, String message) {
+		sendChatToPlayer(sender, target, new Packet3Chat(message, false));
+	}
+	
+	public static void sendChatToPlayer(EntityPlayer sender, EntityPlayerMP target, Packet3Chat packet) {
+		if (onSendChatToPlayerAttempt(sender, target, packet.message)) {
+    		target.playerNetServerHandler.sendPacket(packet);
+    	}
 	}
 
 	public static boolean onBlockActivationAttempt(int blockId, World world, int x, int y, int z, EntityPlayer player, int direction, float xOffset, float yOffset, float zOffset) {
@@ -361,6 +386,18 @@ public class PlayerAPI {
 		return true;
 	}
 
+	public static boolean onHandleChat(EntityPlayer player, String message) {
+		if (!listeners.isEmpty(IPlayerChatListener.class)) {
+			PlayerChatEvent event = PlayerChatEvent.HandleChat(player, message);
+        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+			
+			if (event.isHandled())
+				return true;
+		}
+		
+		return false;
+	}
+
 	public static boolean onHandleGlobalChat(EntityPlayer player, String message) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
 			PlayerChatEvent event = PlayerChatEvent.HandleGlobalChat(player, message);
@@ -380,6 +417,24 @@ public class PlayerAPI {
 		}
 	}
 
+	public static boolean onHandleEmoteChat(EntityPlayer player, String message) {
+		if (!listeners.isEmpty(IPlayerChatListener.class)) {
+			PlayerChatEvent event = PlayerChatEvent.HandleEmote(player, message);
+        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+			
+			if (event.isHandled())
+				return false;
+		}
+		
+		return true;
+	}
+	
+	public static boolean onSendChatToPlayerAttempt(EntityPlayer sender, EntityPlayer target, String message) {
+		PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(sender, target, message);
+       	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+		return event.isAllowed();
+	}
+
 	public static boolean onItemUseAttempt(EntityPlayer player, ItemStack itemStack) {
 		if (!listeners.isEmpty(IPlayerActionListener.class)) {
 			PlayerActionEvent event = PlayerActionEvent.ItemUseAttempt(player, itemStack);
@@ -397,5 +452,16 @@ public class PlayerAPI {
 			PlayerActionEvent event = PlayerActionEvent.ItemUse(player, itemStack, originalItemStack, originalQuantity, originalDamage);
 			((IPlayerActionListener)listeners).onPlayerAction(event);
 		}
+	}
+
+	public static InventoryEnderChest onEnderChestActivate(int x, int y, int z, EntityPlayer player, int direction, float xOffset, float yOffset, float zOffset) {
+		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
+			PlayerBlockEvent event = PlayerBlockEvent.GetEnderChestInventory(player, x, y, z, direction, xOffset, yOffset, zOffset);
+			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
+			
+			return event.getEnderChestInventory();
+		}
+		
+		return null;
 	}
 }

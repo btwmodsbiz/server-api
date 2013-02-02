@@ -1,20 +1,28 @@
 package btwmods;
 
+import java.util.Random;
+
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
 import btwmods.io.Settings;
+import btwmods.server.IServerStopListener;
 import btwmods.server.ITickListener;
+import btwmods.server.ServerStopEvent;
 import btwmods.server.TickEvent;
 
 public class ServerAPI {
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { ITickListener.class });
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { ITickListener.class, IServerStopListener.class });
 	
+	public static boolean softcoreEnderChests = false;
 	private static boolean allowUnloadSpawnChunks = false;
-	
 	private static boolean preloadSpawnChunks = true;
+	private static boolean sendConnectedMessages = true;
+	private static int chanceForWildWolf = 0;
 	
 	private static volatile int tickCounter = -1;
+	
+	private static Random rand = new Random();
 	
 	private ServerAPI() {}
 	
@@ -29,6 +37,9 @@ public class ServerAPI {
 	static void init(Settings settings) {
 		allowUnloadSpawnChunks = settings.getBoolean("ServerAPI", "allowUnloadSpawnChunks", allowUnloadSpawnChunks);
 		preloadSpawnChunks = settings.getBoolean("ServerAPI", "preloadSpawnChunks", preloadSpawnChunks);
+		chanceForWildWolf = settings.getInt("ServerAPI", "chanceForWildWolf", chanceForWildWolf);
+		softcoreEnderChests = settings.getBoolean("ServerAPI", "softcoreEnderChests", softcoreEnderChests);
+		sendConnectedMessages = settings.getBoolean("ServerAPI", "sendConnectedMessages", sendConnectedMessages);
 	}
 	
 	/**
@@ -48,6 +59,10 @@ public class ServerAPI {
 		return allowUnloadSpawnChunks;
 	}
 	
+	public static boolean doConnectedMessages() {
+		return sendConnectedMessages;
+	}
+	
 	public static void onStartTick(int tickCounter) {
 		ServerAPI.tickCounter = tickCounter;
 		StatsAPI.onStartTick();
@@ -65,5 +80,19 @@ public class ServerAPI {
 		}
 		
 		StatsAPI.onEndTick();
+	}
+
+	public static boolean onIsBabyWolfWild() {
+		return chanceForWildWolf > 0 && rand.nextInt(chanceForWildWolf) == 0;
+	}
+
+	public static void onStopServerPre() {
+    	ServerStopEvent event = ServerStopEvent.Pre();
+    	((IServerStopListener)listeners).onServerStop(event);
+	}
+
+	public static void onStopServerPost() {
+    	ServerStopEvent event = ServerStopEvent.Post();
+    	((IServerStopListener)listeners).onServerStop(event);
 	}
 }

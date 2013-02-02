@@ -197,4 +197,9 @@ public class WorldAPI {
 		ChunkEvent event = ChunkEvent.Unloaded(world, chunk);
 		((IChunkListener)listeners).onChunkAction(event);
 	}
+
+	public static void onPreUnloadChunk(World world, Chunk chunk) {
+		ChunkEvent event = ChunkEvent.PreUnload(world, chunk);
+		((IChunkListener)listeners).onChunkAction(event);
+	}
 }
