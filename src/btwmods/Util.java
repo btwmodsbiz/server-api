@@ -172,27 +172,27 @@ public class Util {
 	public static String formatSeconds(long seconds, boolean useShortFormat) {
 		StringBuilder sb = new StringBuilder();
 		
-		if (seconds >= 60L) {
-			sb.append(seconds / 60L).append(useShortFormat ? "m" : " minute");
-			if (!useShortFormat && seconds / 60L != 1)
-				sb.append("s");
+		long hours = seconds / 3600L;
+		seconds -= hours * 3600L;
+		
+		long minutes = seconds / 60L;
+		seconds -= minutes * 60L;
+		
+		if (hours > 0)
+			sb.append(hours).append(useShortFormat ? "h" : (hours == 1 ? " hour" : " hours"));
+		
+		if (minutes > 0) {
+			if (sb.length() > 0)
+				sb.append(" ");
+			
+			sb.append(minutes).append(useShortFormat ? "m" : (minutes == 1 ? " minute" : " minutes"));
 		}
 		
-		if (seconds % 60L != 0) {
-			if (!useShortFormat && sb.length() > 0) sb.append(" ");
+		if (seconds > 0 || sb.length() == 0) {
+			if (sb.length() > 0)
+				sb.append(" ");
 			
-			sb.append(seconds % 60L).append(useShortFormat ? "s" : " second");
-			if (!useShortFormat && seconds % 60L != 1)
-				sb.append("s");
-		}
-		
-		if (sb.length() == 0) {
-			sb.append(seconds);
-			
-			if (useShortFormat)
-				sb.append(seconds == 0 ? "seconds" : "second");
-			else
-				sb.append("s");
+			sb.append(seconds).append(useShortFormat ? "s" : (seconds == 1 ? " second" : " seconds"));
 		}
 		
 		return sb.toString();
