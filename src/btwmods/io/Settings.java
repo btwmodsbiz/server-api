@@ -12,6 +12,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import btwmods.IMod;
+import btwmods.ModLoader;
 import btwmods.util.CaselessKey;
 
 public class Settings {
@@ -412,6 +414,14 @@ public class Settings {
 			throw new IOException("Save target has not been set");
 		
 		writeSettings(saveTarget);
+	}
+	
+	public void saveSettings(IMod mod) {
+		try {
+			saveSettings();
+		} catch (IOException e) {
+			ModLoader.outputError(e, mod.getName() + " failed (" + e.getClass().getSimpleName() + ") to save its data file: " + e.getMessage());
+		}
 	}
 	
 	public void writeSettings(File file) throws IOException {
