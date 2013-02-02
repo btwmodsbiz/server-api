@@ -67,9 +67,7 @@ public class PlayerAPI {
 	}
 	
 	public static void sendChatToPlayer(EntityPlayer sender, EntityPlayerMP target, Packet3Chat packet) {
-		PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(sender, target, packet.message);
-    	((IPlayerChatListener)listeners).onPlayerChatAction(event);
-    	if (event.isAllowed()) {
+		if (onSendChatToPlayerAttempt(sender, target, packet.message)) {
     		target.playerNetServerHandler.sendPacket(packet);
     	}
 	}
@@ -432,14 +430,9 @@ public class PlayerAPI {
 	}
 	
 	public static boolean onSendChatToPlayerAttempt(EntityPlayer sender, EntityPlayer target, String message) {
-		if (!listeners.isEmpty(IPlayerChatListener.class)) {
-			PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(sender, target, message);
-        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
-			
-			return event.isAllowed();
-		}
-		
-		return true;
+		PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(sender, target, message);
+       	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+		return event.isAllowed();
 	}
 
 	public static boolean onItemUseAttempt(EntityPlayer player, ItemStack itemStack) {
