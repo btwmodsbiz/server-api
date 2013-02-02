@@ -1,3 +1,24 @@
+Version 4.54.0 (vMC 1.4.7 BTW 4.54)
+
+  - Updated to BTW 4.54
+
+  - Added hook to PlayerAPI to allow default BTW ender chest's inventory to
+    be handled by a mod.
+    
+  - Added hook to PlayerAPI to handle emote chat
+  
+  - Added hook to PlayerAPI to allow mods to stop chat messages from being
+    received by a player.
+    
+  - Added helper methods to PlayerAPI for sending chat messages to players.
+  
+  - Added config option to ServerAPI to disable BTW connection messages.
+  
+  - Added an additional saveSettings method to Settings that handles
+    IOExceptions in a generic way.
+  
+  - Changed Util's format seconds to support hours.
+
 Version 4.53.1 (vMC 1.4.7 BTW 4.53)
 
   - Added option to ServerAPI to allow "softcore" ender chests.
