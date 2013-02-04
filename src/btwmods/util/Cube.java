@@ -20,4 +20,9 @@ public class Cube<Type> extends Area<Type> {
 	public boolean isWithin(int x, int y, int z) {
 		return super.isWithin(x, y, z) && y >= y1 && y <= y2;
 	}
+
+	@Override
+	public String toString() {
+		return x1 + "," + y1 + "," + z1 + " to " + x2 + "," + y2 + "," + z2;
+	}
 }

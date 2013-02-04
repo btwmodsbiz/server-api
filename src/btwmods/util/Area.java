@@ -64,4 +64,9 @@ public class Area<Type> {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return x1 + "," + z1 + " to " + x2 + "," + z2;
+	}
 }
