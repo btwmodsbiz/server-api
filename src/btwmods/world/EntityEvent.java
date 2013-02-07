@@ -7,7 +7,7 @@ import net.minecraft.src.MathHelper;
 
 public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 	
-	public enum TYPE { IS_ENTITY_INVULNERABLE };
+	public enum TYPE { IS_ENTITY_INVULNERABLE, TRAMPLE_FARMLAND_ATTEMPT };
 
 	private TYPE type;
 	private Entity entity;
@@ -15,6 +15,11 @@ public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 	private boolean isHandled = false;
 	private boolean isAllowed = true;
 	private boolean invulnerable = false;
+	
+	private int blockX = 0;
+	private int blockY = -1;
+	private int blockZ = 0;
+	private float distanceFallen = -1F;
 	
 	public TYPE getType() {
 		return type;
@@ -48,9 +53,34 @@ public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 		if (type == TYPE.IS_ENTITY_INVULNERABLE)
 			invulnerable = true;
 	}
+	
+	public int getBlockX() {
+		return blockX;
+	}
+	
+	public int getBlockY() {
+		return blockY;
+	}
+	
+	public int getBlockZ() {
+		return blockZ;
+	}
+	
+	public float getDistanceFallen() {
+		return distanceFallen;
+	}
 
 	public static EntityEvent CheckIsEntityInvulnerable(Entity entity) {
 		EntityEvent event = new EntityEvent(TYPE.IS_ENTITY_INVULNERABLE, entity);
+		return event;
+	}
+
+	public static EntityEvent TrampleFarmlandAttempt(int blockX, int blockY, int blockZ, Entity entity, float distanceFallen) {
+		EntityEvent event = new EntityEvent(TYPE.TRAMPLE_FARMLAND_ATTEMPT, entity);
+		event.blockX = blockX;
+		event.blockY = blockY;
+		event.blockZ = blockZ;
+		event.distanceFallen = distanceFallen;
 		return event;
 	}
 
