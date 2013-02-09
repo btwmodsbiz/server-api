@@ -182,6 +182,11 @@ public class PlayerAPI {
 			((IContainerListener)listeners).onContainerAction(event);
 		}
 	}
+
+	public static void onContainerClosed(Container container, EntityPlayer player) {
+		ContainerEvent event = ContainerEvent.Closed(player, container);
+		((IContainerListener)listeners).onContainerAction(event);
+	}
 	
 	/**
 	 * Player purposefully drops an item.
