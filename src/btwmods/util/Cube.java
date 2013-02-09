@@ -20,4 +20,34 @@ public class Cube<Type> extends Area<Type> {
 	public boolean isWithin(int x, int y, int z) {
 		return super.isWithin(x, y, z) && y >= y1 && y <= y2;
 	}
+
+	@Override
+	public String toString() {
+		return x1 + "," + y1 + "," + z1 + " to " + x2 + "," + y2 + "," + z2;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + y1;
+		result = prime * result + y2;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Cube other = (Cube)obj;
+		if (y1 != other.y1)
+			return false;
+		if (y2 != other.y2)
+			return false;
+		return true;
+	}
 }

@@ -197,4 +197,15 @@ public class WorldAPI {
 		ChunkEvent event = ChunkEvent.Unloaded(world, chunk);
 		((IChunkListener)listeners).onChunkAction(event);
 	}
+
+	public static void onPreUnloadChunk(World world, Chunk chunk) {
+		ChunkEvent event = ChunkEvent.PreUnload(world, chunk);
+		((IChunkListener)listeners).onChunkAction(event);
+	}
+
+	public static boolean onTrampleFarmlandAttempt(int blockX, int blockY, int blockZ, Entity entity, float distanceFallen) {
+		EntityEvent event = EntityEvent.TrampleFarmlandAttempt(blockX, blockY, blockZ, entity, distanceFallen);
+		((IEntityListener)listeners).onEntityAction(event);
+		return event.isAllowed();
+	}
 }

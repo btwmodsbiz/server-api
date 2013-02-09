@@ -12,6 +12,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import btwmods.IMod;
+import btwmods.ModLoader;
 import btwmods.util.CaselessKey;
 
 public class Settings {
@@ -396,15 +398,15 @@ public class Settings {
 		return false;
 	}
 
-	public void removeKey(String key) {
-		removeKey(null, key);
+	public boolean removeKey(String key) {
+		return removeKey(null, key);
 	}
 
-	public void removeKey(String section, String key) {
-		settings.remove(new SectionKeyPair(section, key));
-		
+	public boolean removeKey(String section, String key) {
 		Set<CaselessKey> keys = sectionKeys.get(section == null ? null : new CaselessKey(section));
 		if (keys != null) keys.remove(key);
+		
+		return settings.remove(new SectionKeyPair(section, key)) != null;
 	}
 	
 	public void saveSettings() throws IOException {
@@ -412,6 +414,14 @@ public class Settings {
 			throw new IOException("Save target has not been set");
 		
 		writeSettings(saveTarget);
+	}
+	
+	public void saveSettings(IMod mod) {
+		try {
+			saveSettings();
+		} catch (IOException e) {
+			ModLoader.outputError(e, mod.getName() + " failed (" + e.getClass().getSimpleName() + ") to save its data file: " + e.getMessage());
+		}
 	}
 	
 	public void writeSettings(File file) throws IOException {

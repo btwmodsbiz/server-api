@@ -3,24 +3,29 @@ package btwmods.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.minecraft.src.ChunkCoordIntPair;
 import btwmods.util.intervals.IntervalTree;
 
-public class Zones<Type> {
+public class Zones<Type> extends HashSet<Area<Type>> {
 
-	private boolean hasAreas = false;
-	
-	private Set<Area<Type>> areas = new HashSet<Area<Type>>();
 	private Map<ChunkCoordIntPair, IntervalTree<Area<Type>>> intervalsByRegion = new HashMap<ChunkCoordIntPair, IntervalTree<Area<Type>>>();
 	
+	@Override
 	public boolean add(Area<Type> area) {
-		boolean added = areas.add(area);
+		if (super.add(area)) {
+			addIntervals(area);
+			return true;
+		}
 		
-		if (added) {
+		return false;
+	}
+	
+	private void addIntervals(Area<Type> area) {
+		if (area != null) {
 			// Add the area to it's respective regions.
 			for (int regionX = area.x1 >> 9; regionX <= area.x2 >> 9; regionX++) {
 				for (int regionZ = area.z1 >> 9; regionZ <= area.z2 >> 9; regionZ++) {
@@ -35,17 +40,24 @@ public class Zones<Type> {
 				}
 			}
 		}
-		
-		// TODO: clear any cache.
-		
-		hasAreas = true;
-		
-		return added;
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		return o instanceof Area && remove((Area)o);
 	}
 	
-	public boolean remove(Area<Type> area) {
-		boolean removed = areas.remove(area);
-		if (removed) {
+	protected boolean remove(Area area) {
+		if (super.remove(area)) {
+			removeIntervals(area);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private void removeIntervals(Area area) {
+		if (area != null) {
 			for (int regionX = area.x1 >> 9; regionX <= area.x2 >> 9; regionX++) {
 				for (int regionZ = area.z1 >> 9; regionZ <= area.z2 >> 9; regionZ++) {
 
@@ -60,12 +72,6 @@ public class Zones<Type> {
 				}
 			}
 		}
-		
-		hasAreas = areas.size() > 0;
-		
-		// TODO: clear any cache.
-		
-		return removed;
 	}
 	
 	public List<Area<Type>> get(int x, int z) {
@@ -79,7 +85,7 @@ public class Zones<Type> {
 	private List<Area<Type>> get(int x, int y, int z, boolean checkY) {
 		ArrayList<Area<Type>> areas = new ArrayList<Area<Type>>();
 		
-		if (hasAreas) {
+		if (!isEmpty()) {
 			// Get areas for the region the X and Z are in.
 			IntervalTree tree = intervalsByRegion.get(new ChunkCoordIntPair(x >> 9, z >> 9));
 			
@@ -98,5 +104,42 @@ public class Zones<Type> {
 		}
 		
 		return areas;
+	}
+
+	@Override
+	public void clear() {
+		intervalsByRegion.clear();
+		super.clear();
+	}
+
+	@Override
+	public Iterator<Area<Type>> iterator() {
+		return new AreaIterator(super.iterator());
+	}
+	
+	private class AreaIterator implements Iterator<Area<Type>> {
+		
+		private final Iterator<Area<Type>> iterator;
+		private Area<Type> current = null;
+		
+		public AreaIterator(Iterator<Area<Type>> iterator) {
+			this.iterator = iterator;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return iterator.hasNext();
+		}
+
+		@Override
+		public Area<Type> next() {
+			return current = iterator.next();
+		}
+
+		@Override
+		public void remove() {
+			iterator.remove();
+			removeIntervals(current);
+		}
 	}
 }

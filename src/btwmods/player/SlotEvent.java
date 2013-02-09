@@ -4,6 +4,8 @@ import btwmods.events.APIEvent;
 import net.minecraft.src.Container;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.IInventory;
+import net.minecraft.src.InventoryEnderChest;
 import net.minecraft.src.InventoryLargeChest;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
@@ -37,7 +39,8 @@ public class SlotEvent extends APIEvent {
 	}
 	
 	public boolean slotIsContainer() {
-		return getSlot().inventory instanceof TileEntity || getSlot().inventory instanceof Entity || getSlot().inventory instanceof InventoryLargeChest;
+		IInventory inventory = getSlot().inventory;
+		return inventory instanceof TileEntity || inventory instanceof Entity || inventory instanceof InventoryLargeChest || inventory instanceof InventoryEnderChest;
 	}
 	
 	public int getSlotId() {

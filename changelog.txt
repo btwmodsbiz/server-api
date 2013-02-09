@@ -1,3 +1,92 @@
+Version 4.55.1 (vMC 1.4.7 BTW 4.55)
+
+  - Added hook to PlayerAPI to catch containers being closed.
+  
+  - Changed SlotEvent to recognize the EnderChest as a container.
+
+Version 4.55.0 (vMC 1.4.7 BTW 4.55)
+
+  - Updated to BTW 4.55
+
+  - Added BSD-licensed Base64 class by Mikael Grev.
+  
+  - Added hook to WorldAPI to allow mods to prevent tilled land from being
+    trampled.
+  
+  - Fixed EntityWolf so it plays the howl for all players in the area and
+    not just the person feeding it, as this made no sense.
+
+Version 4.54.1 (vMC 1.4.7 BTW 4.54)
+
+  - Added toString() overrides to Area and Cube.
+  
+  - Added overrides for hashCode and equals to Cube.
+
+Version 4.54.0 (vMC 1.4.7 BTW 4.54)
+
+  - Updated to BTW 4.54
+
+  - Added hook to PlayerAPI to allow default BTW ender chest's inventory to
+    be handled by a mod.
+    
+  - Added hook to PlayerAPI to handle emote chat
+  
+  - Added hook to PlayerAPI to allow mods to stop chat messages from being
+    received by a player.
+    
+  - Added helper methods to PlayerAPI for sending chat messages to players.
+  
+  - Added config option to ServerAPI to disable BTW connection messages.
+  
+  - Added an additional saveSettings method to Settings that handles
+    IOExceptions in a generic way.
+  
+  - Changed Util's format seconds to support hours.
+
+Version 4.53.1 (vMC 1.4.7 BTW 4.53)
+
+  - Added option to ServerAPI to allow "softcore" ender chests.
+
+  - Fixed bug with PlayerAPI's onHandleChat returning the wrong value.
+
+Version 4.53.0 (vMC 1.4.7 BTW 4.53)
+
+  - Updated to BTW 4.53.
+
+  - Added hook to PlayerAPI so chat packets can be entirely handled by mods.
+
+  - Changed the removeKey methods in Settings to return if the key existed.
+
+Version 4.52.0 (vMC 1.4.7 BTW 4.52)
+
+  - Updated to BTW 4.52.
+
+  - Added hook to WorldAPI to catch chunks just before they are unloaded and
+    saved to disk.
+  
+  - Added hook to ServerAPI to allow code to be run just before and after
+    the server initiates a shutdown.
+    
+  - Added boolean btwmod_canSaveToDisk property to Entity so it can be
+    prevented from saving to disk.
+
+Version 4.51.3 (vMC 1.4.7 BTW 4.51)
+
+  - Changed wolves so they can only be bred by their owner.
+  
+  - Changed feral baby wolves so they howl instead of growl on birth.
+
+Version 4.51.2 (vMC 1.4.7 BTW 4.51)
+
+  - Added Enum is/get methods to Settings.
+  
+  - Added variation of CommandBaseExtended's isStringMatch that takes an
+    array of possible matches.
+    
+  - Added hook to ServerAPI to allow bred wolves to be wild.
+
+  - Changed wolves so they cannot be retamed after being fed wolf chops.
+
 Version 4.51.1 (vMC 1.4.7 BTW 4.51)
 
   - Added hook to PlayerAPI for when players pickup floating items.
