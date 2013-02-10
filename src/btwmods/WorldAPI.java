@@ -11,6 +11,7 @@ import net.minecraft.src.ChunkProviderServer;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityTracker;
+import net.minecraft.src.EnumCreatureType;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.LongHashMap;
 import net.minecraft.src.Packet5PlayerInventory;
@@ -26,11 +27,15 @@ import btwmods.world.EntityEvent;
 import btwmods.world.IBlockListener;
 import btwmods.world.IChunkListener;
 import btwmods.world.IEntityListener;
+import btwmods.world.ISpawnLivingListener;
 import btwmods.world.IWorldTickListener;
+import btwmods.world.SpawnLivingEvent;
 import btwmods.world.WorldTickEvent;
 
 public class WorldAPI {
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IBlockListener.class, IEntityListener.class, IWorldTickListener.class, IChunkListener.class });
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] {
+		IBlockListener.class, IEntityListener.class, IWorldTickListener.class, IChunkListener.class, ISpawnLivingListener.class
+	});
 	
 	private static MinecraftServer server;
 	
@@ -207,5 +212,10 @@ public class WorldAPI {
 		EntityEvent event = EntityEvent.TrampleFarmlandAttempt(blockX, blockY, blockZ, entity, distanceFallen);
 		((IEntityListener)listeners).onEntityAction(event);
 		return event.isAllowed();
+	}
+	
+	public static void onMobsSpawned(World world, EnumCreatureType creatureType, int validChunks, int oldEntityCount, List<EntityLiving> entities) {
+		SpawnLivingEvent event = new SpawnLivingEvent(world, creatureType, validChunks, oldEntityCount, entities);
+		((ISpawnLivingListener)listeners).onSpawnLivingAction(event);
 	}
 }
