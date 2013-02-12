@@ -4,11 +4,11 @@ import net.minecraft.src.World;
 import btwmods.Util;
 import btwmods.stats.Type;
 
-public class WorldMeasurement extends TickMeasurement {
+public class StatWorld extends StatTick {
 
 	public final int worldIndex;
 	
-	public WorldMeasurement(Type identifier, World world) {
+	public StatWorld(Type identifier, World world) {
 		super(identifier);
 		worldIndex = Util.getWorldIndexFromDimension(world.provider.dimensionId);
 	}

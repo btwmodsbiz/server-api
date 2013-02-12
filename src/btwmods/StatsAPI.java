@@ -29,14 +29,14 @@ import btwmods.stats.CommandStats;
 import btwmods.stats.StatsProcessor;
 import btwmods.stats.Type;
 import btwmods.stats.data.QueuedTickStats;
-import btwmods.stats.measurements.BlockUpdate;
-import btwmods.stats.measurements.ChunkMeasurement;
-import btwmods.stats.measurements.EntityUpdate;
-import btwmods.stats.measurements.PlayerNetworkMeasurement;
-import btwmods.stats.measurements.SpawnedLiving;
-import btwmods.stats.measurements.TileEntityUpdate;
-import btwmods.stats.measurements.TrackedEntityUpdate;
-import btwmods.stats.measurements.WorldMeasurement;
+import btwmods.stats.measurements.StatUpdateBlock;
+import btwmods.stats.measurements.StatChunk;
+import btwmods.stats.measurements.StatUpdateEntity;
+import btwmods.stats.measurements.StatNetworkPlayer;
+import btwmods.stats.measurements.StatSpawnedLiving;
+import btwmods.stats.measurements.StatUpdateTileEntity;
+import btwmods.stats.measurements.StatUpdateEntityTracked;
+import btwmods.stats.measurements.StatWorld;
 
 public class StatsAPI {
 	
@@ -202,39 +202,39 @@ public class StatsAPI {
 			bytesSent += (long)bytes;
 		
 		if (player != null)
-			record(new PlayerNetworkMeasurement(type, player, bytes));
+			record(new StatNetworkPlayer(type, player, bytes));
 	}
 
 	public static void recordSpawning(World world, int spawned) {
-		measurements.record(new SpawnedLiving(world, spawned));
+		measurements.record(new StatSpawnedLiving(world, spawned));
 	}
 
 	public static void begin(Type type, World world) {
-		measurements.begin(new WorldMeasurement(type, world));
+		measurements.begin(new StatWorld(type, world));
 	}
 	
 	public static void beginBlockUpdate(World world, Block block, int x, int y, int z) {
-		measurements.begin(new BlockUpdate(world, block, x, y, z));
+		measurements.begin(new StatUpdateBlock(world, block, x, y, z));
 	}
 
 	public static void beginBlockUpdate(World world, NextTickListEntry blockUpdate) {
-		measurements.begin(new BlockUpdate(world, blockUpdate));
+		measurements.begin(new StatUpdateBlock(world, blockUpdate));
 	}
 
 	public static void beginEntityUpdate(World world, Entity entity) {
-		measurements.begin(new EntityUpdate(world, entity));
+		measurements.begin(new StatUpdateEntity(world, entity));
 	}
 
 	public static void beginTileEntityUpdate(World world, TileEntity tileEntity) {
-		measurements.begin(new TileEntityUpdate(world, tileEntity));
+		measurements.begin(new StatUpdateTileEntity(world, tileEntity));
 	}
 
 	public static void beginUpdateTrackedEntityPlayerList(World world, EntityTrackerEntry trackerEntry) {
-		measurements.begin(new TrackedEntityUpdate(world, trackerEntry));
+		measurements.begin(new StatUpdateEntityTracked(world, trackerEntry));
 	}
 
 	public static void beginLoadChunk(World world, int chunkX, int chunkY) {
-		measurements.begin(new ChunkMeasurement(Type.LOAD_CHUNK, world, chunkX, chunkY));
+		measurements.begin(new StatChunk(Type.LOAD_CHUNK, world, chunkX, chunkY));
 	}
 	
 	/**
