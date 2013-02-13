@@ -13,13 +13,11 @@ import btwmods.stats.data.BasicStats;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.data.ServerStats;
 import btwmods.stats.data.WorldStats;
+import btwmods.stats.measurements.StatPositionedClass;
 import btwmods.stats.measurements.StatUpdateBlock;
-import btwmods.stats.measurements.StatUpdateEntity;
 import btwmods.stats.measurements.StatNetwork;
 import btwmods.stats.measurements.StatNetworkPlayer;
 import btwmods.stats.measurements.StatSpawnedLiving;
-import btwmods.stats.measurements.StatUpdateTileEntity;
-import btwmods.stats.measurements.StatUpdateEntityTracked;
 import btwmods.stats.measurements.StatWorld;
 
 public class StatsProcessor implements Runnable {
@@ -202,7 +200,7 @@ public class StatsProcessor implements Runnable {
 							break;
 							
 						case ENTITY_UPDATE:
-							StatUpdateEntity statUpdateEntity = (StatUpdateEntity)statWorld;
+							StatPositionedClass statUpdateEntity = (StatPositionedClass)statWorld;
 							coords = new ChunkCoordIntPair(statUpdateEntity.chunkX, statUpdateEntity.chunkZ);
 							BasicStats entityStats = worldStats[statWorld.worldIndex].entityStats.get(statUpdateEntity.name);
 							if (entityStats == null) {
@@ -218,12 +216,12 @@ public class StatsProcessor implements Runnable {
 							break;
 							
 						case TILE_ENTITY_UPDATE:
-							StatUpdateTileEntity statUpdateTileEntity = (StatUpdateTileEntity)statWorld;
+							StatPositionedClass statUpdateTileEntity = (StatPositionedClass)statWorld;
 							coords = new ChunkCoordIntPair(statUpdateTileEntity.chunkX, statUpdateTileEntity.chunkZ);
 							
-							BasicStats tileEntityStats = worldStats[statWorld.worldIndex].tileEntityStats.get(statUpdateTileEntity.tileEntity);
+							BasicStats tileEntityStats = worldStats[statWorld.worldIndex].tileEntityStats.get(statUpdateTileEntity.clazz);
 							if (tileEntityStats == null) {
-								worldStats[statWorld.worldIndex].tileEntityStats.put(statUpdateTileEntity.tileEntity, tileEntityStats = new BasicStats());
+								worldStats[statWorld.worldIndex].tileEntityStats.put(statUpdateTileEntity.clazz, tileEntityStats = new BasicStats());
 								tileEntityStats.tickTime.record(statWorld.getTime());
 							}
 							else {
@@ -267,7 +265,7 @@ public class StatsProcessor implements Runnable {
 							break;
 							
 						case UPDATE_TRACKED_ENTITY_PLAYER_LIST:
-							StatUpdateEntityTracked statUpdateEntityTracked = (StatUpdateEntityTracked)statWorld;
+							StatPositionedClass statUpdateEntityTracked = (StatPositionedClass)statWorld;
 							BasicStats trackedEntityStats = worldStats[statWorld.worldIndex].trackedEntityStats.get(statUpdateEntityTracked.name);
 							if (trackedEntityStats == null) {
 								worldStats[statWorld.worldIndex].trackedEntityStats.put(statUpdateEntityTracked.name, trackedEntityStats = new BasicStats());

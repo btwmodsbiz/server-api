@@ -29,13 +29,11 @@ import btwmods.stats.CommandStats;
 import btwmods.stats.StatsProcessor;
 import btwmods.stats.Type;
 import btwmods.stats.data.QueuedTickStats;
+import btwmods.stats.measurements.StatPositionedClass;
 import btwmods.stats.measurements.StatUpdateBlock;
 import btwmods.stats.measurements.StatChunk;
-import btwmods.stats.measurements.StatUpdateEntity;
 import btwmods.stats.measurements.StatNetworkPlayer;
 import btwmods.stats.measurements.StatSpawnedLiving;
-import btwmods.stats.measurements.StatUpdateTileEntity;
-import btwmods.stats.measurements.StatUpdateEntityTracked;
 import btwmods.stats.measurements.StatWorld;
 
 public class StatsAPI {
@@ -222,15 +220,15 @@ public class StatsAPI {
 	}
 
 	public static void beginEntityUpdate(World world, Entity entity) {
-		measurements.begin(new StatUpdateEntity(world, entity));
+		measurements.begin(new StatPositionedClass(world, entity));
 	}
 
 	public static void beginTileEntityUpdate(World world, TileEntity tileEntity) {
-		measurements.begin(new StatUpdateTileEntity(world, tileEntity));
+		measurements.begin(new StatPositionedClass(Type.TILE_ENTITY_UPDATE, world, tileEntity));
 	}
 
 	public static void beginUpdateTrackedEntityPlayerList(World world, EntityTrackerEntry trackerEntry) {
-		measurements.begin(new StatUpdateEntityTracked(world, trackerEntry));
+		measurements.begin(new StatPositionedClass(world, trackerEntry));
 	}
 
 	public static void beginLoadChunk(World world, int chunkX, int chunkY) {
