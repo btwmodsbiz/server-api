@@ -1,3 +1,12 @@
+Version 4.56.1 (vMC 1.4.7 BTW 4.56)
+
+  - Added onDoQuietCommand method to CommandsAPI so vMC commands can
+    execute quietly when executed via the console.
+    
+  - Added calls to CommandAPI's onDoQuietCommand for /save-XXX vMC commands.
+  
+  - Added check to /stop so that fails when saving is off.
+
 Version 4.56.0 (vMC 1.4.7 BTW 4.56)
 
   - Updated to BTW 4.56.
