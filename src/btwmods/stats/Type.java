@@ -20,5 +20,7 @@ public enum Type {
 	UPDATE_PLAYER_ENTITIES,
 	UPDATE_TRACKED_ENTITY_PLAYER_LIST,
 	LOAD_CHUNK,
-	SPAWN_LIVING
+	SPAWN_LIVING;
+	
+	public boolean enabled = true;
 }
