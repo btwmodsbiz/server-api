@@ -41,7 +41,7 @@ public class CommandsAPI {
 					File statusFile = new File(args[1]);
 					if (statusFile.isFile() && statusFile.length() == 0) {
 						FileWriter writer = new FileWriter(statusFile);
-						writer.write(status ? "OK" : "FAIL");
+						writer.write(status ? "TRUE" : "FALSE");
 						writer.close();
 					}
 					else {
