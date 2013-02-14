@@ -8,33 +8,23 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkProviderServer;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityTracker;
-import net.minecraft.src.EnumCreatureType;
-import net.minecraft.src.ItemStack;
 import net.minecraft.src.LongHashMap;
-import net.minecraft.src.Packet5PlayerInventory;
 import net.minecraft.src.World;
-import net.minecraft.src.WorldServer;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
 import btwmods.io.Settings;
 import btwmods.world.BlockEvent;
 import btwmods.world.ChunkEvent;
-import btwmods.world.EntityEvent;
 import btwmods.world.IBlockListener;
 import btwmods.world.IChunkListener;
-import btwmods.world.IEntityListener;
-import btwmods.world.ISpawnLivingListener;
 import btwmods.world.IWorldTickListener;
-import btwmods.world.SpawnLivingEvent;
 import btwmods.world.WorldTickEvent;
 
 public class WorldAPI {
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] {
-		IBlockListener.class, IEntityListener.class, IWorldTickListener.class, IChunkListener.class, ISpawnLivingListener.class
+		IBlockListener.class, IWorldTickListener.class, IChunkListener.class
 	});
 	
 	private static MinecraftServer server;
@@ -127,28 +117,6 @@ public class WorldAPI {
 		
 		return true;
 	}
-	
-	public static void sendEntityEquipmentUpdate(EntityLiving entity) {
-		if (entity.worldObj instanceof WorldServer) {
-			WorldServer world = (WorldServer)entity.worldObj;
-			for (int slot = 0; slot < 5; ++slot) {
-				ItemStack item = entity.getEquipmentInSlot(slot);
-				world.getEntityTracker().sendPacketToTrackedPlayers(entity, new Packet5PlayerInventory(entity.entityId, slot, item));
-			}
-		}
-	}
-
-	public static boolean onCheckEntityIsInvulnerable(Entity entity) {
-		if (!listeners.isEmpty(IEntityListener.class)) {
-			EntityEvent event = EntityEvent.CheckIsEntityInvulnerable(entity);
-			((IEntityListener)listeners).onEntityAction(event);
-			
-			if (event.isInvulnerable())
-				return true;
-		}
-		
-		return false;
-	}
 
 	public static boolean onDestroyBlockWithFireAttempt(World world, int blockId, int x, int y, int z) {
 		if (!listeners.isEmpty(IBlockListener.class)) {
@@ -206,16 +174,5 @@ public class WorldAPI {
 	public static void onPreUnloadChunk(World world, Chunk chunk) {
 		ChunkEvent event = ChunkEvent.PreUnload(world, chunk);
 		((IChunkListener)listeners).onChunkAction(event);
-	}
-
-	public static boolean onTrampleFarmlandAttempt(int blockX, int blockY, int blockZ, Entity entity, float distanceFallen) {
-		EntityEvent event = EntityEvent.TrampleFarmlandAttempt(blockX, blockY, blockZ, entity, distanceFallen);
-		((IEntityListener)listeners).onEntityAction(event);
-		return event.isAllowed();
-	}
-	
-	public static void onMobsSpawned(World world, EnumCreatureType creatureType, int validChunks, int oldEntityCount, List<EntityLiving> entities) {
-		SpawnLivingEvent event = new SpawnLivingEvent(world, creatureType, validChunks, oldEntityCount, entities);
-		((ISpawnLivingListener)listeners).onSpawnLivingAction(event);
 	}
 }

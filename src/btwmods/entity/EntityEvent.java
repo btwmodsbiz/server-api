@@ -1,4 +1,4 @@
-package btwmods.world;
+package btwmods.entity;
 
 import btwmods.events.IEventInterrupter;
 import btwmods.events.PositionedEvent;
@@ -71,8 +71,7 @@ public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 	}
 
 	public static EntityEvent CheckIsEntityInvulnerable(Entity entity) {
-		EntityEvent event = new EntityEvent(TYPE.IS_ENTITY_INVULNERABLE, entity);
-		return event;
+		return new EntityEvent(TYPE.IS_ENTITY_INVULNERABLE, entity);
 	}
 
 	public static EntityEvent TrampleFarmlandAttempt(int blockX, int blockY, int blockZ, Entity entity, float distanceFallen) {
