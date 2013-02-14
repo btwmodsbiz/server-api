@@ -64,4 +64,9 @@ public class EntityAPI {
 		SpawnLivingEvent event = new SpawnLivingEvent(world, creatureType, validChunks, oldEntityCount, entities);
 		((ISpawnLivingListener)listeners).onSpawnLivingAction(event);
 	}
+
+	public static void onAttacked(EntityLiving entity, EntityLiving attackingEntity) {
+		EntityEvent event = EntityEvent.Attacked(entity, attackingEntity);
+		((IEntityListener)listeners).onEntityAction(event);
+	}
 }
