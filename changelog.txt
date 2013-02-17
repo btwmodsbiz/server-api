@@ -1,3 +1,21 @@
+Version 4.56.3 (vMC 1.4.7 BTW 4.56)
+
+  - Added new EntityAPI and refactored related API hooks to it from WorldAPI.
+
+  - Added EntityAPI hook for when an Entity is damaged.
+  
+  - Added RotatedFileHandler to write date-rotated Logger files.
+  
+  - Added onServerStart to ModLoader and moved requirement checks to it.
+  
+  - Added custom server log location that is auto-rotated by date.
+  
+  - Changed vMC's ConsoleLogFormatter so it is public.
+  
+  - Fixed /save-all so it properly outputs a message when it's not quiet.
+  
+  - Fixed /save-all so it does not output the initial message when 'quiet'.
+
 Version 4.56.2 (vMC 1.4.7 BTW 4.56)
 
   - Added getChunkLoader method to ChunkProviderServer.
