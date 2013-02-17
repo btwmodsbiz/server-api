@@ -68,13 +68,10 @@ public class EntityAPI {
 	}
 
 	public static void onEntityDamaged(EntityLiving entityLiving, DamageSource damageSource) {
-		if (damageSource.getEntity() instanceof EntityLiving) {
-			
-			if (damageSource.getEntity() instanceof EntityPlayer)
-				btwmods.PlayerAPI.onAttackedByPlayer(entityLiving, (EntityPlayer)damageSource.getEntity());
-			
-			EntityEvent event = EntityEvent.Attacked(entityLiving, damageSource);
-			((IEntityListener)listeners).onEntityAction(event);
-		}
+		if (damageSource.getEntity() instanceof EntityPlayer)
+			btwmods.PlayerAPI.onAttackedByPlayer(entityLiving, (EntityPlayer)damageSource.getEntity());
+		
+		EntityEvent event = EntityEvent.Attacked(entityLiving, damageSource);
+		((IEntityListener)listeners).onEntityAction(event);
 	}
 }
