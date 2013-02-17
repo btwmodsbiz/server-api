@@ -2,8 +2,8 @@ package btwmods.entity;
 
 import btwmods.events.IEventInterrupter;
 import btwmods.events.PositionedEvent;
+import net.minecraft.src.DamageSource;
 import net.minecraft.src.Entity;
-import net.minecraft.src.EntityLiving;
 import net.minecraft.src.MathHelper;
 
 public class EntityEvent extends PositionedEvent implements IEventInterrupter {
@@ -22,7 +22,7 @@ public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 	private int blockZ = 0;
 	private float distanceFallen = -1F;
 	
-	private EntityLiving attackingEntity = null;
+	private DamageSource damageSource = null;
 	
 	public TYPE getType() {
 		return type;
@@ -73,8 +73,8 @@ public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 		return distanceFallen;
 	}
 	
-	public EntityLiving getAttackingEntity() {
-		return attackingEntity;
+	public DamageSource getDamageSource() {
+		return damageSource;
 	}
 
 	public static EntityEvent CheckIsEntityInvulnerable(Entity entity) {
@@ -90,9 +90,9 @@ public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 		return event;
 	}
 
-	public static EntityEvent Attacked(Entity entity, EntityLiving attackingEntity) {
+	public static EntityEvent Attacked(Entity entity, DamageSource damageSource) {
 		EntityEvent event = new EntityEvent(TYPE.ATTACKED, entity);
-		event.attackingEntity = attackingEntity;
+		event.damageSource = damageSource;
 		return event;
 	}
 
