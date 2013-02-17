@@ -20,11 +20,13 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.ConsoleLogFormatter;
 import net.minecraft.src.ICommand;
 import net.minecraft.src.ServerCommandManager;
 import net.minecraft.src.World;
 
 import btwmods.events.IAPIListener;
+import btwmods.io.RotatedFileHandler;
 import btwmods.io.Settings;
 
 public class ModLoader {
@@ -40,6 +42,11 @@ public class ModLoader {
 	 * Location of data saved by mods.
 	 */
 	public final static File modDataDir = new File(modsDir, "data");
+	
+	/**
+	 * Directory that contains server logs separated by date.
+	 */
+	private static File serverLogs = null;
 
 	/**
 	 * Settings used by ModLoader.
@@ -170,6 +177,27 @@ public class ModLoader {
 			String errorLogPath = errorLog.getPath();
 			errorLog = null;
 			outputError("The 'errorLog' path exists but is not a file: " + errorLogPath, Level.SEVERE);
+		}
+		
+		// Enable rotated server.log
+		if (settings.hasKey("serverLogs")) {
+			serverLogs = new File(settings.get("serverLogs"));
+		}
+		if (serverLogs != null) {
+			if (!serverLogs.exists() || !serverLogs.isDirectory()) {
+				serverLogs = null;
+				outputError("The 'serverLogs' path does not point to a directory.", Level.SEVERE);
+			}
+			else {
+				try {
+					RotatedFileHandler handler = new RotatedFileHandler(serverLogs, "yyyy-MM-dd", "server_%DATE%.log");
+					handler.setFormatter(new ConsoleLogFormatter());
+					MinecraftServer.logger.addHandler(handler);
+				} catch (IOException e) {
+					serverLogs = null;
+					outputError("The 'serverLogs' directory could not be writen to: " + e.getMessage(), Level.SEVERE);
+				}
+			}
 		}
 		
 		// Attempt to get the URLClassLoader and its private addURL() method.
