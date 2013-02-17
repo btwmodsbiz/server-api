@@ -34,6 +34,11 @@ public class ModLoader {
 	private ModLoader() {}
 	
 	/**
+	 * Version label for BTWMods
+	 */
+	public static final String VERSION = "4.56.2 (vMC 1.4.7 BTW 4.56)";
+	
+	/**
 	 * Location of settings and mods.
 	 */
 	public final static File modsDir = new File(new File("."), "btwmods");
@@ -94,11 +99,6 @@ public class ModLoader {
 	 * This is <code>null</code> if {@link #classLoader} is not a URLClassLoader.
 	 */
 	private static Method classLoaderAddURLMethod = null;
-	
-	/**
-	 * Version label for BTWMods
-	 */
-	public static final String VERSION = "4.56.2 (vMC 1.4.7 BTW 4.56)";
 	
 	/**
 	 * Pattern that IMod class files must match.
