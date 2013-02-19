@@ -14,7 +14,7 @@ public abstract class CommandBaseExtended extends CommandBase {
 		return index < args.length && Settings.isBooleanValue(args[index]);
 	}
 	
-	public boolean getBoolean(String[] args, int index, ICommandSender sender) {
+	public final boolean getBoolean(String[] args, int index, ICommandSender sender) {
 		return getBoolean(args, index, getCommandUsage(sender));
 	}
 	
