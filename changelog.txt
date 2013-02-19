@@ -1,3 +1,11 @@
+Version 4.56.4 (vMC 1.4.7 BTW 4.56)
+
+  - Added an asynchronous file writer.
+
+  - Added missing hook for NetworkAPI.onReceivedPacket.
+  
+  - Changed a method in CommandBaseExtended to final.
+
 Version 4.56.3 (vMC 1.4.7 BTW 4.56)
 
   - Added new EntityAPI and refactored related API hooks to it from WorldAPI.
