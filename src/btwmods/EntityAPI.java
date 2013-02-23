@@ -1,6 +1,7 @@
 package btwmods;
 
 import java.util.List;
+import java.util.Random;
 
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.Entity;
@@ -18,13 +19,23 @@ import btwmods.entity.SpawnLivingEvent;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
+import btwmods.io.Settings;
 
 public class EntityAPI {
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] {
 		IEntityListener.class, ISpawnLivingListener.class
 	});
+	
+	private static Random rand = new Random();
+	private static boolean spawnBats = true;
+	private static int chanceForWildWolf = 0;
 
 	private EntityAPI() {}
+	
+	static void init(Settings settings) {
+		chanceForWildWolf = settings.getInt("EntityAPI", "chanceForWildWolf", chanceForWildWolf);
+		spawnBats = settings.getBoolean("EntityAPI", "spawnBats", spawnBats);
+	}
 	
 	public static void addListener(IAPIListener listener) {
 		listeners.addListener(listener);
@@ -73,5 +84,13 @@ public class EntityAPI {
 		
 		EntityEvent event = EntityEvent.Attacked(entityLiving, damageSource);
 		((IEntityListener)listeners).onEntityAction(event);
+	}
+
+	public static boolean doSpawnBats() {
+		return spawnBats;
+	}
+
+	public static boolean onIsBabyWolfWild() {
+		return chanceForWildWolf > 0 && rand.nextInt(chanceForWildWolf) == 0;
 	}
 }

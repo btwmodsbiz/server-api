@@ -276,6 +276,16 @@ public class ModLoader {
 				return;
 			}
 			
+			try {
+				EntityAPI.init(settings);
+			}
+			catch (Exception e) {
+				outputError(e, "EntityAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
+				outputError("Initialization aborted.", Level.SEVERE);
+				hasInit = true;
+				return;
+			}
+			
 			if (settings.hasKey("ignoredModClasses")) {
 				ignoredModClasses.addAll(Arrays.asList(settings.get("ignoredModClasses").split("[^A-Za-z0-9_\\.\\$]+")));
 			}

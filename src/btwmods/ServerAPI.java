@@ -1,7 +1,5 @@
 package btwmods;
 
-import java.util.Random;
-
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
@@ -18,12 +16,8 @@ public class ServerAPI {
 	private static boolean allowUnloadSpawnChunks = false;
 	private static boolean preloadSpawnChunks = true;
 	private static boolean sendConnectedMessages = true;
-	private static boolean spawnBats = true;
-	private static int chanceForWildWolf = 0;
 	
 	private static volatile int tickCounter = -1;
-	
-	private static Random rand = new Random();
 	
 	private ServerAPI() {}
 	
@@ -38,10 +32,8 @@ public class ServerAPI {
 	static void init(Settings settings) {
 		allowUnloadSpawnChunks = settings.getBoolean("ServerAPI", "allowUnloadSpawnChunks", allowUnloadSpawnChunks);
 		preloadSpawnChunks = settings.getBoolean("ServerAPI", "preloadSpawnChunks", preloadSpawnChunks);
-		chanceForWildWolf = settings.getInt("ServerAPI", "chanceForWildWolf", chanceForWildWolf);
 		softcoreEnderChests = settings.getBoolean("ServerAPI", "softcoreEnderChests", softcoreEnderChests);
 		sendConnectedMessages = settings.getBoolean("ServerAPI", "sendConnectedMessages", sendConnectedMessages);
-		spawnBats = settings.getBoolean("ServerAPI", "spawnBats", spawnBats);
 	}
 	
 	/**
@@ -64,10 +56,6 @@ public class ServerAPI {
 	public static boolean doConnectedMessages() {
 		return sendConnectedMessages;
 	}
-
-	public static boolean doSpawnBats() {
-		return spawnBats;
-	}
 	
 	public static void onStartTick(int tickCounter) {
 		ServerAPI.tickCounter = tickCounter;
@@ -86,10 +74,6 @@ public class ServerAPI {
 		}
 		
 		StatsAPI.onEndTick();
-	}
-
-	public static boolean onIsBabyWolfWild() {
-		return chanceForWildWolf > 0 && rand.nextInt(chanceForWildWolf) == 0;
 	}
 
 	public static void onStopServerPre() {
