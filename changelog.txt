@@ -1,3 +1,7 @@
+Version 4.57.0 (vMC 1.4.7 BTW 4.57)
+
+  - Updated to BTW 4.57
+
 Version 4.56.4 (vMC 1.4.7 BTW 4.56)
 
   - Added an asynchronous file writer.
