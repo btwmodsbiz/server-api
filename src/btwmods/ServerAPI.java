@@ -1,5 +1,9 @@
 package btwmods;
 
+import java.util.logging.Level;
+
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.MinecraftException;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
@@ -12,10 +16,13 @@ import btwmods.server.TickEvent;
 public class ServerAPI {
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { ITickListener.class, IServerStopListener.class });
 	
+	private static MinecraftServer server = null;
+	
 	public static boolean softcoreEnderChests = false;
 	private static boolean allowUnloadSpawnChunks = false;
 	private static boolean preloadSpawnChunks = true;
 	private static boolean sendConnectedMessages = true;
+	private static boolean shutdownOnSessionLockFailure = true;
 	
 	private static volatile int tickCounter = -1;
 	
@@ -34,6 +41,9 @@ public class ServerAPI {
 		preloadSpawnChunks = settings.getBoolean("ServerAPI", "preloadSpawnChunks", preloadSpawnChunks);
 		softcoreEnderChests = settings.getBoolean("ServerAPI", "softcoreEnderChests", softcoreEnderChests);
 		sendConnectedMessages = settings.getBoolean("ServerAPI", "sendConnectedMessages", sendConnectedMessages);
+		shutdownOnSessionLockFailure = settings.getBoolean("ServerAPI", "shutdownOnSessionLockFailure", shutdownOnSessionLockFailure);
+		
+		server = MinecraftServer.getServer();
 	}
 	
 	/**
@@ -74,6 +84,15 @@ public class ServerAPI {
 		}
 		
 		StatsAPI.onEndTick();
+
+		if (shutdownOnSessionLockFailure && tickCounter % 900 == 0) {
+			try {
+				server.worldServers[0].checkSessionLock();
+			} catch (MinecraftException e) {
+				server.initiateShutdown();
+				ModLoader.outputError(e, "Failed checkSessionLock: " + e.getMessage() + ". Stopping server.", Level.SEVERE);
+			}
+		}
 	}
 
 	public static void onStopServerPre() {
