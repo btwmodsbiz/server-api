@@ -9,6 +9,7 @@ import net.minecraft.src.World;
 import btwmods.stats.measurements.StatBlock;
 import btwmods.stats.measurements.StatChunk;
 import btwmods.stats.measurements.StatPositionedClass;
+import btwmods.stats.measurements.StatSpawnedLiving;
 import btwmods.stats.measurements.StatWorld;
 
 public enum Stat {
@@ -65,5 +66,9 @@ public enum Stat {
 
 	public static void beginLoadChunk(World world, int chunkX, int chunkY) {
 		StatsAPI.begin(new StatChunk(Stat.LOAD_CHUNK, world, chunkX, chunkY));
+	}
+
+	public static void recordSpawning(World world, int spawned) {
+		StatsAPI.record(new StatSpawnedLiving(world, spawned));
 	}
 }

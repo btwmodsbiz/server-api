@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.CommandHandler;
 import net.minecraft.src.EntityPlayerMP;
-import net.minecraft.src.World;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
@@ -21,7 +20,6 @@ import btwmods.stats.CommandStats;
 import btwmods.stats.StatsProcessor;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.measurements.StatNetworkPlayer;
-import btwmods.stats.measurements.StatSpawnedLiving;
 
 public class StatsAPI {
 	
@@ -188,10 +186,6 @@ public class StatsAPI {
 		
 		if (player != null)
 			record(new StatNetworkPlayer(type, player, bytes));
-	}
-
-	public static void recordSpawning(World world, int spawned) {
-		measurements.record(new StatSpawnedLiving(world, spawned));
 	}
 	
 	public static void begin(TimeMeasurement<Stat> measurement) {
