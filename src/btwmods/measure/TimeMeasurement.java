@@ -2,8 +2,8 @@ package btwmods.measure;
 
 public class TimeMeasurement<E> extends Measurement<E> {
 	
-	private long time;
-	private TimeMeasurement parent;
+	private long time = -1;
+	private TimeMeasurement parent = null;
 	
 	public long getTime() {
 		return time;
@@ -27,6 +27,11 @@ public class TimeMeasurement<E> extends Measurement<E> {
 	
 	public TimeMeasurement<E> end() {
 		time = System.nanoTime() - time;
+		return this;
+	}
+	
+	public TimeMeasurement<E> record(long time) {
+		this.time = time;
 		return this;
 	}
 }
