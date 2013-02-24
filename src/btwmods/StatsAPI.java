@@ -17,6 +17,8 @@ import btwmods.stats.IStatsListener;
 import btwmods.stats.CommandStats;
 import btwmods.stats.StatsProcessor;
 import btwmods.stats.data.QueuedTickStats;
+import btwmods.stats.measurements.StatWorld;
+import btwmods.stats.measurements.StatWorldValue;
 
 public class StatsAPI {
 	
@@ -133,28 +135,21 @@ public class StatsAPI {
 			
 			stats.handlerInvocations = EventDispatcherFactory.getInvocationCount();
 			
-			stats.worldTickTimes = new long[server.timeOfLastDimensionTick.length];
-			stats.loadedChunks = new int[stats.worldTickTimes.length];
-			stats.id2ChunkMap = new int[stats.worldTickTimes.length];
-			stats.droppedChunksSet = new int[stats.worldTickTimes.length];
-			stats.loadedEntityList = new int[stats.worldTickTimes.length];
-			stats.loadedTileEntityList = new int[stats.worldTickTimes.length];
-			stats.trackedEntities = new int[stats.worldTickTimes.length];
-			for (int i = 0; i < stats.worldTickTimes.length; i++) {
-				stats.worldTickTimes[i] = server.timeOfLastDimensionTick[i][tickCounter % 100];
-				stats.loadedChunks[i] = WorldAPI.getLoadedChunks()[i].size();
-				stats.id2ChunkMap[i] = WorldAPI.getCachedChunks()[i].getNumHashElements();
-				stats.droppedChunksSet[i] = WorldAPI.getDroppedChunks()[i].size();
-				stats.loadedEntityList[i] = server.worldServers[i].loadedEntityList.size();
-				stats.loadedTileEntityList[i] = server.worldServers[i].loadedTileEntityList.size();
-				stats.trackedEntities[i] = WorldAPI.getTrackedEntities()[i].size();
-			}
-			
 			if (!measurements.completedMeasurements()) {
 				measurements.setEnabled(false);
 				detailedMeasurementsEnabled = false;
 				measurements.startNew();
 				ModLoader.outputError("StatsAPI detected that not all measurements were completed properly. Detailed measurements disabled.", Level.SEVERE);
+			}
+			
+			for (int i = 0, l = server.worldServers.length; i < l; i++) {
+				measurements.record(new StatWorld(Stat.WORLD_TICK, i).record(server.timeOfLastDimensionTick[i][tickCounter % 100]));
+				measurements.record(new StatWorldValue(Stat.WORLD_LOADED_CHUNKS, i, WorldAPI.getLoadedChunks()[i].size()));
+				measurements.record(new StatWorldValue(Stat.WORLD_CACHED_CHUNKS, i, WorldAPI.getCachedChunks()[i].getNumHashElements()));
+				measurements.record(new StatWorldValue(Stat.WORLD_DROPPED_CHUNKS, i, WorldAPI.getDroppedChunks()[i].size()));
+				measurements.record(new StatWorldValue(Stat.WORLD_LOADED_ENTITIES, i, server.worldServers[i].loadedEntityList.size()));
+				measurements.record(new StatWorldValue(Stat.WORLD_LOADED_TILE_ENTITIES, i, server.worldServers[i].loadedTileEntityList.size()));
+				measurements.record(new StatWorldValue(Stat.WORLD_TRACKED_ENTITIES, i, WorldAPI.getTrackedEntities()[i].size()));
 			}
 			
 			// Save measurements and clear it for the next round.

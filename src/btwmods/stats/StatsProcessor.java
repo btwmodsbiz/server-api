@@ -1,25 +1,26 @@
 package btwmods.stats;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.ChunkCoordIntPair;
 import btwmods.ModLoader;
-import btwmods.StatsAPI;
 import btwmods.Stat;
+import btwmods.StatsAPI;
 import btwmods.events.EventDispatcher;
+import btwmods.measure.Average;
 import btwmods.measure.Measurement;
 import btwmods.network.NetworkType;
-import btwmods.stats.data.BasicStats;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.data.ServerStats;
 import btwmods.stats.data.WorldStats;
+import btwmods.stats.measurements.StatChunk;
 import btwmods.stats.measurements.StatPositionedClass;
-import btwmods.stats.measurements.StatBlock;
 import btwmods.stats.measurements.StatNetwork;
 import btwmods.stats.measurements.StatNetworkPlayer;
-import btwmods.stats.measurements.StatSpawnedLiving;
 import btwmods.stats.measurements.StatWorld;
+import btwmods.stats.measurements.StatWorldValue;
 
 public class StatsProcessor implements Runnable {
 	
@@ -131,25 +132,15 @@ public class StatsProcessor implements Runnable {
 			serverStats.bytesReceived = stats.bytesReceived;
 			
 			serverStats.handlerInovcations = stats.handlerInvocations;
-			
+
+			// Reset the current value of averages that are calculated from Measurements.
 			for (int i = 0; i < worldStats.length; i++) {
-				worldStats[i].worldTickTime.record(stats.worldTickTimes[i]);
-				worldStats[i].loadedChunks.record(stats.loadedChunks[i]);
-				worldStats[i].id2ChunkMap.record(stats.id2ChunkMap[i]);
-				worldStats[i].droppedChunksSet.record(stats.droppedChunksSet[i]);
-				worldStats[i].loadedEntityList.record(stats.loadedEntityList[i]);
-				worldStats[i].loadedTileEntityList.record(stats.loadedTileEntityList[i]);
-				worldStats[i].trackedEntities.record(stats.trackedEntities[i]);
-				
-				// Reset the current value of averages to 0.
-				worldStats[i].reset();
+				worldStats[i].resetCurrent();
 			}
 			
 			// Add the time taken by each measurement type.
 			Measurement measurement;
 			while ((measurement = stats.measurements.poll()) != null) {
-				ChunkCoordIntPair coords = null;
-				
 				if (measurement instanceof StatNetwork) {
 					StatNetwork statNetwork = (StatNetwork)measurement;
 					
@@ -163,146 +154,47 @@ public class StatsProcessor implements Runnable {
 					}
 				}
 				
+				else if (measurement instanceof StatWorldValue) {
+					StatWorldValue statWorldValue = (StatWorldValue)measurement;
+					worldStats[statWorldValue.worldIndex].measurements.add(measurement);
+					worldStats[statWorldValue.worldIndex].measurementQueue.incrementCurrent(1);
+					worldStats[statWorldValue.worldIndex].averages.get(statWorldValue.identifier).incrementCurrent(statWorldValue.value);
+				}
+				
 				else if (measurement instanceof StatWorld) {
 					StatWorld statWorld = (StatWorld)measurement;
 				
+					worldStats[statWorld.worldIndex].measurements.add(measurement);
 					worldStats[statWorld.worldIndex].measurementQueue.incrementCurrent(1);
-				
-					switch (statWorld.identifier) {
-						
-						case MOB_SPAWNING:
-							worldStats[statWorld.worldIndex].mobSpawning.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case MOOD_LIGHT_AND_WEATHER:
-							worldStats[statWorld.worldIndex].weather.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case BLOCK_UPDATE:
-							StatBlock statBlock = (StatBlock)statWorld;
-							worldStats[statWorld.worldIndex].blockTick.incrementCurrent(statWorld.getTime());
-							coords = new ChunkCoordIntPair(statBlock.chunkX, statBlock.chunkZ);
-							break;
-							
-						case ENTITIES_SECTION:
-							worldStats[statWorld.worldIndex].entities.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case TIME_SYNC:
-							worldStats[statWorld.worldIndex].timeSync.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case BUILD_ACTIVE_CHUNKSET:
-							worldStats[statWorld.worldIndex].buildActiveChunkSet.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case CHECK_PLAYER_LIGHT:
-							worldStats[statWorld.worldIndex].checkPlayerLight.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case ENTITY_UPDATE:
-							StatPositionedClass statUpdateEntity = (StatPositionedClass)statWorld;
-							coords = new ChunkCoordIntPair(statUpdateEntity.chunkX, statUpdateEntity.chunkZ);
-							BasicStats entityStats = worldStats[statWorld.worldIndex].entityStats.get(statUpdateEntity.name);
-							if (entityStats == null) {
-								worldStats[statWorld.worldIndex].entityStats.put(statUpdateEntity.name, entityStats = new BasicStats());
-								entityStats.tickTime.record(statWorld.getTime());
-							}
-							else {
-								entityStats.tickTime.incrementCurrent(statWorld.getTime());
-							}
-							
-							entityStats.count++;
-							
-							break;
-							
-						case TILE_ENTITY_UPDATE:
-							StatPositionedClass statUpdateTileEntity = (StatPositionedClass)statWorld;
-							coords = new ChunkCoordIntPair(statUpdateTileEntity.chunkX, statUpdateTileEntity.chunkZ);
-							
-							BasicStats tileEntityStats = worldStats[statWorld.worldIndex].tileEntityStats.get(statUpdateTileEntity.clazz);
-							if (tileEntityStats == null) {
-								worldStats[statWorld.worldIndex].tileEntityStats.put(statUpdateTileEntity.clazz, tileEntityStats = new BasicStats());
-								tileEntityStats.tickTime.record(statWorld.getTime());
-							}
-							else {
-								tileEntityStats.tickTime.incrementCurrent(statWorld.getTime());
-							}
-							
-							tileEntityStats.count++;
-							
-							break;
-							
-						case ENTITIES_REGULAR:
-							worldStats[statWorld.worldIndex].entitiesRegular.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case ENTITIES_REMOVE:
-							worldStats[statWorld.worldIndex].entitiesRemove.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case ENTITIES_TILE:
-							worldStats[statWorld.worldIndex].entitiesTile.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case ENTITIES_TILEPENDING:
-							worldStats[statWorld.worldIndex].entitiesTilePending.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case LIGHTNING_AND_RAIN:
-							worldStats[statWorld.worldIndex].lightingAndRain.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case UPDATE_PLAYER_ENTITIES:
-							worldStats[statWorld.worldIndex].updatePlayerEntities.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case UPDATE_TRACKED_ENTITY_PLAYER_LISTS:
-							worldStats[statWorld.worldIndex].updateTrackedEntityPlayerLists.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case WEATHER_EFFECTS:
-							worldStats[statWorld.worldIndex].weatherEffects.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case UPDATE_TRACKED_ENTITY_PLAYER_LIST:
-							StatPositionedClass statUpdateEntityTracked = (StatPositionedClass)statWorld;
-							BasicStats trackedEntityStats = worldStats[statWorld.worldIndex].trackedEntityStats.get(statUpdateEntityTracked.name);
-							if (trackedEntityStats == null) {
-								worldStats[statWorld.worldIndex].trackedEntityStats.put(statUpdateEntityTracked.name, trackedEntityStats = new BasicStats());
-								trackedEntityStats.tickTime.record(statWorld.getTime());
-							}
-							else {
-								trackedEntityStats.tickTime.incrementCurrent(statWorld.getTime());
-							}
-							
-							trackedEntityStats.count++;
-							break;
-							
-						case LOAD_CHUNK:
-							worldStats[statWorld.worldIndex].chunkLoading.incrementCurrent(1L);
-							worldStats[statWorld.worldIndex].chunkLoadingTime.incrementCurrent(statWorld.getTime());
-							break;
-							
-						case SPAWN_LIVING:
-							StatSpawnedLiving statSpawnedLiving = (StatSpawnedLiving)statWorld;
-							worldStats[statWorld.worldIndex].spawnedLiving.incrementCurrent(statSpawnedLiving.count);
-							break;
-					}
 					
-					// Get the average for this chunk and increment it.
-					if (coords != null) {
-						BasicStats chunkStats = worldStats[statWorld.worldIndex].chunkStats.get(coords);
-						if (chunkStats == null) {
-							worldStats[statWorld.worldIndex].chunkStats.put(coords, chunkStats = new BasicStats());
-							chunkStats.tickTime.record(statWorld.getTime());
-						}
-						else {
-							chunkStats.tickTime.incrementCurrent(statWorld.getTime());
-						}
+					if (statWorld.identifier == Stat.LOAD_CHUNK) {
+						worldStats[statWorld.worldIndex].averages.get(Stat.LOAD_CHUNK).incrementCurrent(1L);
+						worldStats[statWorld.worldIndex].averages.get(Stat.LOAD_CHUNK_TIME).incrementCurrent(statWorld.getTime());
+					}
+					else {
+						worldStats[statWorld.worldIndex].averages.get(statWorld.identifier).incrementCurrent(statWorld.getTime());
 						
-						if (measurement.identifier == Stat.ENTITY_UPDATE)
-							chunkStats.count++;
+						if (statWorld instanceof StatChunk) {
+							StatChunk statChunk = (StatChunk)statWorld;
+							
+							// Increment the time for the chunk.
+							ChunkCoordIntPair coords = new ChunkCoordIntPair(statChunk.chunkX, statChunk.chunkZ);
+							Average chunkAverage = worldStats[statWorld.worldIndex].timeByChunk.get(coords);
+							if (chunkAverage == null)
+								worldStats[statWorld.worldIndex].timeByChunk.put(coords, chunkAverage = new Average());
+							chunkAverage.incrementCurrent(statChunk.getTime());
+							
+							if (statWorld instanceof StatPositionedClass) {
+								StatPositionedClass statPositionedClass = (StatPositionedClass)statChunk;
+								
+								// Increment the time for the class.
+								Map<Class, Average> classAverages = worldStats[statWorld.worldIndex].timeByClass.get(statPositionedClass.identifier);
+								Average classAverage = classAverages.get(statPositionedClass.clazz);
+								if (classAverage == null)
+									classAverages.put(statPositionedClass.clazz, classAverage = new Average());
+								classAverage.incrementCurrent(statPositionedClass.getTime());
+							}
+						}
 					}
 				}
 			}

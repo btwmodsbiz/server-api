@@ -1,81 +1,48 @@
 package btwmods.stats.data;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.minecraft.src.ChunkCoordIntPair;
+import btwmods.Stat;
 import btwmods.measure.Average;
+import btwmods.measure.Measurement;
 
 public class WorldStats {
 	public final Average measurementQueue = new Average();
-	public final Average worldTickTime = new Average();
-	public final Average mobSpawning = new Average();
-	public final Average blockTick = new Average();
-	public final Average weather = new Average();
-	public final Average entities = new Average();
-	public final Average timeSync = new Average();
-	public final Average buildActiveChunkSet = new Average();
-	public final Average checkPlayerLight = new Average();
-	public final Average chunkLoading = new Average();
-	public final Average chunkLoadingTime = new Average();
-	public final Average loadedChunks = new Average(); // TODO: make this longer?
-	public final Average id2ChunkMap = new Average(); // TODO: make this longer?
-	public final Average droppedChunksSet = new Average();
-	public final Average entitiesRegular = new Average();
-	public final Average entitiesRemove = new Average();
-	public final Average entitiesTile = new Average();
-	public final Average entitiesTilePending = new Average();
-	public final Average lightingAndRain = new Average();
-	public final Average updatePlayerEntities = new Average();
-	public final Average updateTrackedEntityPlayerLists = new Average();
-	public final Average weatherEffects = new Average();
-	public final Average loadedEntityList = new Average();
-	public final Average loadedTileEntityList = new Average();
-	public final Average trackedEntities = new Average();
-	public final Average spawnedLiving = new Average();
-	public final BasicStatsMap<ChunkCoordIntPair> chunkStats = new BasicStatsMap<ChunkCoordIntPair>();
-	public final BasicStatsMap<String> entityStats = new BasicStatsMap<String>();
-	public final BasicStatsMap<Class> tileEntityStats = new BasicStatsMap<Class>();
-	public final BasicStatsMap<String> trackedEntityStats = new BasicStatsMap<String>();
+	public final EnumMap<Stat, Average> averages;
+	public final Map<ChunkCoordIntPair, Average> timeByChunk = new LinkedHashMap<ChunkCoordIntPair, Average>();
+	public final EnumMap<Stat, Map<Class, Average>> timeByClass = new EnumMap<Stat, Map<Class, Average>>(Stat.class);
+	public final List<Measurement> measurements = new ArrayList<Measurement>();
 	
-	// Reset the averages to 0.
-	public void reset() {
-		measurementQueue.resetCurrent();
-		mobSpawning.resetCurrent();
-		blockTick.resetCurrent();
-		weather.resetCurrent();
-		entities.resetCurrent();
-		timeSync.resetCurrent();
-		buildActiveChunkSet.resetCurrent();
-		checkPlayerLight.resetCurrent();
-		chunkLoading.resetCurrent();
-		chunkLoadingTime.resetCurrent();
-		entitiesRegular.resetCurrent();
-		entitiesRemove.resetCurrent();
-		entitiesTile.resetCurrent();
-		entitiesTilePending.resetCurrent();
-		lightingAndRain.resetCurrent();
-		updatePlayerEntities.resetCurrent();
-		updateTrackedEntityPlayerLists.resetCurrent();
-		weatherEffects.resetCurrent();
-		spawnedLiving.resetCurrent();
-
-		resetCurrentMap(chunkStats);
-		resetCurrentMap(entityStats);
-		resetCurrentMap(tileEntityStats);
-		resetCurrentMap(trackedEntityStats);
+	public WorldStats() {
+		averages = new EnumMap<Stat, Average>(Stat.class);
+		for (Stat stat : Stat.values()) {
+			averages.put(stat, new Average(stat.averageResolution));
+			timeByClass.put(stat, new LinkedHashMap<Class, Average>());
+		}
 	}
 	
-	private static void resetCurrentMap(BasicStatsMap map) {
-		Iterator<Map.Entry<Class, BasicStats>> iterator = map.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Map.Entry<Class, BasicStats> entry = iterator.next();
-			
-			if (entry.getValue().tickTime.getAverage() == 0.0D && entry.getValue().tickTime.getTick() > Average.RESOLUTION) {
-				iterator.remove();
-			}
-			else {
-				entry.getValue().resetCurrent();
+	// Reset the averages to 0.
+	public void resetCurrent() {
+		measurementQueue.resetCurrent();
+		measurements.clear();
+		
+		for (Entry<Stat, Average> entry : averages.entrySet()) {
+			entry.getValue().resetCurrent();
+		}
+		
+		for (Entry<ChunkCoordIntPair, Average> entry : timeByChunk.entrySet()) {
+			entry.getValue().resetCurrent();
+		}
+		
+		for (Entry<Stat, Map<Class, Average>> entry : timeByClass.entrySet()) {
+			for (Entry<Class, Average> subEntry : entry.getValue().entrySet()) {
+				subEntry.getValue().resetCurrent();
 			}
 		}
 	}

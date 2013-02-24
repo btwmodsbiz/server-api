@@ -13,13 +13,6 @@ public class QueuedTickStats {
 	public long sentPacketSize;
 	public long receivedPacketCount;
 	public long receivedPacketSize;
-	public long[] worldTickTimes;
-	public int[] loadedChunks;
-	public int[] id2ChunkMap;
-	public int[] droppedChunksSet;
-	public int[] loadedEntityList;
-	public int[] loadedTileEntityList;
-	public int[] trackedEntities;
 	public ArrayDeque<Measurement> measurements;
 	public long bytesSent;
 	public long bytesReceived;

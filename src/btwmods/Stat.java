@@ -6,6 +6,7 @@ import net.minecraft.src.EntityTrackerEntry;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
+import btwmods.measure.Average;
 import btwmods.network.NetworkType;
 import btwmods.stats.measurements.StatBlock;
 import btwmods.stats.measurements.StatChunk;
@@ -15,6 +16,14 @@ import btwmods.stats.measurements.StatWorld;
 import btwmods.stats.measurements.StatWorldValue;
 
 public enum Stat {
+	WORLD_TICK,
+	WORLD_LOADED_CHUNKS,
+	WORLD_CACHED_CHUNKS,
+	WORLD_DROPPED_CHUNKS,
+	WORLD_LOADED_ENTITIES,
+	WORLD_LOADED_TILE_ENTITIES,
+	WORLD_TRACKED_ENTITIES,
+	
 	MOB_SPAWNING,
 	BLOCK_UPDATE,
 	ENTITIES_SECTION,
@@ -34,9 +43,11 @@ public enum Stat {
 	UPDATE_PLAYER_ENTITIES,
 	UPDATE_TRACKED_ENTITY_PLAYER_LIST,
 	LOAD_CHUNK,
+	LOAD_CHUNK_TIME,
 	SPAWN_LIVING;
 	
 	public boolean enabled = true;
+	public int averageResolution = Average.RESOLUTION;
 	
 	public static long bytesSent = 0;
 	public static long bytesReceived = 0;
