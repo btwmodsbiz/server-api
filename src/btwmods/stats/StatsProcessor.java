@@ -14,7 +14,7 @@ import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.data.ServerStats;
 import btwmods.stats.data.WorldStats;
 import btwmods.stats.measurements.StatPositionedClass;
-import btwmods.stats.measurements.StatUpdateBlock;
+import btwmods.stats.measurements.StatBlock;
 import btwmods.stats.measurements.StatNetwork;
 import btwmods.stats.measurements.StatNetworkPlayer;
 import btwmods.stats.measurements.StatSpawnedLiving;
@@ -178,9 +178,9 @@ public class StatsProcessor implements Runnable {
 							break;
 							
 						case BLOCK_UPDATE:
-							StatUpdateBlock statUpdateBlock = (StatUpdateBlock)statWorld;
+							StatBlock statBlock = (StatBlock)statWorld;
 							worldStats[statWorld.worldIndex].blockTick.incrementCurrent(statWorld.getTime());
-							coords = new ChunkCoordIntPair(statUpdateBlock.chunkX, statUpdateBlock.chunkZ);
+							coords = new ChunkCoordIntPair(statBlock.chunkX, statBlock.chunkZ);
 							break;
 							
 						case ENTITIES_SECTION:

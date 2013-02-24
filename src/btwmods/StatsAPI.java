@@ -30,7 +30,7 @@ import btwmods.stats.StatsProcessor;
 import btwmods.stats.Type;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.measurements.StatPositionedClass;
-import btwmods.stats.measurements.StatUpdateBlock;
+import btwmods.stats.measurements.StatBlock;
 import btwmods.stats.measurements.StatChunk;
 import btwmods.stats.measurements.StatNetworkPlayer;
 import btwmods.stats.measurements.StatSpawnedLiving;
@@ -212,11 +212,11 @@ public class StatsAPI {
 	}
 	
 	public static void beginBlockUpdate(World world, Block block, int x, int y, int z) {
-		measurements.begin(new StatUpdateBlock(world, block, x, y, z));
+		measurements.begin(new StatBlock(Type.BLOCK_UPDATE, world, block, x, y, z));
 	}
 
 	public static void beginBlockUpdate(World world, NextTickListEntry blockUpdate) {
-		measurements.begin(new StatUpdateBlock(world, blockUpdate));
+		measurements.begin(new StatBlock(Type.BLOCK_UPDATE, world, blockUpdate));
 	}
 
 	public static void beginEntityUpdate(World world, Entity entity) {
