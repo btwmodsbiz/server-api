@@ -5,17 +5,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.Block;
 import net.minecraft.src.CommandHandler;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityList;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
-import net.minecraft.src.EntityTrackerEntry;
 import net.minecraft.src.EntityXPOrb;
-import net.minecraft.src.NextTickListEntry;
-import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
@@ -23,18 +19,15 @@ import btwmods.events.IAPIListener;
 import btwmods.io.Settings;
 import btwmods.measure.Measurement;
 import btwmods.measure.Measurements;
+import btwmods.measure.TimeMeasurement;
 import btwmods.network.NetworkType;
 import btwmods.stats.IStatsListener;
 import btwmods.stats.CommandStats;
 import btwmods.stats.StatsProcessor;
 import btwmods.stats.Type;
 import btwmods.stats.data.QueuedTickStats;
-import btwmods.stats.measurements.StatPositionedClass;
-import btwmods.stats.measurements.StatBlock;
-import btwmods.stats.measurements.StatChunk;
 import btwmods.stats.measurements.StatNetworkPlayer;
 import btwmods.stats.measurements.StatSpawnedLiving;
-import btwmods.stats.measurements.StatWorld;
 
 public class StatsAPI {
 	
@@ -206,33 +199,9 @@ public class StatsAPI {
 	public static void recordSpawning(World world, int spawned) {
 		measurements.record(new StatSpawnedLiving(world, spawned));
 	}
-
-	public static void begin(Type type, World world) {
-		measurements.begin(new StatWorld(type, world));
-	}
 	
-	public static void beginBlockUpdate(World world, Block block, int x, int y, int z) {
-		measurements.begin(new StatBlock(Type.BLOCK_UPDATE, world, block, x, y, z));
-	}
-
-	public static void beginBlockUpdate(World world, NextTickListEntry blockUpdate) {
-		measurements.begin(new StatBlock(Type.BLOCK_UPDATE, world, blockUpdate));
-	}
-
-	public static void beginEntityUpdate(World world, Entity entity) {
-		measurements.begin(new StatPositionedClass(world, entity));
-	}
-
-	public static void beginTileEntityUpdate(World world, TileEntity tileEntity) {
-		measurements.begin(new StatPositionedClass(Type.TILE_ENTITY_UPDATE, world, tileEntity));
-	}
-
-	public static void beginUpdateTrackedEntityPlayerList(World world, EntityTrackerEntry trackerEntry) {
-		measurements.begin(new StatPositionedClass(world, trackerEntry));
-	}
-
-	public static void beginLoadChunk(World world, int chunkX, int chunkY) {
-		measurements.begin(new StatChunk(Type.LOAD_CHUNK, world, chunkX, chunkY));
+	public static void begin(TimeMeasurement<Type> measurement) {
+		measurements.begin(measurement);
 	}
 	
 	/**
