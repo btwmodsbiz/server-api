@@ -6,12 +6,7 @@ import java.util.logging.Level;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.CommandHandler;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityItem;
-import net.minecraft.src.EntityList;
-import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
-import net.minecraft.src.EntityXPOrb;
 import net.minecraft.src.World;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
@@ -223,27 +218,5 @@ public class StatsAPI {
 			measurements.startNew();
 			ModLoader.outputError(e, "StatsAPI#end() called unexpectedly. Detailed measurements disabled.", Level.SEVERE);
 		}
-	}
-	
-	public static String getEntityName(Entity entity) {
-		String name;
-		
-		if (entity instanceof EntityItem) {
-			name = ((EntityItem)entity).func_92059_d().getItemName();
-		}
-		else if (entity instanceof EntityPlayer) {
-			name = entity.getClass().getSimpleName();
-		}
-		else {
-			String nameLookup = EntityList.getEntityString(entity);
-			
-			String extra = "";
-			if (entity instanceof EntityXPOrb && ((EntityXPOrb)entity).m_bNotPlayerOwned) {
-				extra = " (Dragon)";
-			}
-			name = (nameLookup == null ? entity.getEntityName() : nameLookup) + extra;
-		}
-		
-		return name;
 	}
 }

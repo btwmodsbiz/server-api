@@ -7,6 +7,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.src.Entity;
+import net.minecraft.src.EntityItem;
+import net.minecraft.src.EntityList;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityXPOrb;
 import net.minecraft.src.ICommandSender;
 import net.minecraft.src.Packet3Chat;
 
@@ -196,5 +201,27 @@ public class Util {
 		}
 		
 		return sb.toString();
+	}
+	
+	public static String getEntityName(Entity entity) {
+		String name;
+		
+		if (entity instanceof EntityItem) {
+			name = ((EntityItem)entity).func_92059_d().getItemName();
+		}
+		else if (entity instanceof EntityPlayer) {
+			name = entity.getClass().getSimpleName();
+		}
+		else {
+			String nameLookup = EntityList.getEntityString(entity);
+			
+			String extra = "";
+			if (entity instanceof EntityXPOrb && ((EntityXPOrb)entity).m_bNotPlayerOwned) {
+				extra = " (Dragon)";
+			}
+			name = (nameLookup == null ? entity.getEntityName() : nameLookup) + extra;
+		}
+		
+		return name;
 	}
 }
