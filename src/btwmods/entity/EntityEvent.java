@@ -1,13 +1,14 @@
-package btwmods.world;
+package btwmods.entity;
 
 import btwmods.events.IEventInterrupter;
 import btwmods.events.PositionedEvent;
+import net.minecraft.src.DamageSource;
 import net.minecraft.src.Entity;
 import net.minecraft.src.MathHelper;
 
 public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 	
-	public enum TYPE { IS_ENTITY_INVULNERABLE, TRAMPLE_FARMLAND_ATTEMPT };
+	public enum TYPE { IS_ENTITY_INVULNERABLE, TRAMPLE_FARMLAND_ATTEMPT, ATTACKED };
 
 	private TYPE type;
 	private Entity entity;
@@ -20,6 +21,8 @@ public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 	private int blockY = -1;
 	private int blockZ = 0;
 	private float distanceFallen = -1F;
+	
+	private DamageSource damageSource = null;
 	
 	public TYPE getType() {
 		return type;
@@ -69,10 +72,13 @@ public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 	public float getDistanceFallen() {
 		return distanceFallen;
 	}
+	
+	public DamageSource getDamageSource() {
+		return damageSource;
+	}
 
 	public static EntityEvent CheckIsEntityInvulnerable(Entity entity) {
-		EntityEvent event = new EntityEvent(TYPE.IS_ENTITY_INVULNERABLE, entity);
-		return event;
+		return new EntityEvent(TYPE.IS_ENTITY_INVULNERABLE, entity);
 	}
 
 	public static EntityEvent TrampleFarmlandAttempt(int blockX, int blockY, int blockZ, Entity entity, float distanceFallen) {
@@ -81,6 +87,12 @@ public class EntityEvent extends PositionedEvent implements IEventInterrupter {
 		event.blockY = blockY;
 		event.blockZ = blockZ;
 		event.distanceFallen = distanceFallen;
+		return event;
+	}
+
+	public static EntityEvent Attacked(Entity entity, DamageSource damageSource) {
+		EntityEvent event = new EntityEvent(TYPE.ATTACKED, entity);
+		event.damageSource = damageSource;
 		return event;
 	}
 

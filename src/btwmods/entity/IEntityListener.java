@@ -1,4 +1,4 @@
-package btwmods.world;
+package btwmods.entity;
 
 import btwmods.events.IAPIListener;
 

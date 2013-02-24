@@ -1,7 +1,9 @@
 package btwmods;
 
-import java.util.Random;
+import java.util.logging.Level;
 
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.MinecraftException;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
@@ -14,16 +16,15 @@ import btwmods.server.TickEvent;
 public class ServerAPI {
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { ITickListener.class, IServerStopListener.class });
 	
+	private static MinecraftServer server = null;
+	
 	public static boolean softcoreEnderChests = false;
 	private static boolean allowUnloadSpawnChunks = false;
 	private static boolean preloadSpawnChunks = true;
 	private static boolean sendConnectedMessages = true;
-	private static boolean spawnBats = true;
-	private static int chanceForWildWolf = 0;
+	private static boolean shutdownOnSessionLockFailure = true;
 	
 	private static volatile int tickCounter = -1;
-	
-	private static Random rand = new Random();
 	
 	private ServerAPI() {}
 	
@@ -38,10 +39,11 @@ public class ServerAPI {
 	static void init(Settings settings) {
 		allowUnloadSpawnChunks = settings.getBoolean("ServerAPI", "allowUnloadSpawnChunks", allowUnloadSpawnChunks);
 		preloadSpawnChunks = settings.getBoolean("ServerAPI", "preloadSpawnChunks", preloadSpawnChunks);
-		chanceForWildWolf = settings.getInt("ServerAPI", "chanceForWildWolf", chanceForWildWolf);
 		softcoreEnderChests = settings.getBoolean("ServerAPI", "softcoreEnderChests", softcoreEnderChests);
 		sendConnectedMessages = settings.getBoolean("ServerAPI", "sendConnectedMessages", sendConnectedMessages);
-		spawnBats = settings.getBoolean("ServerAPI", "spawnBats", spawnBats);
+		shutdownOnSessionLockFailure = settings.getBoolean("ServerAPI", "shutdownOnSessionLockFailure", shutdownOnSessionLockFailure);
+		
+		server = MinecraftServer.getServer();
 	}
 	
 	/**
@@ -64,10 +66,6 @@ public class ServerAPI {
 	public static boolean doConnectedMessages() {
 		return sendConnectedMessages;
 	}
-
-	public static boolean doSpawnBats() {
-		return spawnBats;
-	}
 	
 	public static void onStartTick(int tickCounter) {
 		ServerAPI.tickCounter = tickCounter;
@@ -86,10 +84,15 @@ public class ServerAPI {
 		}
 		
 		StatsAPI.onEndTick();
-	}
 
-	public static boolean onIsBabyWolfWild() {
-		return chanceForWildWolf > 0 && rand.nextInt(chanceForWildWolf) == 0;
+		if (shutdownOnSessionLockFailure && tickCounter % 900 == 0) {
+			try {
+				server.worldServers[0].checkSessionLock();
+			} catch (MinecraftException e) {
+				server.initiateShutdown();
+				ModLoader.outputError(e, "Failed checkSessionLock: " + e.getMessage() + ". Stopping server.", Level.SEVERE);
+			}
+		}
 	}
 
 	public static void onStopServerPre() {

@@ -20,16 +20,23 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.ConsoleLogFormatter;
 import net.minecraft.src.ICommand;
 import net.minecraft.src.ServerCommandManager;
 import net.minecraft.src.World;
 
 import btwmods.events.IAPIListener;
+import btwmods.io.RotatedFileHandler;
 import btwmods.io.Settings;
 
 public class ModLoader {
 	
 	private ModLoader() {}
+	
+	/**
+	 * Version label for BTWMods
+	 */
+	public static final String VERSION = "4.57.0 (vMC 1.4.7 BTW 4.57)";
 	
 	/**
 	 * Location of settings and mods.
@@ -40,6 +47,11 @@ public class ModLoader {
 	 * Location of data saved by mods.
 	 */
 	public final static File modDataDir = new File(modsDir, "data");
+	
+	/**
+	 * Directory that contains server logs separated by date.
+	 */
+	private static File serverLogs = null;
 
 	/**
 	 * Settings used by ModLoader.
@@ -89,11 +101,6 @@ public class ModLoader {
 	private static Method classLoaderAddURLMethod = null;
 	
 	/**
-	 * Version label for BTWMods
-	 */
-	public static final String VERSION = "4.56.0 (vMC 1.4.7 BTW 4.56)";
-	
-	/**
 	 * Pattern that IMod class files must match.
 	 */
 	public static final String BTWMOD_REGEX = "(?i)^(BTWMod|mod_|BTWMod_).*\\.class$";
@@ -136,60 +143,89 @@ public class ModLoader {
 	 * Specifically, it's the time at which this class was loaded by the ClassLoader.
 	 */
 	public static long serverStartTime = System.currentTimeMillis();
+
+	/**
+	 * Called just after the console logging has been initialized.
+	 */
+	public static void onServerStart() {
+		// Mark the current thread as the main one.
+		thread = Thread.currentThread();
+		
+		outputInfo("Verifying requirements...");
+
+		// Make sure required directory exist and are directories.
+		if (!requiredDirectory(modsDir) || !requiredDirectory(modDataDir)) {
+			outputError("Missing 'btwmods' directory in server root. Will not initialize BTWMods.", Level.SEVERE);
+			hasInit = true;
+			return;
+		}
+		
+		// Load settings file for ModLoader and APIs.
+		settings = loadSettings("BTWMods");
+		
+		// Set the default error log file.
+		// Must be done after the modsDir has been verified and settings have been loaded.
+		errorLog = new File(modsDir, "errors.log");
+		
+		// Override default error log location.
+		if (settings.hasKey("errorLog")) {
+			errorLog = new File(settings.get("errorLog"));
+		}
+		
+		// Fail if the path exists and isn't a file.
+		if (errorLog.exists() && !errorLog.isFile()) {
+			String errorLogPath = errorLog.getPath();
+			errorLog = null;
+			outputError("The 'errorLog' path exists but is not a file: " + errorLogPath, Level.SEVERE);
+		}
+		
+		// Enable rotated server.log
+		if (settings.hasKey("serverLogs")) {
+			serverLogs = new File(settings.get("serverLogs"));
+		}
+		if (serverLogs != null) {
+			if (!serverLogs.exists() || !serverLogs.isDirectory()) {
+				serverLogs = null;
+				outputError("The 'serverLogs' path does not point to a directory.", Level.SEVERE);
+			}
+			else {
+				try {
+					RotatedFileHandler handler = new RotatedFileHandler(serverLogs, "yyyy-MM-dd", "server_%DATE%.log");
+					handler.setFormatter(new ConsoleLogFormatter());
+					MinecraftServer.logger.addHandler(handler);
+				} catch (IOException e) {
+					serverLogs = null;
+					outputError("The 'serverLogs' directory could not be writen to: " + e.getMessage(), Level.SEVERE);
+				}
+			}
+		}
+		
+		// Attempt to get the URLClassLoader and its private addURL() method.
+		if (classLoader == null) {
+			classLoader = ModLoader.class.getClassLoader();
+			
+			if (classLoader instanceof URLClassLoader) {
+				try {
+					classLoaderUrls.addAll(Arrays.asList(((URLClassLoader)classLoader).getURLs()));
+					classLoaderAddURLMethod = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
+					classLoaderAddURLMethod.setAccessible(true);
+				} catch (Exception e) {
+					outputError(e, "Failed (" + e.getClass().getSimpleName() + ") to hook into ClassLoader to add class paths: " + e.getMessage());
+				}
+			}
+			
+			// TODO: Can we use our own URLClassLoader instead?
+		}
+	}
 	
 	/**
 	 * Initialize the ModLoader and mods. Should only be called from the {@link World} constructor.
 	 */
-	public static void init() {
+	public static void onWorldsLoaded() {
 		if (!hasInit) {
-			
-			// Mark the current thread as the main one.
-			thread = Thread.currentThread();
 			
 			outputInfo("Version " + VERSION + " initializing...");
 			
-			// Make sure required directory exist and are directories.
-			if (!requiredDirectory(modsDir) || !requiredDirectory(modDataDir)) {
-				outputError("Initialization aborted.", Level.SEVERE);
-				hasInit = true;
-				return;
-			}
-			
-			// Set the error log file.
-			errorLog = new File(modsDir, "errors.log");
-			
-			// Attempt to get the URLClassLoader and its private addURL() method.
-			if (classLoader == null) {
-				classLoader = ModLoader.class.getClassLoader();
-				
-				if (classLoader instanceof URLClassLoader) {
-					try {
-						classLoaderUrls.addAll(Arrays.asList(((URLClassLoader)classLoader).getURLs()));
-						classLoaderAddURLMethod = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
-						classLoaderAddURLMethod.setAccessible(true);
-					} catch (Throwable e) {
-						outputError(e, "Could not load mods from the class path (i.e. any mods directly in your minecraft_server.jar).");
-					}
-				}
-				
-				// TODO: Can we use our own URLClassLoader instead?
-			}
-			
-			// Load settings file.
-			settings = loadSettings("BTWMods");
-			
-			// Process settings.
-			if (settings.hasKey("errorLog")) {
-				errorLog = new File(settings.get("errorLog"));
-			}
-			
-			// Check that the error log is a valid path to write to.
-			if (errorLog != null && errorLog.exists() && !errorLog.isFile()) {
-				String errorLogPath = errorLog.getPath();
-				errorLog = null;
-				outputError("The BTWMods errorLog exists but is not a file: " + errorLogPath, Level.SEVERE);
-			}
-
 			try {
 				ReflectionAPI.init(settings);
 			}
@@ -235,6 +271,16 @@ public class ModLoader {
 			}
 			catch (Exception e) {
 				outputError(e, "ServerAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
+				outputError("Initialization aborted.", Level.SEVERE);
+				hasInit = true;
+				return;
+			}
+			
+			try {
+				EntityAPI.init(settings);
+			}
+			catch (Exception e) {
+				outputError(e, "EntityAPI failed (" + e.getClass().getSimpleName() + ") to load: " + e.getMessage(), Level.SEVERE);
 				outputError("Initialization aborted.", Level.SEVERE);
 				hasInit = true;
 				return;
