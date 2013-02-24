@@ -11,8 +11,8 @@ import btwmods.stats.measurements.StatBlock;
 import btwmods.stats.measurements.StatChunk;
 import btwmods.stats.measurements.StatNetworkPlayer;
 import btwmods.stats.measurements.StatPositionedClass;
-import btwmods.stats.measurements.StatSpawnedLiving;
 import btwmods.stats.measurements.StatWorld;
+import btwmods.stats.measurements.StatWorldValue;
 
 public enum Stat {
 	MOB_SPAWNING,
@@ -74,7 +74,7 @@ public enum Stat {
 	}
 
 	public static void recordSpawning(World world, int spawned) {
-		StatsAPI.record(new StatSpawnedLiving(world, spawned));
+		StatsAPI.record(new StatWorldValue(Stat.SPAWN_LIVING, world, spawned));
 	}
 	
 	public static void recordNetworkIO(NetworkType type, int bytes) {
