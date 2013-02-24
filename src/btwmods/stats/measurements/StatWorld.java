@@ -8,8 +8,12 @@ public class StatWorld extends StatTick {
 
 	public final int worldIndex;
 	
-	public StatWorld(Stat identifier, World world) {
+	public StatWorld(Stat identifier, int worldIndex) {
 		super(identifier);
-		worldIndex = Util.getWorldIndexFromDimension(world.provider.dimensionId);
+		this.worldIndex = worldIndex;
+	}
+	
+	public StatWorld(Stat identifier, World world) {
+		this(identifier, Util.getWorldIndexFromDimension(world.provider.dimensionId));
 	}
 }
