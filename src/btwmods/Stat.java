@@ -1,4 +1,4 @@
-package btwmods.stats;
+package btwmods;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.Entity;
@@ -6,13 +6,12 @@ import net.minecraft.src.EntityTrackerEntry;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
-import btwmods.StatsAPI;
 import btwmods.stats.measurements.StatBlock;
 import btwmods.stats.measurements.StatChunk;
 import btwmods.stats.measurements.StatPositionedClass;
 import btwmods.stats.measurements.StatWorld;
 
-public enum Type {
+public enum Stat {
 	MOB_SPAWNING,
 	BLOCK_UPDATE,
 	ENTITIES_SECTION,
@@ -45,11 +44,11 @@ public enum Type {
 	}
 	
 	public static void beginBlockUpdate(World world, Block block, int x, int y, int z) {
-		StatsAPI.begin(new StatBlock(Type.BLOCK_UPDATE, world, block, x, y, z));
+		StatsAPI.begin(new StatBlock(Stat.BLOCK_UPDATE, world, block, x, y, z));
 	}
 
 	public static void beginBlockUpdate(World world, NextTickListEntry blockUpdate) {
-		StatsAPI.begin(new StatBlock(Type.BLOCK_UPDATE, world, blockUpdate));
+		StatsAPI.begin(new StatBlock(Stat.BLOCK_UPDATE, world, blockUpdate));
 	}
 
 	public static void beginEntityUpdate(World world, Entity entity) {
@@ -57,7 +56,7 @@ public enum Type {
 	}
 
 	public static void beginTileEntityUpdate(World world, TileEntity tileEntity) {
-		StatsAPI.begin(new StatPositionedClass(Type.TILE_ENTITY_UPDATE, world, tileEntity));
+		StatsAPI.begin(new StatPositionedClass(Stat.TILE_ENTITY_UPDATE, world, tileEntity));
 	}
 
 	public static void beginUpdateTrackedEntityPlayerList(World world, EntityTrackerEntry trackerEntry) {
@@ -65,6 +64,6 @@ public enum Type {
 	}
 
 	public static void beginLoadChunk(World world, int chunkX, int chunkY) {
-		StatsAPI.begin(new StatChunk(Type.LOAD_CHUNK, world, chunkX, chunkY));
+		StatsAPI.begin(new StatChunk(Stat.LOAD_CHUNK, world, chunkX, chunkY));
 	}
 }

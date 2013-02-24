@@ -24,7 +24,6 @@ import btwmods.network.NetworkType;
 import btwmods.stats.IStatsListener;
 import btwmods.stats.CommandStats;
 import btwmods.stats.StatsProcessor;
-import btwmods.stats.Type;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.measurements.StatNetworkPlayer;
 import btwmods.stats.measurements.StatSpawnedLiving;
@@ -200,17 +199,17 @@ public class StatsAPI {
 		measurements.record(new StatSpawnedLiving(world, spawned));
 	}
 	
-	public static void begin(TimeMeasurement<Type> measurement) {
+	public static void begin(TimeMeasurement<Stat> measurement) {
 		measurements.begin(measurement);
 	}
 	
 	/**
 	 * End a measurement.
-	 * @param type The type that matches the last {@link #begin} statement. 
+	 * @param stat The stat that matches the last {@link #begin}. 
 	 */
-	public static void end(Type type) {
+	public static void end(Stat stat) {
 		try {
-			measurements.end(type);
+			measurements.end(stat);
 		}
 		catch (IllegalStateException e) {
 			measurements.setEnabled(false);

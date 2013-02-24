@@ -6,6 +6,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.ChunkCoordIntPair;
 import btwmods.ModLoader;
 import btwmods.StatsAPI;
+import btwmods.Stat;
 import btwmods.events.EventDispatcher;
 import btwmods.measure.Measurement;
 import btwmods.network.NetworkType;
@@ -300,7 +301,7 @@ public class StatsProcessor implements Runnable {
 							chunkStats.tickTime.incrementCurrent(statWorld.getTime());
 						}
 						
-						if (measurement.identifier == Type.ENTITY_UPDATE)
+						if (measurement.identifier == Stat.ENTITY_UPDATE)
 							chunkStats.count++;
 					}
 				}
