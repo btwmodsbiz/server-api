@@ -12,11 +12,11 @@ public class StatPositionedClass extends StatPositioned {
 	public final Class clazz;
 	public final String name;
 
-	public StatPositionedClass(Type type, World world, int x, int y, int z, Class clazz) {
+	public StatPositionedClass(Type type, World world, double x, double y, double z, Class clazz) {
 		this(type, world, x, y, z, clazz, null);
 	}
 
-	public StatPositionedClass(Type type, World world, int x, int y, int z, Class clazz, String name) {
+	public StatPositionedClass(Type type, World world, double x, double y, double z, Class clazz, String name) {
 		super(type, world, x, y, z);
 		this.clazz = clazz;
 		this.name = name;
@@ -27,10 +27,10 @@ public class StatPositionedClass extends StatPositioned {
 	}
 	
 	public StatPositionedClass(World world, Entity entity) {
-		this(Type.ENTITY_UPDATE, world, (int)entity.posX, (int)entity.posY, (int)entity.posZ, entity.getClass(), StatsAPI.getEntityName(entity));
+		this(Type.ENTITY_UPDATE, world, entity.posX, entity.posY, entity.posZ, entity.getClass(), StatsAPI.getEntityName(entity));
 	}
 	
 	public StatPositionedClass(World world, EntityTrackerEntry trackerEntry) {
-		this(Type.UPDATE_TRACKED_ENTITY_PLAYER_LIST, world, (int)trackerEntry.trackedEntity.posX, (int)trackerEntry.trackedEntity.posY, (int)trackerEntry.trackedEntity.posZ, trackerEntry.trackedEntity.getClass(), StatsAPI.getEntityName(trackerEntry.trackedEntity));
+		this(Type.UPDATE_TRACKED_ENTITY_PLAYER_LIST, world, trackerEntry.trackedEntity.posX, trackerEntry.trackedEntity.posY, trackerEntry.trackedEntity.posZ, trackerEntry.trackedEntity.getClass(), StatsAPI.getEntityName(trackerEntry.trackedEntity));
 	}
 }
