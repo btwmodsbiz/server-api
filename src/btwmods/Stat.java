@@ -6,8 +6,10 @@ import net.minecraft.src.EntityTrackerEntry;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
+import btwmods.network.NetworkType;
 import btwmods.stats.measurements.StatBlock;
 import btwmods.stats.measurements.StatChunk;
+import btwmods.stats.measurements.StatNetworkPlayer;
 import btwmods.stats.measurements.StatPositionedClass;
 import btwmods.stats.measurements.StatSpawnedLiving;
 import btwmods.stats.measurements.StatWorld;
@@ -35,6 +37,9 @@ public enum Stat {
 	SPAWN_LIVING;
 	
 	public boolean enabled = true;
+	
+	public static long bytesSent = 0;
+	public static long bytesReceived = 0;
 	
 	public void begin(World world) {
 		StatsAPI.begin(new StatWorld(this, world));
@@ -70,5 +75,17 @@ public enum Stat {
 
 	public static void recordSpawning(World world, int spawned) {
 		StatsAPI.record(new StatSpawnedLiving(world, spawned));
+	}
+	
+	public static void recordNetworkIO(NetworkType type, int bytes) {
+		if (type == NetworkType.RECEIVED)
+			bytesReceived += (long)bytes;
+		else
+			bytesSent += (long)bytes;
+	}
+	
+	public static void recordNetworkIO(NetworkType type, int bytes, String username) {
+		recordNetworkIO(type, bytes);
+		StatsAPI.record(new StatNetworkPlayer(type, username, bytes));
 	}
 }

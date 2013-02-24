@@ -165,7 +165,7 @@ public class NetworkAPI {
 			}
 		}
 		
-		StatsAPI.recordNetworkIO(NetworkType.RECEIVED, packet.getPacketSize(), player);
+		Stat.recordNetworkIO(NetworkType.RECEIVED, packet.getPacketSize(), player.username);
 	}
 
 	public static void onSentPacket(Packet packet, NetHandler netHandler) {
@@ -187,7 +187,7 @@ public class NetworkAPI {
 			}
 		}
 
-		StatsAPI.recordNetworkIO(NetworkType.SENT, packet.getPacketSize(), player);
+		Stat.recordNetworkIO(NetworkType.SENT, packet.getPacketSize(), player.username);
 	}
 	
 	public static Packet onSendPlayerPacket(Packet packet, EntityPlayerMP player) {

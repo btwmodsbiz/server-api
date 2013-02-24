@@ -6,7 +6,6 @@ import java.util.logging.Level;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.CommandHandler;
-import net.minecraft.src.EntityPlayerMP;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
@@ -14,12 +13,10 @@ import btwmods.io.Settings;
 import btwmods.measure.Measurement;
 import btwmods.measure.Measurements;
 import btwmods.measure.TimeMeasurement;
-import btwmods.network.NetworkType;
 import btwmods.stats.IStatsListener;
 import btwmods.stats.CommandStats;
 import btwmods.stats.StatsProcessor;
 import btwmods.stats.data.QueuedTickStats;
-import btwmods.stats.measurements.StatNetworkPlayer;
 
 public class StatsAPI {
 	
@@ -45,9 +42,6 @@ public class StatsAPI {
 	 * A thread-safe queue where tick stats are stored for the StatsProcessor to pick retrieve.
 	 */
 	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<QueuedTickStats>();
-	
-	private static long bytesSent = 0;
-	private static long bytesReceived = 0;
 	
 	/**
 	 * Should only be called by ModLoader.
@@ -134,8 +128,8 @@ public class StatsAPI {
 			stats.receivedPacketCount = server.receivedPacketCountArray[tickCounter % 100];
 			stats.receivedPacketSize = server.receivedPacketSizeArray[tickCounter % 100];
 			
-			stats.bytesReceived = bytesReceived;
-			stats.bytesSent = bytesSent;
+			stats.bytesReceived = Stat.bytesReceived;
+			stats.bytesSent = Stat.bytesSent;
 			
 			stats.handlerInvocations = EventDispatcherFactory.getInvocationCount();
 			
@@ -172,20 +166,6 @@ public class StatsAPI {
 
 	public static void record(Measurement measurement) {
 		measurements.record(measurement);
-	}
-	
-	public static void onRecordNetworkIO(NetworkType type, int bytes) {
-		recordNetworkIO(type, bytes, null);
-	}
-	
-	public static void recordNetworkIO(NetworkType type, int bytes, EntityPlayerMP player) {
-		if (type == NetworkType.RECEIVED)
-			bytesReceived += (long)bytes;
-		else
-			bytesSent += (long)bytes;
-		
-		if (player != null)
-			record(new StatNetworkPlayer(type, player, bytes));
 	}
 	
 	public static void begin(TimeMeasurement<Stat> measurement) {
