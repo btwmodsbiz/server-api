@@ -36,13 +36,25 @@ public class WorldStats {
 			entry.getValue().resetCurrent();
 		}
 		
+		List<ChunkCoordIntPair> timeByChunkRemove = new ArrayList<ChunkCoordIntPair>();
 		for (Entry<ChunkCoordIntPair, Average> entry : timeByChunk.entrySet()) {
 			entry.getValue().resetCurrent();
+			if (entry.getValue().getTotal() == 0 && entry.getValue().getTick() > 100)
+				timeByChunkRemove.add(entry.getKey());
 		}
-		
+		for (ChunkCoordIntPair key : timeByChunkRemove) {
+			timeByChunk.remove(key);
+		}
+
 		for (Entry<Stat, Map<Class, Average>> entry : timeByClass.entrySet()) {
+			List<Class> timeByClassRemove = new ArrayList<Class>();
 			for (Entry<Class, Average> subEntry : entry.getValue().entrySet()) {
 				subEntry.getValue().resetCurrent();
+				if (subEntry.getValue().getTotal() == 0 && subEntry.getValue().getTick() > 100)
+					timeByClassRemove.add(subEntry.getKey());
+			}
+			for (Class key : timeByClassRemove) {
+				entry.getValue().remove(key);
 			}
 		}
 	}
