@@ -2,6 +2,7 @@ package btwmods;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.Entity;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityTrackerEntry;
 import net.minecraft.src.NextTickListEntry;
 import net.minecraft.src.TileEntity;
@@ -102,5 +103,12 @@ public enum Stat {
 	public static void recordNetworkIO(NetworkType type, int bytes, String username) {
 		recordNetworkIO(type, bytes);
 		StatsAPI.record(new StatNetworkPlayer(type, username, bytes));
+	}
+	
+	public static void recordNetworkIO(NetworkType type, int bytes, EntityPlayer player) {
+		recordNetworkIO(type, bytes);
+		
+		if (player != null)
+			StatsAPI.record(new StatNetworkPlayer(type, player.username, bytes));
 	}
 }
