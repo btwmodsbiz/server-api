@@ -180,8 +180,10 @@ public class StatsProcessor implements Runnable {
 							// Increment the time for the chunk.
 							ChunkCoordIntPair coords = new ChunkCoordIntPair(statChunk.chunkX, statChunk.chunkZ);
 							Average chunkAverage = worldStats[statWorld.worldIndex].timeByChunk.get(coords);
-							if (chunkAverage == null)
+							if (chunkAverage == null) {
 								worldStats[statWorld.worldIndex].timeByChunk.put(coords, chunkAverage = new Average());
+								chunkAverage.resetCurrent();
+							}
 							chunkAverage.incrementCurrent(statChunk.getTime());
 							
 							if (statWorld instanceof StatPositionedClass) {
@@ -190,8 +192,10 @@ public class StatsProcessor implements Runnable {
 								// Increment the time for the class.
 								Map<Class, Average> classAverages = worldStats[statWorld.worldIndex].timeByClass.get(statPositionedClass.identifier);
 								Average classAverage = classAverages.get(statPositionedClass.clazz);
-								if (classAverage == null)
+								if (classAverage == null) {
 									classAverages.put(statPositionedClass.clazz, classAverage = new Average());
+									classAverage.resetCurrent();
+								}
 								classAverage.incrementCurrent(statPositionedClass.getTime());
 							}
 						}
