@@ -39,7 +39,7 @@ public class StatsAPI {
 	/**
 	 * The detailed measurements that have been take this tick. 
 	 */
-	private static Measurements measurements = new Measurements(false);
+	private static Measurements measurements = new Measurements();
 	
 	/**
 	 * The stat profile that will be used. Changes do not take effect till the start of the next server tick.
