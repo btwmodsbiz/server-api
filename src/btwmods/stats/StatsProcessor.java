@@ -75,20 +75,22 @@ public class StatsProcessor implements Runnable {
 						processStats(stats);
 					}
 					
-					serverStats.statsThreadTime.record(System.nanoTime() - threadStart);
-					serverStats.statsThreadQueueCount.record(polled);
-					
-					// Make sure the thread should still should be running.
-					if (statsProcessor == this) {
+					if (serverStats != null) {
+						serverStats.statsThreadTime.record(System.nanoTime() - threadStart);
+						serverStats.statsThreadQueueCount.record(polled);
 						
-						// Run all the listeners.
-						StatsEvent event = new StatsEvent(MinecraftServer.getServer(), tickCounter, serverStats, worldStats);
-						((IStatsListener)listeners).onStats(event);
-
-						try {
-							Thread.sleep(40L);
-						} catch (InterruptedException e) {
+						// Make sure the thread should still should be running.
+						if (statsProcessor == this) {
 							
+							// Run all the listeners.
+							StatsEvent event = new StatsEvent(MinecraftServer.getServer(), tickCounter, serverStats, worldStats);
+							((IStatsListener)listeners).onStats(event);
+	
+							try {
+								Thread.sleep(40L);
+							} catch (InterruptedException e) {
+								
+							}
 						}
 					}
 				}
