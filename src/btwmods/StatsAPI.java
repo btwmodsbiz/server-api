@@ -21,7 +21,6 @@ import btwmods.stats.IStatsListener;
 import btwmods.stats.CommandStats;
 import btwmods.stats.StatsProcessor;
 import btwmods.stats.data.QueuedTickStats;
-import btwmods.stats.measurements.StatValue;
 import btwmods.stats.measurements.StatWorld;
 import btwmods.stats.measurements.StatWorldValue;
 
@@ -269,16 +268,6 @@ public class StatsAPI {
 	public static void record(Measurement measurement) {
 		if (Thread.currentThread() == ModLoader.getInitThread()) {
 			measurements.record(measurement);
-		}
-		else {
-			recordMeasurementQueue.add(measurement);
-		}
-	}
-	
-	public static void record(StatValue measurement) {
-		if (Thread.currentThread() == ModLoader.getInitThread()) {
-			if (measurement.identifier.enabled)
-				measurements.record(measurement);
 		}
 		else {
 			recordMeasurementQueue.add(measurement);
