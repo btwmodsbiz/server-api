@@ -12,7 +12,6 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import btwmods.measure.Average;
 import btwmods.network.NetworkType;
-import btwmods.stats.measurements.StatBlock;
 import btwmods.stats.measurements.StatChunk;
 import btwmods.stats.measurements.StatPositionedClass;
 import btwmods.stats.measurements.StatWorld;
@@ -90,12 +89,14 @@ public enum Stat {
 	
 	public static void beginBlockUpdate(World world, Block block, int x, int y, int z) {
 		if (BLOCK_UPDATE.enabled)
-			StatsAPI.begin(new StatBlock(BLOCK_UPDATE, world, block, x, y, z));
+			StatsAPI.begin(new StatPositionedClass(BLOCK_UPDATE, world,
+				x, y, z, block.getClass(), block.blockID));
 	}
 
 	public static void beginBlockUpdate(World world, NextTickListEntry blockUpdate) {
 		if (BLOCK_UPDATE.enabled)
-			StatsAPI.begin(new StatBlock(BLOCK_UPDATE, world, blockUpdate));
+			StatsAPI.begin(new StatPositionedClass(BLOCK_UPDATE, world,
+				blockUpdate.xCoord, blockUpdate.yCoord, blockUpdate.zCoord, Block.blocksList[blockUpdate.blockID].getClass(), blockUpdate.blockID));
 	}
 
 	public static void beginEntityUpdate(World world, Entity entity) {
