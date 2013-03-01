@@ -1,43 +1,38 @@
 package btwmods.stats;
 
+import java.util.List;
+import java.util.Set;
+
 import btwmods.StatsAPI;
-import net.minecraft.src.CommandBase;
+import btwmods.Util;
+import btwmods.commands.CommandBaseExtended;
 import net.minecraft.src.ICommandSender;
 import net.minecraft.src.WrongUsageException;
 
-public class CommandStats extends CommandBase {
+public class CommandStats extends CommandBaseExtended {
 
 	@Override
 	public String getCommandName() {
 		return "stats";
 	}
 	
-	public String getCommandUsage(ICommandSender sender)
-    {
-        return "/" + getCommandName() + " [<on|off|status>]";
+	public String getCommandUsage(ICommandSender sender) {
+        return "/" + getCommandName() + " [<profile>]";
     }
 
 	@Override
 	public void processCommand(ICommandSender sender, String[] args) {
-		if (args.length == 0 || args[0].equalsIgnoreCase("status")) {
-			sender.sendChatToPlayer("StatsAPI detailed measurements are " + (StatsAPI.detailedMeasurementsEnabled ? "on" : "off") + ".");
+		if (args.length == 0) {
+			sender.sendChatToPlayer(Util.COLOR_YELLOW + "Stats profile: " + StatsAPI.statProfile);
 		}
-		else if (args[0].toLowerCase().equals("on")) {
-			if (StatsAPI.detailedMeasurementsEnabled) {
-				sender.sendChatToPlayer("StatsAPI detailed measurements are already on.");
+		else if (args.length == 1) {
+			Set<String> profileNames = StatsAPI.getProfileNames();
+			if (profileNames.contains(args[0].toLowerCase())) {
+				StatsAPI.statProfile = args[0].toLowerCase();
+				sender.sendChatToPlayer(Util.COLOR_YELLOW + "Stats profile set to " + args[0].toLowerCase() + ".");
 			}
 			else {
-				StatsAPI.detailedMeasurementsEnabled = true;
-				sender.sendChatToPlayer("StatsAPI detailed measurements are now on.");
-			}
-		}
-		else if (args[0].toLowerCase().equals("off")) {
-			if (StatsAPI.detailedMeasurementsEnabled) {
-				StatsAPI.detailedMeasurementsEnabled = false;
-				sender.sendChatToPlayer("StatsAPI detailed measurements are now off.");
-			}
-			else {
-				sender.sendChatToPlayer("StatsAPI detailed measurements are already off.");
+				sender.sendChatToPlayer(Util.COLOR_RED + "A stats profile with that name does not exist.");
 			}
 		}
 		else {
@@ -45,4 +40,13 @@ public class CommandStats extends CommandBase {
 		}
 	}
 
+	@Override
+	public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+		if (args.length == 1)
+			return getListOfStringsFromIterableMatchingLastWord(args, StatsAPI.getProfileNames());
+		
+		return super.addTabCompletionOptions(sender, args);
+	}
+	
+	
 }

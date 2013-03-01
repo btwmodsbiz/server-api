@@ -1,6 +1,10 @@
 package btwmods;
 
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
@@ -17,10 +21,15 @@ import btwmods.stats.IStatsListener;
 import btwmods.stats.CommandStats;
 import btwmods.stats.StatsProcessor;
 import btwmods.stats.data.QueuedTickStats;
+import btwmods.stats.measurements.StatValue;
 import btwmods.stats.measurements.StatWorld;
 import btwmods.stats.measurements.StatWorldValue;
 
 public class StatsAPI {
+	
+	private static final String PROFILE_DEFAULT = "default";
+	private static final String PROFILE_FULL = "full";
+	private static final String PROFILE_OFF = "off";
 	
 	private StatsAPI() {}
 	
@@ -34,9 +43,16 @@ public class StatsAPI {
 	private static Measurements measurements = new Measurements(false);
 	
 	/**
-	 * Whether or not to skip detailed measurements, starting with the next tick.
+	 * The stat profile that will be used. Changes do not take effect till the start of the next server tick.
 	 */
-	public static volatile boolean detailedMeasurementsEnabled = false;
+	public static volatile String statProfile = PROFILE_DEFAULT;
+	
+	private static volatile String statProfileCurrent = null;
+	
+	/**
+	 * Named profiles that specify that stats are enabled/disabled. 
+	 */
+	private static Map<String, EnumMap<Stat, Boolean>> statProfiles = new HashMap<String, EnumMap<Stat, Boolean>>();
 	
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IStatsListener.class });
 	
@@ -44,6 +60,11 @@ public class StatsAPI {
 	 * A thread-safe queue where tick stats are stored for the StatsProcessor to pick retrieve.
 	 */
 	private static ConcurrentLinkedQueue<QueuedTickStats> statsQueue = new ConcurrentLinkedQueue<QueuedTickStats>();
+	
+	/**
+	 * A thread-safe queue where recorded measurements from other threads are stored.
+	 */
+	private static ConcurrentLinkedQueue<Measurement> recordMeasurementQueue = new ConcurrentLinkedQueue<Measurement>();
 	
 	/**
 	 * Should only be called by ModLoader.
@@ -56,13 +77,75 @@ public class StatsAPI {
 		server = MinecraftServer.getServer();
 
 		// Load settings
-		detailedMeasurementsEnabled = settings.getBoolean("StatsAPI", "detailedMeasurements", detailedMeasurementsEnabled);
+		loadProfiles(settings);
+		
+		if (settings.hasKey("StatsAPI", "statProfile")) {
+			statProfile = settings.get("StatsAPI", "statProfile");
+		}
 		
 		((CommandHandler)server.getCommandManager()).registerCommand(new CommandStats());
 		
 		isInitialized = true;
 	}
 
+	private static void loadProfiles(Settings settings) {
+		int count = settings.getInt("StatsAPI", "profiles", 0);
+		for (int i = 1; i <= count; i++) {
+			if (!settings.hasKey("StatsAPI", "profile" + i)) {
+				// TODO: Report error
+			}
+			else {
+				String[] pairs = settings.get("StatsAPI", "profile" + i).split(";", 2);
+				if (pairs.length != 2) {
+					// TODO: Report error
+				}
+				else {
+					String name = pairs[0].toLowerCase();
+					if (name.equals(PROFILE_DEFAULT) || name.equals(PROFILE_FULL) || name.equals(PROFILE_OFF)) {
+						// TODO: Report error
+					}
+					else {
+						pairs = pairs[1].split(";");
+						
+						EnumMap<Stat, Boolean> profile = new EnumMap<Stat, Boolean>(Stat.class);
+						for (String pair : pairs) {
+							String[] splitPair = pair.split(":", 2);
+							if (splitPair.length != 2) {
+								// TODO: Report error
+							}
+							else if (!Settings.isBooleanValue(splitPair[1])) {
+								// TODO: Report error
+							}
+							else {
+								try {
+									profile.put(Stat.valueOf(splitPair[0]), Settings.getBooleanValue(splitPair[1], false));
+								}
+								catch (IllegalStateException e) {
+									// TODO: Report error
+								}
+							}
+						}
+						
+						statProfiles.put(name, profile);
+					}
+				}
+			}
+		}
+		
+		// Empty profile that will use default values.
+		statProfiles.put(PROFILE_DEFAULT, new EnumMap<Stat, Boolean>(Stat.class));
+		
+		// Profile where all stats are enabled.
+		EnumMap<Stat, Boolean> full = new EnumMap<Stat, Boolean>(Stat.class);
+		EnumMap<Stat, Boolean> off = new EnumMap<Stat, Boolean>(Stat.class);
+		for (Stat stat : Stat.values()) {
+			full.put(stat, Boolean.TRUE);
+			off.put(stat, Boolean.FALSE);
+		}
+		statProfiles.put(PROFILE_FULL, full);
+		statProfiles.put(PROFILE_OFF, off);
+	}
+	
 	/**
 	 * Add a listener supported by this API.
 	 * 
@@ -104,8 +187,26 @@ public class StatsAPI {
 		// Process any failures that may be queued from the last tick.
 		ModLoader.processFailureQueue();
 		
-		// Set if we are recording measurements this tick.
-		measurements.setEnabled(StatsProcessor.isRunning() && detailedMeasurementsEnabled);
+		// Set the stat profile for this tick, if it has changed.
+		if (!statProfile.equals(statProfileCurrent)) {
+			EnumMap<Stat, Boolean> profile = statProfiles.get(statProfile);
+			if (profile == null) {
+				statProfile = PROFILE_DEFAULT;
+				profile = statProfiles.get(statProfile);
+			}
+			
+			statProfileCurrent = statProfile;
+			Stat.setEnabled(profile);
+		}
+	}
+	
+	public static Set<String> getProfileNames() {
+		return statProfiles.keySet();
+	}
+	
+	private static void setProfileOff() {
+		statProfile = statProfileCurrent = PROFILE_OFF;
+		Stat.setEnabled(statProfiles.get(PROFILE_OFF));
 	}
 
 	public static void onEndTick() {
@@ -130,16 +231,21 @@ public class StatsAPI {
 			stats.receivedPacketCount = server.receivedPacketCountArray[tickCounter % 100];
 			stats.receivedPacketSize = server.receivedPacketSizeArray[tickCounter % 100];
 			
-			stats.bytesReceived = Stat.bytesReceived;
-			stats.bytesSent = Stat.bytesSent;
+			stats.bytesReceived = Stat.bytesReceived.get();
+			stats.bytesSent = Stat.bytesSent.get();
 			
 			stats.handlerInvocations = EventDispatcherFactory.getInvocationCount();
 			
 			if (!measurements.completedMeasurements()) {
-				measurements.setEnabled(false);
-				detailedMeasurementsEnabled = false;
+				setProfileOff();
 				measurements.startNew();
-				ModLoader.outputError("StatsAPI detected that not all measurements were completed properly. Detailed measurements disabled.", Level.SEVERE);
+				ModLoader.outputError("StatsAPI detected that not all measurements were completed properly and has switched to the 'off' profile.", Level.SEVERE);
+			}
+			
+			Measurement polled = null;
+			while ((polled = recordMeasurementQueue.poll()) != null) {
+				if (!(polled.identifier instanceof Stat) || ((Stat)polled.identifier).enabled)
+					measurements.record(polled);
 			}
 			
 			for (int i = 0, l = server.worldServers.length; i < l; i++) {
@@ -158,34 +264,48 @@ public class StatsAPI {
 			statsQueue.add(stats);
 		}
 	}
-
+	
 	public static void record(Measurement measurement) {
-		measurements.record(measurement);
+		if (Thread.currentThread() == ModLoader.getInitThread()) {
+			measurements.record(measurement);
+		}
+		else {
+			recordMeasurementQueue.add(measurement);
+		}
 	}
 	
-	public static void begin(TimeMeasurement<Stat> measurement) {
+	public static void record(StatValue measurement) {
+		if (Thread.currentThread() == ModLoader.getInitThread()) {
+			if (measurement.identifier.enabled)
+				measurements.record(measurement);
+		}
+		else {
+			recordMeasurementQueue.add(measurement);
+		}
+	}
+	
+	public static void begin(TimeMeasurement measurement) {
 		measurements.begin(measurement);
 	}
 	
 	/**
 	 * End a measurement.
-	 * @param stat The stat that matches the last {@link #begin}. 
+	 * 
+	 * @param identifier The identifier that matches the last {@link #begin}. 
 	 */
-	public static void end(Stat stat) {
+	public static void end(Object identifier) {
 		try {
-			measurements.end(stat);
+			measurements.end(identifier);
 		}
 		catch (IllegalStateException e) {
-			measurements.setEnabled(false);
-			detailedMeasurementsEnabled = false;
+			setProfileOff();
 			measurements.startNew();
-			ModLoader.outputError(e, "StatsAPI#end() call did not match the type at the top of the stack. Detailed measurements disabled: " + e.getMessage(), Level.SEVERE);
+			ModLoader.outputError(e, "StatsAPI#end(" + identifier.toString() + ") switched to the 'off' profile: " + e.getMessage(), Level.SEVERE);
 		}
 		catch (NoSuchElementException e) {
-			measurements.setEnabled(false);
-			detailedMeasurementsEnabled = false;
+			setProfileOff();
 			measurements.startNew();
-			ModLoader.outputError(e, "StatsAPI#end() called unexpectedly. Detailed measurements disabled.", Level.SEVERE);
+			ModLoader.outputError(e, "StatsAPI#end(" + identifier.toString() + ") called unexpectedly. Switched to 'off' profile.", Level.SEVERE);
 		}
 	}
 }

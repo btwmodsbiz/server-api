@@ -37,7 +37,7 @@ public class StatsProcessor implements Runnable {
 	
 	private ConcurrentLinkedQueue<QueuedTickStats> statsQueue;
 	private EventDispatcher listeners;
-	private boolean doingDetailedStats = StatsAPI.detailedMeasurementsEnabled;
+	private String statProfile = StatsAPI.statProfile;
 	private int tickCounter = 0;
 	private ServerStats serverStats = new ServerStats();
 	private WorldStats[] worldStats = null;
@@ -62,8 +62,8 @@ public class StatsProcessor implements Runnable {
 					long threadStart = System.nanoTime();
 					
 					// Reset the detailed stats if the detailed measurements setting has changed.
-					if (doingDetailedStats != StatsAPI.detailedMeasurementsEnabled || worldStats == null) {
-						doingDetailedStats = StatsAPI.detailedMeasurementsEnabled;
+					if (statProfile != StatsAPI.statProfile || worldStats == null) {
+						statProfile = StatsAPI.statProfile;
 						
 						resetStats();
 					}
