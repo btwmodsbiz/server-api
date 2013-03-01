@@ -1,3 +1,24 @@
+Version 4.57.1 (vMC 1.4.7 BTW 4.57)
+
+  - Major rewrite of StatsAPI and related classes.
+
+  - Added missing measurements for block update calls.
+  
+  - Added configurable session.lock checks to ServerAPI that are done after
+    world saves. If the check fails
+  
+  - Changed a block update Stat call in World so it only counted the block's
+    update method call.
+    
+  - Changed StatPositioned so it can handle double and int X/Y/Z values.
+    
+  - Moved entity related methods from ServerAPI to EntityAPI.
+  
+  - Removed improper block update measurement from WorldServer.
+
+  - Fixed bug in EntityPlayer where pressing Q would trigger onItemEjected
+    even when on an empty slot.
+
 Version 4.57.0 (vMC 1.4.7 BTW 4.57)
 
   - Updated to BTW 4.57
