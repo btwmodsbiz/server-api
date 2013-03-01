@@ -161,7 +161,8 @@ public class StatsProcessor implements Runnable {
 			else if (measurement instanceof StatWorldValue) {
 				StatWorldValue statWorldValue = (StatWorldValue)measurement;
 				worldStats[statWorldValue.worldIndex].measurements.add(measurement);
-				worldStats[statWorldValue.worldIndex].measurementQueue.incrementCurrent(1);
+				worldStats[statWorldValue.worldIndex].measurementsQueued.incrementCurrent(1);
+				worldStats[statWorldValue.worldIndex].measurementsQueuedByStat.get(statWorldValue.identifier).incrementCurrent(1);
 				worldStats[statWorldValue.worldIndex].averages.get(statWorldValue.identifier).incrementCurrent(statWorldValue.value);
 			}
 			
@@ -169,7 +170,8 @@ public class StatsProcessor implements Runnable {
 				StatWorld statWorld = (StatWorld)measurement;
 			
 				worldStats[statWorld.worldIndex].measurements.add(measurement);
-				worldStats[statWorld.worldIndex].measurementQueue.incrementCurrent(1);
+				worldStats[statWorld.worldIndex].measurementsQueued.incrementCurrent(1);
+				worldStats[statWorld.worldIndex].measurementsQueuedByStat.get(statWorld.identifier).incrementCurrent(1);
 				
 				if (statWorld.identifier == Stat.LOAD_CHUNK) {
 					worldStats[statWorld.worldIndex].averages.get(Stat.LOAD_CHUNK).incrementCurrent(1L);

@@ -13,24 +13,30 @@ import btwmods.measure.Average;
 import btwmods.measure.Measurement;
 
 public class WorldStats {
-	public final Average measurementQueue = new Average();
-	public final EnumMap<Stat, Average> averages;
+	public final Average measurementsQueued = new Average();
+	public final EnumMap<Stat, Average> measurementsQueuedByStat = new EnumMap<Stat, Average>(Stat.class);
+	
+	public final EnumMap<Stat, Average> averages = new EnumMap<Stat, Average>(Stat.class);
 	public final Map<ChunkCoordIntPair, Average> timeByChunk = new LinkedHashMap<ChunkCoordIntPair, Average>();
 	public final EnumMap<Stat, Map<Class, Average>> timeByClass = new EnumMap<Stat, Map<Class, Average>>(Stat.class);
 	public final List<Measurement> measurements = new ArrayList<Measurement>();
 	
 	public WorldStats() {
-		averages = new EnumMap<Stat, Average>(Stat.class);
 		for (Stat stat : Stat.values()) {
 			averages.put(stat, new Average(stat.averageResolution));
+			measurementsQueuedByStat.put(stat, new Average());
 			timeByClass.put(stat, new LinkedHashMap<Class, Average>());
 		}
 	}
 	
 	// Reset the averages to 0.
 	public void resetCurrent() {
-		measurementQueue.resetCurrent();
+		measurementsQueued.resetCurrent();
 		measurements.clear();
+		
+		for (Entry<Stat, Average> entry : measurementsQueuedByStat.entrySet()) {
+			entry.getValue().resetCurrent();
+		}
 		
 		for (Entry<Stat, Average> entry : averages.entrySet()) {
 			entry.getValue().resetCurrent();
