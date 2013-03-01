@@ -222,6 +222,7 @@ public class StatsAPI {
 		else {
 			QueuedTickStats stats = new QueuedTickStats();
 			
+			stats.statProfile = statProfileCurrent;
 			stats.tickEnd = System.currentTimeMillis();
 			stats.tickCounter = tickCounter;
 			stats.tickTime = server.tickTimeArray[tickCounter % 100];
