@@ -1,5 +1,6 @@
 package btwmods;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,6 +86,11 @@ public class StatsAPI {
 		((CommandHandler)server.getCommandManager()).registerCommand(new CommandStats());
 		
 		isInitialized = true;
+	}
+	
+	public static Map<Stat, Boolean> getStatsProfile(String name) {
+		EnumMap<Stat, Boolean> profile = statProfiles.get(name);
+		return profile == null ? null : Collections.unmodifiableMap(profile);
 	}
 
 	private static void loadProfiles(Settings settings) {
