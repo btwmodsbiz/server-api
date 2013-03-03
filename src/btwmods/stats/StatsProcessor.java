@@ -83,7 +83,7 @@ public class StatsProcessor implements Runnable {
 						if (statsProcessor == this) {
 							
 							// Run all the listeners.
-							StatsEvent event = new StatsEvent(MinecraftServer.getServer(), tickCounter, serverStats, worldStats);
+							StatsEvent event = new StatsEvent(MinecraftServer.getServer(), tickCounter, statProfile, serverStats, worldStats);
 							((IStatsListener)listeners).onStats(event);
 	
 							try {
