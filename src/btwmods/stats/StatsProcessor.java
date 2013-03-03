@@ -14,6 +14,7 @@ import btwmods.network.NetworkType;
 import btwmods.stats.data.QueuedTickStats;
 import btwmods.stats.data.ServerStats;
 import btwmods.stats.data.WorldStats;
+import btwmods.stats.measurements.PlayerPosition;
 import btwmods.stats.measurements.StatChunk;
 import btwmods.stats.measurements.StatPositionedClass;
 import btwmods.stats.measurements.StatNetwork;
@@ -206,6 +207,12 @@ public class StatsProcessor implements Runnable {
 						}
 					}
 				}
+			}
+			else if (measurement instanceof PlayerPosition) {
+				PlayerPosition playerPosition = (PlayerPosition)measurement;
+				worldStats[playerPosition.worldIndex].measurements.add(measurement);
+				worldStats[playerPosition.worldIndex].measurementsQueued.incrementCurrent(1);
+				worldStats[playerPosition.worldIndex].playerPositions.add(playerPosition);
 			}
 		}
 		

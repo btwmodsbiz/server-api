@@ -3,6 +3,7 @@ package btwmods;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.logging.Level;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.CommandHandler;
+import net.minecraft.src.EntityPlayerMP;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
@@ -22,6 +24,7 @@ import btwmods.stats.IStatsListener;
 import btwmods.stats.CommandStats;
 import btwmods.stats.StatsProcessor;
 import btwmods.stats.data.QueuedTickStats;
+import btwmods.stats.measurements.PlayerPosition;
 import btwmods.stats.measurements.StatWorld;
 import btwmods.stats.measurements.StatWorldValue;
 
@@ -262,6 +265,11 @@ public class StatsAPI {
 				measurements.record(new StatWorldValue(Stat.WORLD_LOADED_ENTITIES, i, server.worldServers[i].loadedEntityList.size()));
 				measurements.record(new StatWorldValue(Stat.WORLD_LOADED_TILE_ENTITIES, i, server.worldServers[i].loadedTileEntityList.size()));
 				measurements.record(new StatWorldValue(Stat.WORLD_TRACKED_ENTITIES, i, WorldAPI.getTrackedEntities()[i].size()));
+				
+				// Record player positions.
+				for (EntityPlayerMP player : (List<EntityPlayerMP>)server.worldServers[i].playerEntities) {
+					measurements.record(new PlayerPosition(player.username, i, player.posX, player.posY, player.posZ));
+				}
 			}
 			
 			// Save measurements and clear it for the next round.

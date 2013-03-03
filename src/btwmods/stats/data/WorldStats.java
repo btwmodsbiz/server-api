@@ -11,6 +11,7 @@ import net.minecraft.src.ChunkCoordIntPair;
 import btwmods.Stat;
 import btwmods.measure.Average;
 import btwmods.measure.Measurement;
+import btwmods.stats.measurements.PlayerPosition;
 
 public class WorldStats {
 	public final Average measurementsQueued = new Average();
@@ -20,6 +21,7 @@ public class WorldStats {
 	public final Map<ChunkCoordIntPair, Average> timeByChunk = new LinkedHashMap<ChunkCoordIntPair, Average>();
 	public final EnumMap<Stat, Map<Class, Average>> timeByClass = new EnumMap<Stat, Map<Class, Average>>(Stat.class);
 	public final List<Measurement> measurements = new ArrayList<Measurement>();
+	public final List<PlayerPosition> playerPositions = new ArrayList<PlayerPosition>();
 	
 	public WorldStats() {
 		for (Stat stat : Stat.values()) {
@@ -33,6 +35,7 @@ public class WorldStats {
 	public void resetCurrent() {
 		measurementsQueued.resetCurrent();
 		measurements.clear();
+		playerPositions.clear();
 		
 		for (Entry<Stat, Average> entry : measurementsQueuedByStat.entrySet()) {
 			entry.getValue().resetCurrent();
