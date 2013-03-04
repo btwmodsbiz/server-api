@@ -1,6 +1,6 @@
 package btwmods;
 
-import java.util.EnumMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.minecraft.src.Block;
@@ -80,7 +80,7 @@ public enum Stat {
 			StatsAPI.end(this);
 	}
 	
-	public static void setEnabled(EnumMap<Stat, Boolean> profile) {
+	public static void setEnabled(Map<Stat, Boolean> profile) {
 		for (Stat stat : values()) {
 			Boolean enabled = profile.get(stat);
 			stat.enabled = enabled == null ? stat.defaultEnabled : enabled.booleanValue();

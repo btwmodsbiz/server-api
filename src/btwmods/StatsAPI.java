@@ -55,7 +55,7 @@ public class StatsAPI {
 	/**
 	 * Named profiles that specify that stats are enabled/disabled. 
 	 */
-	private static Map<String, EnumMap<Stat, Boolean>> statProfiles = new HashMap<String, EnumMap<Stat, Boolean>>();
+	private static Map<String, Map<Stat, Boolean>> statProfiles = new HashMap<String, Map<Stat, Boolean>>();
 	
 	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IStatsListener.class });
 	
@@ -92,8 +92,7 @@ public class StatsAPI {
 	}
 	
 	public static Map<Stat, Boolean> getStatsProfile(String name) {
-		EnumMap<Stat, Boolean> profile = statProfiles.get(name);
-		return profile == null ? null : Collections.unmodifiableMap(profile);
+		return statProfiles.get(name);
 	}
 
 	private static void loadProfiles(Settings settings) {
@@ -115,7 +114,7 @@ public class StatsAPI {
 					else {
 						pairs = pairs[1].split(";");
 						
-						EnumMap<Stat, Boolean> profile = new EnumMap<Stat, Boolean>(Stat.class);
+						Map<Stat, Boolean> profile = new EnumMap<Stat, Boolean>(Stat.class);
 						for (String pair : pairs) {
 							String[] splitPair = pair.split(":", 2);
 							if (splitPair.length != 2) {
@@ -134,14 +133,14 @@ public class StatsAPI {
 							}
 						}
 						
-						statProfiles.put(name, profile);
+						statProfiles.put(name, Collections.unmodifiableMap(profile));
 					}
 				}
 			}
 		}
 		
 		// Empty profile that will use default values.
-		statProfiles.put(PROFILE_DEFAULT, new EnumMap<Stat, Boolean>(Stat.class));
+		statProfiles.put(PROFILE_DEFAULT, Collections.unmodifiableMap(new EnumMap<Stat, Boolean>(Stat.class)));
 		
 		// Profile where all stats are enabled.
 		EnumMap<Stat, Boolean> full = new EnumMap<Stat, Boolean>(Stat.class);
@@ -150,8 +149,8 @@ public class StatsAPI {
 			full.put(stat, Boolean.TRUE);
 			off.put(stat, Boolean.FALSE);
 		}
-		statProfiles.put(PROFILE_FULL, full);
-		statProfiles.put(PROFILE_OFF, off);
+		statProfiles.put(PROFILE_FULL, Collections.unmodifiableMap(full));
+		statProfiles.put(PROFILE_OFF, Collections.unmodifiableMap(off));
 	}
 	
 	/**
@@ -197,7 +196,7 @@ public class StatsAPI {
 		
 		// Set the stat profile for this tick, if it has changed.
 		if (!statProfile.equals(statProfileCurrent)) {
-			EnumMap<Stat, Boolean> profile = statProfiles.get(statProfile);
+			Map<Stat, Boolean> profile = statProfiles.get(statProfile);
 			if (profile == null) {
 				statProfile = PROFILE_DEFAULT;
 				profile = statProfiles.get(statProfile);
