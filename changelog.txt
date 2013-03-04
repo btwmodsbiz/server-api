@@ -1,3 +1,12 @@
+Version 4.57.2 (vMC 1.4.7 BTW 4.57)
+
+  - Added the stats profile name to StatsEvent.
+  
+  - Added player positions to WorldStats.
+  
+  - Changed StatsAPI so it stores EnumMaps as unmodifiable and changed
+    references from EnumMap to Map.
+
 Version 4.57.1 (vMC 1.4.7 BTW 4.57)
 
   - Major rewrite of StatsAPI and related classes.
