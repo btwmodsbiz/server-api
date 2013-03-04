@@ -67,7 +67,7 @@ public class StatsProcessor implements Runnable {
 					while ((stats = statsQueue.poll()) != null) {
 						polled++;
 						
-						// Reset the detailed stats if the detailed measurements setting has changed.
+						// Reset the detailed stats if the profile setting has changed.
 						if (statProfile != stats.statProfile || serverStats == null) {
 							statProfile = stats.statProfile;
 							resetStats();
