@@ -1,3 +1,7 @@
+Version 4.59.1 (vMC 1.4.7 BTW 4.59)
+
+  - Added PlayerAPI hook for handling auto completion.
+
 Version 4.59.0 (vMC 1.4.7 BTW 4.59)
 
   - Updated to BTW 4.59
