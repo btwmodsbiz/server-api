@@ -1,5 +1,7 @@
 package btwmods.player;
 
+import java.util.List;
+
 import btwmods.PlayerAPI;
 import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
@@ -8,7 +10,7 @@ import net.minecraft.src.EntityPlayer;
 
 public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	
-	public enum TYPE { HANDLE_CHAT, HANDLE_GLOBAL, GLOBAL, HANDLE_EMOTE, SEND_TO_PLAYER_ATTEMPT };
+	public enum TYPE { HANDLE_CHAT, HANDLE_GLOBAL, GLOBAL, HANDLE_EMOTE, SEND_TO_PLAYER_ATTEMPT, AUTO_COMPLETE };
 	
 	public final TYPE type;
 	public final EntityPlayer player;
@@ -18,13 +20,14 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	private boolean isHandled = false;
 	private boolean isAllowed = true;
 	private EntityPlayer targetPlayer = null;
+	private List completions = null;
 	
 	public boolean isHandled() {
 		return isHandled;
 	}
 	
 	public void markHandled() {
-		if (type == TYPE.HANDLE_CHAT || type == TYPE.HANDLE_GLOBAL || type == TYPE.HANDLE_EMOTE)
+		if (type == TYPE.HANDLE_CHAT || type == TYPE.HANDLE_GLOBAL || type == TYPE.HANDLE_EMOTE || type == TYPE.AUTO_COMPLETE)
 			isHandled = true;
 	}
 	
@@ -63,6 +66,11 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 		}
 	}
 	
+	public void addCompletion(String completion) {
+		if (completions != null)
+			completions.add(completion);
+	}
+	
 	private boolean canChangeMessage() {
 		return type == TYPE.HANDLE_CHAT || type == TYPE.HANDLE_GLOBAL || type == TYPE.HANDLE_EMOTE;
 	}
@@ -86,6 +94,12 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	public static PlayerChatEvent SendChatToPlayerAttempt(EntityPlayer player, EntityPlayer target, String message) {
 		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.SEND_TO_PLAYER_ATTEMPT, message);
 		event.targetPlayer = target;
+		return event;
+	}
+
+	public static PlayerChatEvent HandleAutoComplete(EntityPlayer player, String text, List completions) {
+		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.AUTO_COMPLETE, text);
+		event.completions = completions;
 		return event;
 	}
 	

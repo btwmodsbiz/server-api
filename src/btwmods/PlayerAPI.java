@@ -31,6 +31,7 @@ import net.minecraft.src.DamageSource;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.ICommandSender;
 import net.minecraft.src.InventoryEnderChest;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
@@ -438,6 +439,16 @@ public class PlayerAPI {
 		PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(sender, target, message);
        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 		return event.isAllowed();
+	}
+
+	public static boolean onAutoComplete(ICommandSender sender, String text, List completions) {
+		if (sender instanceof EntityPlayerMP) {
+			PlayerChatEvent event = PlayerChatEvent.HandleAutoComplete((EntityPlayer)sender, text, completions);
+	    	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+			return event.isHandled();
+		}
+		
+		return false;
 	}
 
 	public static boolean onItemUseAttempt(EntityPlayer player, ItemStack itemStack) {
