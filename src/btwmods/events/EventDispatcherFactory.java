@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import btwmods.ModLoader;
+import btwmods.Stat;
 
 public class EventDispatcherFactory implements InvocationHandler, EventDispatcher {
 	
@@ -295,10 +296,13 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		long start = System.nanoTime();
 		Class declaringClass = method.getDeclaringClass();
 		
 		if (declaringClass == EventDispatcher.class) {
-			return method.invoke(this, args);
+			Object result = method.invoke(this, args);
+			Stat.recordEventDispatch(declaringClass, method, args, 1, System.nanoTime() - start);
+			return result;
 		}
 		else {
 			// Process any queued failures before invoking a method on a mod.
@@ -308,11 +312,11 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 			IAPIListener[] listeners = getListeners(method.getDeclaringClass());
 			
 			// Execute all the listeners.
+			int calls = 0;
 			if (listeners != null) {
 				for (int i = 0; i < listeners.length; i++) {
 					invocationCount++;
-					
-					// TODO: pass the Method to StatsAPI.
+					calls++;
 					
 					try {
 						if (invocationWrapper != null)
@@ -335,6 +339,8 @@ public class EventDispatcherFactory implements InvocationHandler, EventDispatche
 					}
 				}
 			}
+
+			Stat.recordEventDispatch(declaringClass, method, args, calls, System.nanoTime() - start);
 			
 			// Listener methods return void.
 			return null;

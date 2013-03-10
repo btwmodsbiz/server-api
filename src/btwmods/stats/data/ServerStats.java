@@ -1,5 +1,9 @@
 package btwmods.stats.data;
 
+import java.util.EnumMap;
+import java.util.Map;
+
+import btwmods.Stat;
 import btwmods.measure.Average;
 
 public class ServerStats {
@@ -17,4 +21,9 @@ public class ServerStats {
 	public long bytesSentToPlayers = 0L;
 	public long bytesReceivedFromPlayers = 0L;
 	public long handlerInovcations = 0L;
+	
+	public final EnumMap<Stat, Map<Class, Average>> timeByListener = new EnumMap<Stat, Map<Class, Average>>(Stat.class);
+	public final EnumMap<Stat, Map<Class, Average>> callsByListener = new EnumMap<Stat, Map<Class, Average>>(Stat.class);
+	
+	public final EnumMap<Stat, Map<Class, Average>> timeByMod = new EnumMap<Stat, Map<Class, Average>>(Stat.class);
 }

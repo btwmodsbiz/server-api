@@ -1,5 +1,6 @@
 package btwmods;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -13,6 +14,7 @@ import net.minecraft.src.World;
 import btwmods.measure.Average;
 import btwmods.network.NetworkType;
 import btwmods.stats.measurements.StatChunk;
+import btwmods.stats.measurements.StatEventDispatch;
 import btwmods.stats.measurements.StatPositionedClass;
 import btwmods.stats.measurements.StatWorld;
 import btwmods.stats.measurements.StatWorldValue;
@@ -50,7 +52,8 @@ public enum Stat {
 	
 	LOAD_CHUNK(false),
 	LOAD_CHUNK_TIME(false),
-	SPAWN_LIVING(false);
+	SPAWN_LIVING(false),
+	EVENT_DISPATCH(false, 1.0E-6D);
 	
 	public static AtomicLong bytesSent = new AtomicLong();
 	public static AtomicLong bytesReceived = new AtomicLong();
@@ -144,6 +147,11 @@ public enum Stat {
 		
 		//if (player != null)
 		//	StatsAPI.record(new StatNetworkPlayer(type, player.username, bytes));
+	}
+	
+	public static void recordEventDispatch(Class declaringClass, Method method, Object[] args, int methodCalls, long nanoTime) {
+		if (EVENT_DISPATCH.enabled)
+			StatsAPI.record(new StatEventDispatch(declaringClass, method, args, methodCalls, nanoTime));
 	}
 	
 	public String nameAsCamelCase() {
