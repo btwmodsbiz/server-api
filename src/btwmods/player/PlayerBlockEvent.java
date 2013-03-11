@@ -10,7 +10,7 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 	
 	public static PlayerBlockEvent Activated(EntityPlayer player, Block block, int x, int y, int z) {
 		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ACTIVATED, player, x, y, z);
-		event.block = block;
+		event.setBlock(block);
 		return event;
 	}
 
@@ -20,7 +20,7 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 		event.xOffset = xOffset;
 		event.yOffset = yOffset;
 		event.zOffset = zOffset;
-		event.block = block;
+		event.setBlock(block);
 		return event;
 	}
 	

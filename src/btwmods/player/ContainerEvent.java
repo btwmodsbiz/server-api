@@ -21,7 +21,7 @@ public class ContainerEvent extends PlayerBlockEventBase {
 	
 	public static ContainerEvent Open(EntityPlayer player, Block block, Container container, int x, int y, int z) {
 		ContainerEvent event = new ContainerEvent(TYPE.OPENED, player, x, y, z);
-		event.block = block;
+		event.setBlock(block);
 		event.container = container;
 		return event;
 	}
@@ -39,8 +39,8 @@ public class ContainerEvent extends PlayerBlockEventBase {
 	
 	public static ContainerEvent Removed(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
 		ContainerEvent event = new ContainerEvent(TYPE.REMOVED, player, x, y, z);
-		event.block = block;
-		event.metadata = metadata;
+		event.setBlock(block);
+		event.setMetadata(metadata);
 		return event;
 	}
 	

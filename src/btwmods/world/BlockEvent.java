@@ -67,20 +67,20 @@ public class BlockEvent extends BlockEventBase implements IEventInterrupter {
 	public static BlockEvent Broken(World world, Chunk chunk, Block block, int metadata, int x, int y, int z) {
 		BlockEvent event = new BlockEvent(TYPE.BROKEN, world, x, y, z);
 		event.chunk = chunk;
-		event.block = block;
-		event.metadata = metadata;
+		event.setBlock(block);
+		event.setMetadata(metadata);
 		return event;
 	}
 	
 	public static BlockEvent ExplodeAttempt(World world, int blockId, int x, int y, int z) {
 		BlockEvent event = new BlockEvent(TYPE.EXPLODE_ATTEMPT, world, x, y, z);
-		event.block = blockId > 0 ? Block.blocksList[blockId] : null;
+		event.setBlockId(blockId);
 		return event;
 	}
 
 	public static BlockEvent BurnAttempt(World world, int blockId, int x, int y, int z) {
 		BlockEvent event = new BlockEvent(TYPE.BURN_ATTEMPT, world, x, y, z);
-		event.block = blockId > 0 ? Block.blocksList[blockId] : null;
+		event.setBlockId(blockId);
 		return event;
 	}
 
