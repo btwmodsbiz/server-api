@@ -10,14 +10,14 @@ import net.minecraft.src.World;
 public abstract class BlockEventBase extends PositionedEvent {
 
 	private boolean checkedBlockId = false;
-	protected int blockId = 0;
-	protected Block block = null;
-	protected int metadata = -1;
-	protected boolean metadataSet = false;
+	private int blockId = 0;
+	private Block block = null;
+	private int metadata = -1;
+	private boolean metadataSet = false;
 	
 	private boolean checkedTileEntity = false;
-	protected TileEntity tileEntity = null;
-	protected ItemStack[] contents = null;
+	private TileEntity tileEntity = null;
+	private ItemStack[] contents = null;
 	
 	public int getBlockId() {
 		if (!checkedBlockId) {
@@ -36,11 +36,25 @@ public abstract class BlockEventBase extends PositionedEvent {
 		return blockId;
 	}
 	
+	protected void setBlockId(int blockId) {
+		this.blockId = blockId;
+		this.block = Block.blocksList[blockId];
+		checkedBlockId = true;
+	}
+	
 	public Block getBlock() {
 		if (!checkedBlockId)
 			getBlockId();
 		
 		return block;
+	}
+	
+	protected void setBlock(Block block) {
+		this.block = block;
+		if (block != null)
+			blockId = block.blockID;
+		
+		checkedBlockId = true;
 	}
 	
 	public int getMetadata() {
@@ -51,6 +65,11 @@ public abstract class BlockEventBase extends PositionedEvent {
 		return metadata;
 	}
 	
+	protected void setMetadata(int metadata) {
+		this.metadata = metadata;
+		metadataSet = true;
+	}
+	
 	public TileEntity getTileEntity() {
 		if (tileEntity == null && !checkedTileEntity) {
 			tileEntity = world.getBlockTileEntity(x, y, z);
@@ -58,6 +77,11 @@ public abstract class BlockEventBase extends PositionedEvent {
 		}
 		
 		return tileEntity;
+	}
+	
+	protected void setTileEntity(TileEntity tileEntity) {
+		this.tileEntity = tileEntity;
+		checkedTileEntity = true;
 	}
 	
 	public boolean hasInventory() {
