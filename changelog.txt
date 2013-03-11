@@ -1,3 +1,24 @@
+Version 4.59.2 (vMC 1.4.7 BTW 4.59)
+
+  - Added methods for copying Area and Cube but with different data.
+  
+  - Added onItemUsed to PlayerAPI.
+  
+  - Changed PlayerAPI's onBlockRemoved so it properly dispatches a PlayerBlockEvent.
+  
+  - Changed argument order of PlayerAPI's onItemUseAttempt.
+  
+  - Changed BlockEventBase so that classes extending it must use setXX
+    methods to set properties that have flags that determine if they have
+    been set or not.
+  
+  - Renamed PlayerAPI's onBlockPlaceAttempt to onItemUseAttempt.
+  
+  - Renamed PlayerAPI's onCheckCanPlayerEdit to onItemUseCheckEdit.
+  
+  - Fixed bug in PlayerAPI that prevented item use of the activation
+    attempt was not allowed.
+
 Version 4.59.1 (vMC 1.4.7 BTW 4.59)
 
   - Added PlayerAPI hook for handling auto completion.

@@ -36,7 +36,7 @@ public class ModLoader {
 	/**
 	 * Version label for BTWMods
 	 */
-	public static final String VERSION = "4.59.0 (vMC 1.4.7 BTW 4.59)";
+	public static final String VERSION = "4.59.2 (vMC 1.4.7 BTW 4.59)";
 	
 	/**
 	 * Location of settings and mods.
