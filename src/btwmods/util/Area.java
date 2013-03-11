@@ -33,6 +33,10 @@ public class Area<Type> {
 		return isWithin(x, z);
 	}
 	
+	public Area<Type> clone(Type data) {
+		return new Area<Type>(x1, x2, z1, z2, data);
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
