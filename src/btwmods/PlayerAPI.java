@@ -121,21 +121,21 @@ public class PlayerAPI {
 	/**
 	 * Asks all mods if the attempt should be allowed. Mods can only say that it's not allowed.
 	 * 
-	 * @param itemStack The item being placed.
+	 * @param itemStack The item being used.
 	 * @param player The player making the attempt.
 	 * @param world The world in which the attempt is taking place.
-	 * @param x The X coordinate where the item is being placed.
-	 * @param y The Y coordinate where the item is being placed.
-	 * @param z The Z coordinate where the item is being placed.
+	 * @param x The X coordinate where the item is being used.
+	 * @param y The Y coordinate where the item is being used.
+	 * @param z The Z coordinate where the item is being used.
 	 * @param direction The direction the player is facing.
-	 * @param xOffset The X offset the player is from where the item is being placed.
-	 * @param yOffset The Y offset the player is from where the item is being placed.
-	 * @param zOffset The Z offset the player is from where the item is being placed.
+	 * @param xOffset The X offset the player is from where the item is being used.
+	 * @param yOffset The Y offset the player is from where the item is being used.
+	 * @param zOffset The Z offset the player is from where the item is being used.
 	 * @return true is the attempt should be allowed; false otherwise.
 	 */
-	public static boolean onBlockPlaceAttempt(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
+	public static boolean onItemUseAttempt(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
-			PlayerBlockEvent event = PlayerBlockEvent.PlaceAttempt(player, itemStack, x, y, z, direction, xOffset, yOffset, zOffset);
+			PlayerBlockEvent event = PlayerBlockEvent.ItemUseAttempt(player, itemStack, world, x, y, z, direction, xOffset, yOffset, zOffset);
 			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
 			
 			if (!event.isAllowed())
@@ -145,11 +145,21 @@ public class PlayerAPI {
 		return true;
 	}
 	
-	public static void onBlockRemoved(EntityPlayer player, Block block, int metadata, int x, int y, int z) {
+	public static void onItemUsed(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
+		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
+			PlayerBlockEvent event = PlayerBlockEvent.ItemUsed(player, itemStack, world, x, y, z, direction, xOffset, yOffset, zOffset);
+			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
+		}
+	}
+	
+	public static void onBlockRemoved(EntityPlayer player, World world, Block block, int metadata, int x, int y, int z) {
 		if (block instanceof BlockContainer && !listeners.isEmpty(IContainerListener.class)) {
-			ContainerEvent event = ContainerEvent.Removed(player, block, metadata, x, y, z);
+			ContainerEvent event = ContainerEvent.Removed(player, world, block, metadata, x, y, z);
 			((IContainerListener)listeners).onContainerAction(event);
 		}
+		
+		PlayerBlockEvent event = PlayerBlockEvent.Removed(player, world, block, metadata, x, y, z);
+		((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
 	}
 
 	/**
@@ -157,14 +167,16 @@ public class PlayerAPI {
 	 * 
 	 * @param player The player making the attempt.
 	 * @param world The world in which the attempt is taking place.
+	 * @param block The block to be removed.
+	 * @param metadata  The metadata for the block to be removed.
 	 * @param x The block X coordinate.
 	 * @param y The block Y coordinate.
 	 * @param z The block Z coordinate.
 	 * @return true if the attempt should be allowed; false otherwise.
 	 */
-	public static boolean onBlockRemoveAttempt(EntityPlayer player, World world, int x, int y, int z) {
+	public static boolean onBlockRemoveAttempt(EntityPlayer player, World world, Block block, int metadata, int x, int y, int z) {
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
-			PlayerBlockEvent event = PlayerBlockEvent.RemoveAttempt(player, x, y, z);
+			PlayerBlockEvent event = PlayerBlockEvent.RemoveAttempt(player, world, block, metadata, x, y, z);
 			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
 
 			if (!event.isAllowed())
@@ -382,9 +394,9 @@ public class PlayerAPI {
 		}
 	}
 
-	public static boolean onCheckCanPlayerEdit(EntityPlayer player, int x, int y, int z, int direction, ItemStack itemStack) {
+	public static boolean onItemUseCheckEdit(EntityPlayer player, World world, int x, int y, int z, int direction, ItemStack itemStack) {
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
-			PlayerBlockEvent event = PlayerBlockEvent.CheckCanPlayerEdit(player, x, y, z, direction, itemStack);
+			PlayerBlockEvent event = PlayerBlockEvent.ItemUseCheckEdit(player, world, x, y, z, direction, itemStack);
         	((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
 			
 			if (!event.isAllowed())
@@ -453,7 +465,7 @@ public class PlayerAPI {
 		return false;
 	}
 
-	public static boolean onItemUseAttempt(EntityPlayer player, ItemStack itemStack) {
+	public static boolean onItemUseAttempt(ItemStack itemStack, EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerActionListener.class)) {
 			PlayerActionEvent event = PlayerActionEvent.ItemUseAttempt(player, itemStack);
 			((IPlayerActionListener)listeners).onPlayerAction(event);

@@ -5,17 +5,18 @@ import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryEnderChest;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.World;
 
 public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInterrupter {
 	
 	public static PlayerBlockEvent Activated(EntityPlayer player, Block block, int x, int y, int z) {
-		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ACTIVATED, player, x, y, z);
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ACTIVATED, player, player.worldObj, x, y, z);
 		event.setBlock(block);
 		return event;
 	}
 
 	public static PlayerBlockEvent ActivationAttempt(EntityPlayer player, Block block, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
-		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ACTIVATION_ATTEMPT, player, x, y, z);
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ACTIVATION_ATTEMPT, player, player.worldObj, x, y, z);
 		event.direction = direction;
 		event.xOffset = xOffset;
 		event.yOffset = yOffset;
@@ -24,8 +25,18 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 		return event;
 	}
 	
-	public static PlayerBlockEvent PlaceAttempt(EntityPlayer player, ItemStack itemStack, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
-		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.PLACE_ATTEMPT, player, x, y, z);
+	public static PlayerBlockEvent ItemUseAttempt(EntityPlayer player, ItemStack itemStack, World world, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ITEM_USE_ATTEMPT, player, world, x, y, z);
+		event.itemStack = itemStack;
+		event.direction = direction;
+		event.xOffset = xOffset;
+		event.yOffset = yOffset;
+		event.zOffset = zOffset;
+		return event;
+	}
+	
+	public static PlayerBlockEvent ItemUsed(EntityPlayer player, ItemStack itemStack, World world, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ITEM_USED, player, world, x, y, z);
 		event.itemStack = itemStack;
 		event.direction = direction;
 		event.xOffset = xOffset;
@@ -34,20 +45,29 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 		return event;
 	}
 
-	public static PlayerBlockEvent RemoveAttempt(EntityPlayer player, int x, int y, int z) {
-		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.REMOVE_ATTEMPT, player, x, y, z);
+	public static PlayerBlockEvent RemoveAttempt(EntityPlayer player, World world, Block block, int metadata, int x, int y, int z) {
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.REMOVE_ATTEMPT, player, world, x, y, z);
+		event.setBlock(block);
+		event.setMetadata(metadata);
 		return event;
 	}
 
-	public static PlayerBlockEvent CheckCanPlayerEdit(EntityPlayer player, int x, int y, int z, int direction, ItemStack itemStack) {
-		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.CHECK_PLAYEREDIT, player, x, y, z);
+	public static PlayerBlockEvent Removed(EntityPlayer player, World world, Block block, int metadata, int x, int y, int z) {
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.REMOVED, player, world, x, y, z);
+		event.setBlock(block);
+		event.setMetadata(metadata);
+		return event;
+	}
+
+	public static PlayerBlockEvent ItemUseCheckEdit(EntityPlayer player, World world, int x, int y, int z, int direction, ItemStack itemStack) {
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.ITEM_USE_CHECK_EDIT, player, world, x, y, z);
 		event.direction = direction;
 		event.itemStack = itemStack;
 		return event;
 	}
 
 	public static PlayerBlockEvent GetEnderChestInventory(EntityPlayer player, int x, int y, int z, int direction, float xOffset, float yOffset, float zOffset) {
-		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.GET_ENDERCHEST_INVENTORY, player, x, y, z);
+		PlayerBlockEvent event = new PlayerBlockEvent(TYPE.GET_ENDERCHEST_INVENTORY, player, player.worldObj, x, y, z);
 		event.direction = direction;
 		event.xOffset = xOffset;
 		event.yOffset = yOffset;
@@ -56,11 +76,16 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 	}
 	
 	public enum TYPE {
-		ACTIVATED,
 		ACTIVATION_ATTEMPT(true),
-		PLACE_ATTEMPT(true),
+		ACTIVATED,
+		
 		REMOVE_ATTEMPT(true),
-		CHECK_PLAYEREDIT,
+		REMOVED,
+
+		ITEM_USE_ATTEMPT(true),
+		ITEM_USE_CHECK_EDIT,
+		ITEM_USED,
+		
 		GET_ENDERCHEST_INVENTORY(true);
 		
 		public final boolean allowHandle;
@@ -136,8 +161,8 @@ public class PlayerBlockEvent extends PlayerBlockEventBase implements IEventInte
 		markHandled();
 	}
 	
-	private PlayerBlockEvent(TYPE type, EntityPlayer player, int x, int y, int z) {
-		super(player, player.worldObj, x, y, z);
+	private PlayerBlockEvent(TYPE type, EntityPlayer player, World world, int x, int y, int z) {
+		super(player, world, x, y, z);
 		this.type = type;
 	}
 
