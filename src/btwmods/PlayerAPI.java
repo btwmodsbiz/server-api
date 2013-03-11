@@ -75,6 +75,7 @@ public class PlayerAPI {
 
 	public static boolean onBlockActivationAttempt(int blockId, World world, int x, int y, int z, EntityPlayer player, int direction, float xOffset, float yOffset, float zOffset) {
 		boolean isHandled = false;
+		boolean isAllowed = true;
 		boolean wasActivated = false;
 		
 		if (!listeners.isEmpty(IPlayerBlockListener.class)) {
@@ -82,14 +83,15 @@ public class PlayerAPI {
 			((IPlayerBlockListener)listeners).onPlayerBlockAction(event);
 			
 			isHandled = event.isHandled();
-			wasActivated = event.isAllowed();
+			isAllowed = event.isAllowed();
 		}
 		
-		if (!isHandled)
-			wasActivated = Block.blocksList[blockId].onBlockActivated(world, x, y, z, player, direction, xOffset, yOffset, zOffset);
-		
-		if (wasActivated) {
-			onBlockActivated(player, Block.blocksList[blockId], x, y, z);
+		if (isAllowed) {
+			if (!isHandled)
+				wasActivated = Block.blocksList[blockId].onBlockActivated(world, x, y, z, player, direction, xOffset, yOffset, zOffset);
+			
+			if (wasActivated)
+				onBlockActivated(player, Block.blocksList[blockId], x, y, z);
 		}
 		
 		return wasActivated;
