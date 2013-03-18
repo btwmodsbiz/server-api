@@ -2,7 +2,7 @@ package btwmods.player;
 
 import java.util.List;
 
-import btwmods.PlayerAPI;
+import btwmods.ChatAPI;
 import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
 import net.minecraft.server.MinecraftServer;
@@ -59,9 +59,9 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	
 	public void sendAsGlobalMessage() {
 		if (message != null && canChangeMessage()) {
-			PlayerAPI.sendChatToAllPlayers(player, message);
+			ChatAPI.sendChatToAllPlayers(player, message);
 			MinecraftServer.getServer().logger.info(message);
-			PlayerAPI.onGlobalChat(player, message);
+			ChatAPI.onGlobalChat(player, message);
 			markHandled();
 		}
 	}
