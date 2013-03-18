@@ -1,4 +1,4 @@
-package btwmods.player;
+package btwmods.chat;
 
 import java.util.List;
 

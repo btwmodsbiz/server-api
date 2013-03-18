@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import btwmods.chat.IPlayerAliasListener;
+import btwmods.chat.IPlayerChatListener;
 import btwmods.chat.PlayerAliasEvent;
+import btwmods.chat.PlayerChatEvent;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
-import btwmods.player.IPlayerChatListener;
-import btwmods.player.PlayerChatEvent;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.EntityPlayer;
