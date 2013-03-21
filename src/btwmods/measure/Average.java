@@ -133,6 +133,6 @@ public class Average implements Comparable<Average> {
 
 	@Override
 	public int compareTo(Average o) {
-		return new Long(total).compareTo(o.total);
+		return Long.valueOf(total).compareTo(o.total);
 	}
 }
