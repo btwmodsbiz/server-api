@@ -1,12 +1,14 @@
 package btwmods;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
+import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.ChunkProviderServer;
 import net.minecraft.src.EntityTracker;
 import net.minecraft.src.LongHashMap;
@@ -174,5 +176,9 @@ public class WorldAPI {
 	public static void onPreUnloadChunk(World world, Chunk chunk) {
 		ChunkEvent event = ChunkEvent.PreUnload(world, chunk);
 		((IChunkListener)listeners).onChunkAction(event);
+	}
+
+	public static int onSpawnCustom(HashMap<ChunkCoordIntPair, Boolean> eligibleChunksForSpawning) {
+		return 0;
 	}
 }
