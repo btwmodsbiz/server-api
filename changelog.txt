@@ -1,3 +1,7 @@
+Version 4.62.0 (vMC 1.4.7 BTW 4.62)
+
+  - Updated to BTW 4.62
+
 Version 4.61.1 (vMC 1.4.7 BTW 4.61)
 
   - Added ChatAPI for handling aliases, and also moved chat related methods
