@@ -1,11 +1,13 @@
 package btwmods;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.AnvilChunkLoader;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkCoordIntPair;
@@ -35,6 +37,9 @@ public class WorldAPI {
 	private static LongHashMap[] id2ChunkMap;
 	private static Set[] droppedChunksSet;
 	private static Set[] trackedEntitiesSet;
+
+	private static AnvilChunkLoader[] chunkLoaders;
+	private static File[] chunkLoaderLocations;
 	
 	private WorldAPI() { }
 	
@@ -67,6 +72,24 @@ public class WorldAPI {
 			droppedChunksSet[i] = (Set)droppedChunksSetField.get(provider);
 			trackedEntitiesSet[i] = (Set)trackedEntitiesSetField.get(server.worldServers[i].getEntityTracker());
 		}
+
+		try {
+			Field chunkLoaderField = ReflectionAPI.getPrivateField(ChunkProviderServer.class, "chunkLoader");
+			Field chunkSaveLocationField = ReflectionAPI.getPrivateField(AnvilChunkLoader.class, "chunkSaveLocation");
+			
+			chunkLoaders = new AnvilChunkLoader[server.worldServers.length];
+			chunkLoaderLocations = new File[server.worldServers.length];
+			
+			for (int i = 0; i < chunkLoaders.length; i++) {
+				chunkLoaders[i] = (AnvilChunkLoader)chunkLoaderField.get(MinecraftServer.getServer().worldServers[i].getChunkProvider());
+				chunkLoaderLocations[i] = (File)chunkSaveLocationField.get(chunkLoaders[i]);
+			}
+		}
+		catch (Exception e) {
+			ModLoader.outputError(WorldAPI.class.getSimpleName() + " failed (" + e.getClass().getSimpleName() + ") to load the chunkLoaders and chunkSaveLocations: " + e.getMessage());
+			chunkLoaders = null;
+			chunkLoaderLocations = null;
+		}
 	}
 	
 	public static List[] getLoadedChunks() {
@@ -83,6 +106,22 @@ public class WorldAPI {
 	
 	public static Set[] getTrackedEntities() {
 		return trackedEntitiesSet;
+	}
+	
+	public static AnvilChunkLoader getAnvilChunkLoader(int worldIndex) {
+		if (chunkLoaders != null && worldIndex >= 0 && worldIndex < chunkLoaders.length && chunkLoaders[worldIndex] != null) {
+			return chunkLoaders[worldIndex];
+		}
+		
+		return null;
+	}
+	
+	public static File getAnvilSaveLocation(int worldIndex) {
+		if (chunkLoaders != null && worldIndex >= 0 && worldIndex < chunkLoaders.length && chunkLoaders[worldIndex] != null) {
+			return chunkLoaderLocations[worldIndex];
+		}
+		
+		return null;
 	}
 
 	public static void addListener(IAPIListener listener) {
