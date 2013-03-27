@@ -1,3 +1,21 @@
+Version 4.62.1 (vMC 1.4.7 BTW 4.62)
+
+  - Added methods to WorldAPI to get a World's AnvilChunkLoader and the
+    location where it saves.
+    
+  - Added exceptions for missing and illegal Settings.
+  
+  - Added flag to mark if an Entity should be counted toward the spawn
+    cap.
+
+  - Changed breeding (and eggs) so the animals that were bred and the
+    baby are marked to not count toward the spawn cap.
+  
+  - Changed AnvilChunkLoader so Chunks can be loaded in a lightweight way
+    for mods to process their data.
+    
+  - Changed the AI for tempting animals so it is shorter and random.
+
 Version 4.62.0 (vMC 1.4.7 BTW 4.62)
 
   - Updated to BTW 4.62
