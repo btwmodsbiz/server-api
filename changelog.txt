@@ -1,3 +1,7 @@
+Version 4.64.0 (vMC 1.4.7 BTW 4.64)
+
+  - Updated to BTW 4.64.
+
 Version 4.62.2 (vMC 1.4.7 BTW 4.62)
 
   - Changed EntityAnimals so it only allows spawns during the day and at
