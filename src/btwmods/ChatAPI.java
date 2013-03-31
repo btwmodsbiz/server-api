@@ -43,7 +43,9 @@ public class ChatAPI {
 			PlayerAliasEvent event = new PlayerAliasEvent(username);
         	((IPlayerAliasListener)listeners).onPlayerAliasAction(event);
         	
-        	alias = event.alias == null ? username : event.alias;
+        	EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerEntity(username);
+        	alias = event.alias == null ? (player == null ? username : player.username) : event.alias;
+        	
         	setAlias(username, alias);
 		}
 		
@@ -64,26 +66,36 @@ public class ChatAPI {
 	}
 	
 	public static void setAlias(String username, String alias) {
-		System.out.println("Set alias " + username + " to " + alias);
+		ModLoader.outputInfo("Set alias " + username + " to " + alias);
    		String oldAlias = usernameToAlias.put(username.toLowerCase(), alias);
    		aliasToUsername.put(alias.toLowerCase(), username);
    		
-   		if (oldAlias != null)
-   			resetPlayerInfo(oldAlias, alias);
-	}
-	
-	public static void removeAlias(String username) {
-   		String oldAlias = usernameToAlias.remove(username.toLowerCase());
-   		
    		if (oldAlias != null) {
-   	   		String oldUsername = aliasToUsername.remove(oldAlias.toLowerCase());
-   	   		resetPlayerInfo(oldAlias, oldUsername);
+   	   		EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerEntity(username);
+   			resetPlayerInfo(oldAlias, alias, player == null ? 1000 : player.ping);
    		}
 	}
 	
-	private static void resetPlayerInfo(String fromUsername, String toUsername) {
+	public static void refreshAlias(String username) {
+   		String oldAlias = usernameToAlias.remove(username.toLowerCase());
+   		
+   		if (oldAlias != null) {
+   	   		aliasToUsername.remove(oldAlias.toLowerCase());
+   	   		
+   	   		EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerEntity(username);
+   	   		resetPlayerInfo(oldAlias, getUsernameAliased(username), player == null ? 1000 : player.ping);
+   		}
+	}
+	
+	public static void removeAllAliases() {
+		String[] usernames = usernameToAlias.keySet().toArray(new String[0]);
+		for (String username : usernames)
+			refreshAlias(username);
+	}
+	
+	private static void resetPlayerInfo(String fromUsername, String toUsername, int ping) {
 		MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(new Packet201PlayerInfo(fromUsername, false, 9999));
-		MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(new Packet201PlayerInfo(toUsername, true, 1000));
+		MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(new Packet201PlayerInfo(toUsername, true, ping));
 	}
 	
 	public static void sendChatToAllPlayers(EntityPlayer sender, String message) {
