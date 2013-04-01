@@ -263,9 +263,16 @@ public class PlayerAPI {
 		}
 	}
 	
-	public static void onLogout(EntityPlayer player) {
+	public static void onLogoutPre(EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
-        	PlayerInstanceEvent event = PlayerInstanceEvent.Logout(player);
+        	PlayerInstanceEvent event = PlayerInstanceEvent.LogoutPre(player);
+        	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
+		}
+	}
+	
+	public static void onLogoutPost(EntityPlayer player) {
+		if (!listeners.isEmpty(IPlayerInstanceListener.class)) {
+        	PlayerInstanceEvent event = PlayerInstanceEvent.LogoutPost(player);
         	((IPlayerInstanceListener)listeners).onPlayerInstanceAction(event);
 		}
 	}

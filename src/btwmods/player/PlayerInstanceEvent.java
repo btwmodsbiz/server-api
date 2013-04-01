@@ -12,7 +12,7 @@ import net.minecraft.src.NBTTagCompound;
 
 public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 	
-	public enum TYPE { LOGIN, LOGOUT, DEATH, RESPAWN, READ_NBT, WRITE_NBT, CHECK_METADATA, METADATA_CHANGED, GET_DEFAULT_LOCATION };
+	public enum TYPE { LOGIN, LOGOUT_PRE, LOGOUT_POST, DEATH, RESPAWN, READ_NBT, WRITE_NBT, CHECK_METADATA, METADATA_CHANGED, GET_DEFAULT_LOCATION };
 	public enum METADATA { IS_PVP };
 
 	private final TYPE type;
@@ -130,8 +130,12 @@ public class PlayerInstanceEvent extends APIEvent implements IEventInterrupter {
 		return new PlayerInstanceEvent(TYPE.LOGIN, playerInstance);
 	}
 	
-	public static PlayerInstanceEvent Logout(EntityPlayer playerInstance) {
-		return new PlayerInstanceEvent(TYPE.LOGOUT, playerInstance);
+	public static PlayerInstanceEvent LogoutPre(EntityPlayer playerInstance) {
+		return new PlayerInstanceEvent(TYPE.LOGOUT_PRE, playerInstance);
+	}
+	
+	public static PlayerInstanceEvent LogoutPost(EntityPlayer playerInstance) {
+		return new PlayerInstanceEvent(TYPE.LOGOUT_POST, playerInstance);
 	}
 	
 	public static PlayerInstanceEvent Respawn(EntityPlayer playerInstance) {
