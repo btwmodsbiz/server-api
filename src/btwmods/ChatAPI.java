@@ -76,6 +76,13 @@ public class ChatAPI {
    		}
 	}
 	
+	public static void removeAlias(String username) {
+   		String oldAlias = usernameToAlias.remove(username.toLowerCase());
+   		if (oldAlias != null) {
+   	   		aliasToUsername.remove(oldAlias.toLowerCase());
+   		}
+	}
+	
 	public static void refreshAlias(String username) {
    		String oldAlias = usernameToAlias.remove(username.toLowerCase());
    		
@@ -88,6 +95,12 @@ public class ChatAPI {
 	}
 	
 	public static void removeAllAliases() {
+		String[] usernames = usernameToAlias.keySet().toArray(new String[0]);
+		for (String username : usernames)
+			removeAlias(username);
+	}
+	
+	public static void refreshAllAliases() {
 		String[] usernames = usernameToAlias.keySet().toArray(new String[0]);
 		for (String username : usernames)
 			refreshAlias(username);
