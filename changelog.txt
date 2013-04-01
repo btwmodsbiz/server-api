@@ -1,3 +1,10 @@
+Version 4.64.2 (vMC 1.4.7 BTW 4.64)
+
+  - Added removeAlias, and refreshAllAliases to ChatAPI and changed
+    removeAllAliases to call removeAlias instead.
+
+  - Changed PlayerAPI's onLogout to onLogoutPre and added an onLogoutPost.
+
 Version 4.64.1 (vMC 1.4.7 BTW 4.64)
 
   - Changed ChatAPI to better support changing of aliases.
