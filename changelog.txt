@@ -1,3 +1,10 @@
+Version 4.65b.0 (vMC 1.4.7 BTW 4.65b)
+
+  - Updated to BTW 4.65b.
+  
+  - Changed EntityAISit so it does not force the pet to sit if the tamed
+    animal's owner disappears but it is not following it anyway.
+
 Version 4.64.3 (vMC 1.4.7 BTW 4.64)
 
   - Added willFollowOwner to EntityTamable and added check to
