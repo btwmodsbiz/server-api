@@ -10,8 +10,8 @@ import net.minecraft.src.World;
 
 public class ModBlockFire extends FCBlockFire {
 
-	public ModBlockFire(int var1, int var2) {
-		super(var1, var2);
+	public ModBlockFire(int var1) {
+		super(var1);
 	}
 
 	@Override

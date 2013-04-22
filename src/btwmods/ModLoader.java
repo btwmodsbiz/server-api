@@ -20,7 +20,6 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.ConsoleLogFormatter;
 import net.minecraft.src.ICommand;
 import net.minecraft.src.ServerCommandManager;
 import net.minecraft.src.World;
@@ -28,6 +27,7 @@ import net.minecraft.src.World;
 import btwmods.events.IAPIListener;
 import btwmods.io.RotatedFileHandler;
 import btwmods.io.Settings;
+import btwmods.util.LogFormatter;
 
 public class ModLoader {
 	
@@ -191,8 +191,8 @@ public class ModLoader {
 			else {
 				try {
 					RotatedFileHandler handler = new RotatedFileHandler(serverLogs, "yyyy-MM-dd", "server_%DATE%.log");
-					handler.setFormatter(new ConsoleLogFormatter());
-					MinecraftServer.logger.addHandler(handler);
+					handler.setFormatter(new LogFormatter());
+					MinecraftServer.getServer().getLogAgent().getServerLogger().addHandler(handler);
 				} catch (IOException e) {
 					serverLogs = null;
 					outputError("The 'serverLogs' directory could not be writen to: " + e.getMessage(), Level.SEVERE);
@@ -603,7 +603,7 @@ public class ModLoader {
 		
 		// Output the stack trace.
 		String stackTrace = Util.getStackTrace(throwable);
-		MinecraftServer.logger.log(level, stackTrace);
+		MinecraftServer.getServer().getLogAgent().getServerLogger().log(level, stackTrace);
 		errorLogWrite(stackTrace);
 	}
 	
@@ -612,7 +612,7 @@ public class ModLoader {
 	}
 	
 	private static void outputLog(String message, Level level) {
-		MinecraftServer.logger.log(level, LOGPREFIX + message);
+		MinecraftServer.getServer().getLogAgent().getServerLogger().log(level, LOGPREFIX + message);
 		
 		// Notify logged in admins.
 		MinecraftServer server = MinecraftServer.getServer();
@@ -635,12 +635,12 @@ public class ModLoader {
 					errorLogWriteFails--;
 			}
 			catch (IOException e) {
-				MinecraftServer.logger.severe(LOGPREFIX + "Failed to write to the errorLog: " + e.getMessage());
+				MinecraftServer.getServer().getLogAgent().logSevere(LOGPREFIX + "Failed to write to the errorLog: " + e.getMessage());
 				errorLogWriteFails++;
 				
 				if (errorLogWriteFails >= errorLogWriteFailsMax) {
 					errorLog = null;
-					MinecraftServer.logger.severe(LOGPREFIX + "Failed to write to the errorLog " + errorLogWriteFails + " times. Disabled logging to error file.");
+					MinecraftServer.getServer().getLogAgent().logSevere(LOGPREFIX + "Failed to write to the errorLog " + errorLogWriteFails + " times. Disabled logging to error file.");
 				}
 			}
 			finally {

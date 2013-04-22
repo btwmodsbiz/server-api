@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class Util {
 	public static final DecimalFormat DECIMAL_FORMAT_3MAX = new DecimalFormat("0.###");
 	public static final DecimalFormat DECIMAL_FORMAT_2MAX = new DecimalFormat("0.##");
 	public static final DecimalFormat DECIMAL_FORMAT_1MAX = new DecimalFormat("0.#");
+	public static final SimpleDateFormat DATE_FORMAT_LOGS = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
 	
 	public static String getStackTrace() {
 		return getStackTrace(new Throwable(""));
@@ -207,7 +209,7 @@ public class Util {
 		String name;
 		
 		if (entity instanceof EntityItem) {
-			name = ((EntityItem)entity).func_92059_d().getItemName();
+			name = ((EntityItem)entity).getEntityItem().getItemName();
 		}
 		else if (entity instanceof EntityPlayer) {
 			name = entity.getClass().getSimpleName();

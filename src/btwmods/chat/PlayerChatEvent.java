@@ -60,7 +60,7 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	public void sendAsGlobalMessage() {
 		if (message != null && canChangeMessage()) {
 			ChatAPI.sendChatToAllPlayers(player, message);
-			MinecraftServer.getServer().logger.info(message);
+			MinecraftServer.getServer().getLogAgent().func_98233_a(message);
 			ChatAPI.onGlobalChat(player, message);
 			markHandled();
 		}

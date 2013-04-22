@@ -36,7 +36,7 @@ public class WorldAPI {
 	private static List[] loadedChunks;
 	private static LongHashMap[] id2ChunkMap;
 	private static Set[] droppedChunksSet;
-	private static Set[] trackedEntitiesSet;
+	private static Set[] trackedEntities;
 
 	private static AnvilChunkLoader[] chunkLoaders;
 	private static File[] chunkLoaderLocations;
@@ -49,7 +49,7 @@ public class WorldAPI {
 		Field loadedChunksField = ReflectionAPI.getPrivateField(ChunkProviderServer.class, "loadedChunks");
 		Field id2ChunkMapField = ReflectionAPI.getPrivateField(ChunkProviderServer.class, "id2ChunkMap");
 		Field droppedChunksSetField = ReflectionAPI.getPrivateField(ChunkProviderServer.class, "droppedChunksSet");
-		Field trackedEntitiesSetField = ReflectionAPI.getPrivateField(EntityTracker.class, "trackedEntitySet");
+		Field trackedEntitiesField = ReflectionAPI.getPrivateField(EntityTracker.class, "trackedEntities");
 		
 		if (loadedChunksField == null)
 			throw new NoSuchFieldException("loadedChunks");
@@ -57,20 +57,20 @@ public class WorldAPI {
 			throw new NoSuchFieldException("id2ChunkMap");
 		if (droppedChunksSetField == null)
 			throw new NoSuchFieldException("droppedChunksSet");
-		if (trackedEntitiesSetField == null)
-			throw new NoSuchFieldException("trackedEntitySet");
+		if (trackedEntitiesField == null)
+			throw new NoSuchFieldException("trackedEntities");
 		
 		loadedChunks = new List[server.worldServers.length];
 		id2ChunkMap = new LongHashMap[server.worldServers.length];
 		droppedChunksSet = new Set[server.worldServers.length];
-		trackedEntitiesSet = new Set[server.worldServers.length];
+		trackedEntities = new Set[server.worldServers.length];
 		
 		for (int i = 0; i < server.worldServers.length; i++) {
 			ChunkProviderServer provider = (ChunkProviderServer)server.worldServers[i].getChunkProvider();
 			loadedChunks[i] = (List)loadedChunksField.get(provider);
 			id2ChunkMap[i] = (LongHashMap)id2ChunkMapField.get(provider);
 			droppedChunksSet[i] = (Set)droppedChunksSetField.get(provider);
-			trackedEntitiesSet[i] = (Set)trackedEntitiesSetField.get(server.worldServers[i].getEntityTracker());
+			trackedEntities[i] = (Set)trackedEntitiesField.get(server.worldServers[i].getEntityTracker());
 		}
 
 		try {
@@ -105,7 +105,7 @@ public class WorldAPI {
 	}
 	
 	public static Set[] getTrackedEntities() {
-		return trackedEntitiesSet;
+		return trackedEntities;
 	}
 	
 	public static AnvilChunkLoader getAnvilChunkLoader(int worldIndex) {
