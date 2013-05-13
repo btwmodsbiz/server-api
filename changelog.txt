@@ -1,3 +1,7 @@
+Version 4.80.0 (vMC 1.5.1 BTW 4.80)
+
+  - Updated to BTW 4.80
+
 Version 4.71.0 (vMC 1.5.1 BTW 4.71)
 
   - Updated to BTW 4.71
