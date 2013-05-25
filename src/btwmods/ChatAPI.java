@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import btwmods.chat.IPlayerAliasListener;
 import btwmods.chat.IPlayerChatListener;
-import btwmods.chat.PlayerAliasEvent;
+import btwmods.chat.IPlayerUsernameListener;
 import btwmods.chat.PlayerChatEvent;
+import btwmods.chat.PlayerUsernameEvent;
 import btwmods.events.EventDispatcher;
 import btwmods.events.EventDispatcherFactory;
 import btwmods.events.IAPIListener;
@@ -21,7 +21,7 @@ import net.minecraft.src.Packet3Chat;
 
 public class ChatAPI {
 	
-	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IPlayerAliasListener.class, IPlayerChatListener.class });
+	private static EventDispatcher listeners = EventDispatcherFactory.create(new Class[] { IPlayerUsernameListener.class, IPlayerChatListener.class });
 	
 	private ChatAPI() {}
 	
@@ -40,11 +40,11 @@ public class ChatAPI {
 		String alias = usernameToAlias.get(username.toLowerCase());
 		
 		if (alias == null) {
-			PlayerAliasEvent event = new PlayerAliasEvent(username);
-        	((IPlayerAliasListener)listeners).onPlayerAliasAction(event);
+			PlayerUsernameEvent event = PlayerUsernameEvent.GetAlias(username);
+        	((IPlayerUsernameListener)listeners).onPlayerUsernameAction(event);
         	
         	EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerEntity(username);
-        	alias = event.alias == null ? (player == null ? username : player.username) : event.alias;
+        	alias = event.getAlias() == null ? (player == null ? username : player.username) : event.getAlias();
         	
         	setAlias(username, alias);
 		}
