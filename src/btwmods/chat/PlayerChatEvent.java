@@ -14,7 +14,7 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 		HANDLE_LOGIN_MESSAGE, HANDLE_LOGOUT_MESSAGE, HANDLE_DEATH_MESSAGE };
 	
 	public final TYPE type;
-	public final EntityPlayer player;
+	public final String username;
 	public final String originalMessage;
 	
 	private String message = null;
@@ -72,9 +72,9 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	
 	public void sendAsGlobalMessage() {
 		if (message != null && canChangeMessage()) {
-			ChatAPI.sendChatToAllPlayers(player, message);
+			ChatAPI.sendChatToAllPlayers(username, message);
 			MinecraftServer.getServer().getLogAgent().func_98233_a(message);
-			ChatAPI.onGlobalChat(player, message);
+			ChatAPI.onGlobalChat(username, message);
 			markHandled();
 		}
 	}
@@ -103,50 +103,50 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 		return false;
 	}
 
-	public static PlayerChatEvent GlobalChat(EntityPlayer player, String message) {
-		return new PlayerChatEvent(player, TYPE.GLOBAL, message);
+	public static PlayerChatEvent GlobalChat(String username, String message) {
+		return new PlayerChatEvent(username, TYPE.GLOBAL, message);
 	}
 
-	public static PlayerChatEvent HandleGlobalChat(EntityPlayer player, String message) {
-		return new PlayerChatEvent(player, TYPE.HANDLE_GLOBAL, message);
+	public static PlayerChatEvent HandleGlobalChat(String username, String message) {
+		return new PlayerChatEvent(username, TYPE.HANDLE_GLOBAL, message);
 	}
 
-	public static PlayerChatEvent HandleEmote(EntityPlayer player, String message) {
-		return new PlayerChatEvent(player, TYPE.HANDLE_EMOTE, message);
+	public static PlayerChatEvent HandleEmote(String username, String message) {
+		return new PlayerChatEvent(username, TYPE.HANDLE_EMOTE, message);
 	}
 
-	public static PlayerChatEvent HandleChat(EntityPlayer player, String message) {
-		return new PlayerChatEvent(player, TYPE.HANDLE_CHAT, message);
+	public static PlayerChatEvent HandleChat(String username, String message) {
+		return new PlayerChatEvent(username, TYPE.HANDLE_CHAT, message);
 	}
 
-	public static PlayerChatEvent HandleLoginMessage(EntityPlayer player) {
-		return new PlayerChatEvent(player, TYPE.HANDLE_LOGIN_MESSAGE, null);
+	public static PlayerChatEvent HandleLoginMessage(String username) {
+		return new PlayerChatEvent(username, TYPE.HANDLE_LOGIN_MESSAGE, null);
 	}
 
-	public static PlayerChatEvent HandleLogoutMessage(EntityPlayer player) {
-		return new PlayerChatEvent(player, TYPE.HANDLE_LOGOUT_MESSAGE, null);
+	public static PlayerChatEvent HandleLogoutMessage(String username) {
+		return new PlayerChatEvent(username, TYPE.HANDLE_LOGOUT_MESSAGE, null);
 	}
 
-	public static PlayerChatEvent HandleDeathMessage(EntityPlayer player, String message) {
-		return new PlayerChatEvent(player, TYPE.HANDLE_DEATH_MESSAGE, message);
+	public static PlayerChatEvent HandleDeathMessage(String username, String message) {
+		return new PlayerChatEvent(username, TYPE.HANDLE_DEATH_MESSAGE, message);
 	}
 
-	public static PlayerChatEvent SendChatToPlayerAttempt(EntityPlayer player, EntityPlayer target, String message) {
-		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.SEND_TO_PLAYER_ATTEMPT, message);
+	public static PlayerChatEvent SendChatToPlayerAttempt(String username, String playerName, EntityPlayer target, String message) {
+		PlayerChatEvent event = new PlayerChatEvent(username, TYPE.SEND_TO_PLAYER_ATTEMPT, message);
 		event.targetPlayer = target;
 		return event;
 	}
 
-	public static PlayerChatEvent HandleAutoComplete(EntityPlayer player, String text, List completions) {
-		PlayerChatEvent event = new PlayerChatEvent(player, TYPE.AUTO_COMPLETE, text);
+	public static PlayerChatEvent HandleAutoComplete(String username, String text, List completions) {
+		PlayerChatEvent event = new PlayerChatEvent(username, TYPE.AUTO_COMPLETE, text);
 		event.completions = completions;
 		return event;
 	}
 	
-	private PlayerChatEvent(EntityPlayer player, TYPE type, String message) {
-		super(player);
+	private PlayerChatEvent(String username, TYPE type, String message) {
+		super(username);
 		this.type = type;
-		this.player = player;
+		this.username = username;
 		this.originalMessage = message;
 	}
 

@@ -111,29 +111,29 @@ public class ChatAPI {
 		MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(new Packet201PlayerInfo(toUsername, true, ping));
 	}
 	
-	public static void sendChatToAllPlayers(EntityPlayer sender, String message) {
-		sendChatToAllPlayers(sender, new Packet3Chat(message, false));
+	public static void sendChatToAllPlayers(String senderUsername, String message) {
+		sendChatToAllPlayers(senderUsername, new Packet3Chat(message, false));
 	}
 	
-	public static void sendChatToAllPlayers(EntityPlayer sender, Packet3Chat packet) {
+	public static void sendChatToAllPlayers(String senderUsername, Packet3Chat packet) {
 		for (EntityPlayerMP player : (List<EntityPlayerMP>)MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
-			sendChatToPlayer(sender, player, packet);
+			sendChatToPlayer(senderUsername, player, packet);
 		}
 	}
 	
-	public static void sendChatToPlayer(EntityPlayer sender, EntityPlayerMP target, String message) {
-		sendChatToPlayer(sender, target, new Packet3Chat(message, false));
+	public static void sendChatToPlayer(String senderUsername, EntityPlayerMP target, String message) {
+		sendChatToPlayer(senderUsername, target, new Packet3Chat(message, false));
 	}
 	
-	public static void sendChatToPlayer(EntityPlayer sender, EntityPlayerMP target, Packet3Chat packet) {
-		if (onSendChatToPlayerAttempt(sender, target, packet.message)) {
+	public static void sendChatToPlayer(String senderUsername, EntityPlayerMP target, Packet3Chat packet) {
+		if (onSendChatToPlayerAttempt(senderUsername, target, packet.message)) {
     		target.playerNetServerHandler.sendPacket(packet);
     	}
 	}
 
 	public static boolean onHandleChat(EntityPlayer player, String message) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
-			PlayerChatEvent event = PlayerChatEvent.HandleChat(player, message);
+			PlayerChatEvent event = PlayerChatEvent.HandleChat(player.username, message);
         	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 			
 			if (event.isHandled())
@@ -145,7 +145,7 @@ public class ChatAPI {
 
 	public static boolean onHandleGlobalChat(EntityPlayer player, String message) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
-			PlayerChatEvent event = PlayerChatEvent.HandleGlobalChat(player, message);
+			PlayerChatEvent event = PlayerChatEvent.HandleGlobalChat(player.username, message);
         	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 			
 			if (event.isHandled())
@@ -155,16 +155,16 @@ public class ChatAPI {
 		return true;
 	}
 	
-	public static void onGlobalChat(EntityPlayer player, String message) {
+	public static void onGlobalChat(String senderUsername, String message) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
-			PlayerChatEvent event = PlayerChatEvent.GlobalChat(player, message);
+			PlayerChatEvent event = PlayerChatEvent.GlobalChat(senderUsername, message);
         	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 		}
 	}
 
 	public static boolean onHandleEmoteChat(EntityPlayer player, String message) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
-			PlayerChatEvent event = PlayerChatEvent.HandleEmote(player, message);
+			PlayerChatEvent event = PlayerChatEvent.HandleEmote(player.username, message);
         	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 			
 			if (event.isHandled())
@@ -176,7 +176,7 @@ public class ChatAPI {
 
 	public static boolean onHandleLoginMessage(EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
-			PlayerChatEvent event = PlayerChatEvent.HandleLoginMessage(player);
+			PlayerChatEvent event = PlayerChatEvent.HandleLoginMessage(player.username);
         	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 			
 			if (event.isHandled())
@@ -188,7 +188,7 @@ public class ChatAPI {
 
 	public static boolean onHandleLogoutMessage(EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
-			PlayerChatEvent event = PlayerChatEvent.HandleLogoutMessage(player);
+			PlayerChatEvent event = PlayerChatEvent.HandleLogoutMessage(player.username);
         	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 			
 			if (event.isHandled())
@@ -200,7 +200,7 @@ public class ChatAPI {
 
 	public static boolean onHandleDeathMessage(EntityPlayer player, String deathMessage) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
-			PlayerChatEvent event = PlayerChatEvent.HandleDeathMessage(player, deathMessage);
+			PlayerChatEvent event = PlayerChatEvent.HandleDeathMessage(player.username, deathMessage);
         	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 			
 			if (event.isHandled())
@@ -210,15 +210,15 @@ public class ChatAPI {
 		return true;
 	}
 	
-	public static boolean onSendChatToPlayerAttempt(EntityPlayer sender, EntityPlayer target, String message) {
-		PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(sender, target, message);
+	public static boolean onSendChatToPlayerAttempt(String senderUsername, EntityPlayer target, String message) {
+		PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(null, senderUsername, target, message);
        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 		return event.isAllowed();
 	}
 
 	public static boolean onAutoComplete(ICommandSender sender, String text, List completions) {
 		if (sender instanceof EntityPlayerMP) {
-			PlayerChatEvent event = PlayerChatEvent.HandleAutoComplete((EntityPlayer)sender, text, completions);
+			PlayerChatEvent event = PlayerChatEvent.HandleAutoComplete(((EntityPlayer)sender).username, text, completions);
 	    	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 			return event.isHandled();
 		}
