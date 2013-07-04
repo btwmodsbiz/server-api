@@ -173,6 +173,42 @@ public class ChatAPI {
 		
 		return true;
 	}
+
+	public static boolean onHandleLoginMessage(EntityPlayer player) {
+		if (!listeners.isEmpty(IPlayerChatListener.class)) {
+			PlayerChatEvent event = PlayerChatEvent.HandleLoginMessage(player);
+        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+			
+			if (event.isHandled())
+				return false;
+		}
+		
+		return true;
+	}
+
+	public static boolean onHandleLogoutMessage(EntityPlayer player) {
+		if (!listeners.isEmpty(IPlayerChatListener.class)) {
+			PlayerChatEvent event = PlayerChatEvent.HandleLogoutMessage(player);
+        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+			
+			if (event.isHandled())
+				return false;
+		}
+		
+		return true;
+	}
+
+	public static boolean onHandleDeathMessage(EntityPlayer player, String deathMessage) {
+		if (!listeners.isEmpty(IPlayerChatListener.class)) {
+			PlayerChatEvent event = PlayerChatEvent.HandleDeathMessage(player, deathMessage);
+        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+			
+			if (event.isHandled())
+				return false;
+		}
+		
+		return true;
+	}
 	
 	public static boolean onSendChatToPlayerAttempt(EntityPlayer sender, EntityPlayer target, String message) {
 		PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(sender, target, message);

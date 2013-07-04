@@ -10,7 +10,8 @@ import net.minecraft.src.EntityPlayer;
 
 public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	
-	public enum TYPE { HANDLE_CHAT, HANDLE_GLOBAL, GLOBAL, HANDLE_EMOTE, SEND_TO_PLAYER_ATTEMPT, AUTO_COMPLETE };
+	public enum TYPE { HANDLE_CHAT, HANDLE_GLOBAL, GLOBAL, HANDLE_EMOTE, SEND_TO_PLAYER_ATTEMPT, AUTO_COMPLETE,
+		HANDLE_LOGIN_MESSAGE, HANDLE_LOGOUT_MESSAGE, HANDLE_DEATH_MESSAGE };
 	
 	public final TYPE type;
 	public final EntityPlayer player;
@@ -27,8 +28,20 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	}
 	
 	public void markHandled() {
-		if (type == TYPE.HANDLE_CHAT || type == TYPE.HANDLE_GLOBAL || type == TYPE.HANDLE_EMOTE || type == TYPE.AUTO_COMPLETE)
-			isHandled = true;
+		switch (type) {
+			case AUTO_COMPLETE:
+			case HANDLE_CHAT:
+			case HANDLE_DEATH_MESSAGE:
+			case HANDLE_EMOTE:
+			case HANDLE_GLOBAL:
+			case HANDLE_LOGIN_MESSAGE:
+			case HANDLE_LOGOUT_MESSAGE:
+				isHandled = true;
+				break;
+			case SEND_TO_PLAYER_ATTEMPT:
+			case GLOBAL:
+				break;
+		}
 	}
 	
 	public String getMessage() {
@@ -72,7 +85,22 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	}
 	
 	private boolean canChangeMessage() {
-		return type == TYPE.HANDLE_CHAT || type == TYPE.HANDLE_GLOBAL || type == TYPE.HANDLE_EMOTE;
+		switch (type) {
+			case HANDLE_CHAT:
+			case HANDLE_DEATH_MESSAGE:
+			case HANDLE_EMOTE:
+			case HANDLE_GLOBAL:
+				return true;
+
+			case HANDLE_LOGIN_MESSAGE:
+			case HANDLE_LOGOUT_MESSAGE:
+			case SEND_TO_PLAYER_ATTEMPT:
+			case AUTO_COMPLETE:
+			case GLOBAL:
+				break;
+		}
+		
+		return false;
 	}
 
 	public static PlayerChatEvent GlobalChat(EntityPlayer player, String message) {
@@ -89,6 +117,18 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 
 	public static PlayerChatEvent HandleChat(EntityPlayer player, String message) {
 		return new PlayerChatEvent(player, TYPE.HANDLE_CHAT, message);
+	}
+
+	public static PlayerChatEvent HandleLoginMessage(EntityPlayer player) {
+		return new PlayerChatEvent(player, TYPE.HANDLE_LOGIN_MESSAGE, null);
+	}
+
+	public static PlayerChatEvent HandleLogoutMessage(EntityPlayer player) {
+		return new PlayerChatEvent(player, TYPE.HANDLE_LOGOUT_MESSAGE, null);
+	}
+
+	public static PlayerChatEvent HandleDeathMessage(EntityPlayer player, String message) {
+		return new PlayerChatEvent(player, TYPE.HANDLE_DEATH_MESSAGE, message);
 	}
 
 	public static PlayerChatEvent SendChatToPlayerAttempt(EntityPlayer player, EntityPlayer target, String message) {
