@@ -130,6 +130,16 @@ public class ChatAPI {
     		target.playerNetServerHandler.sendPacket(packet);
     	}
 	}
+	
+	public static void sendChatToAllPlayers(String message) {
+		sendChatToAllPlayers(new Packet3Chat(message, false));
+	}
+	
+	public static void sendChatToAllPlayers(Packet3Chat packet) {
+		for (EntityPlayerMP player : (List<EntityPlayerMP>)MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+			player.playerNetServerHandler.sendPacket(packet);
+		}
+	}
 
 	public static boolean onHandleChat(EntityPlayer player, String message) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
