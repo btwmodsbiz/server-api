@@ -131,7 +131,7 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 		return new PlayerChatEvent(username, TYPE.HANDLE_DEATH_MESSAGE, message);
 	}
 
-	public static PlayerChatEvent SendChatToPlayerAttempt(String username, String playerName, EntityPlayer target, String message) {
+	public static PlayerChatEvent SendChatToPlayerAttempt(String username, EntityPlayer target, String message) {
 		PlayerChatEvent event = new PlayerChatEvent(username, TYPE.SEND_TO_PLAYER_ATTEMPT, message);
 		event.targetPlayer = target;
 		return event;

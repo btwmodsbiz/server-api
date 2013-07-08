@@ -221,7 +221,7 @@ public class ChatAPI {
 	}
 	
 	public static boolean onSendChatToPlayerAttempt(String senderUsername, EntityPlayer target, String message) {
-		PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(null, senderUsername, target, message);
+		PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(senderUsername, target, message);
        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 		return event.isAllowed();
 	}
