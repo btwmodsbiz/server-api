@@ -210,7 +210,7 @@ public class ChatAPI {
 
 	public static boolean onHandleDeathMessage(EntityPlayer player, String deathMessage) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
-			PlayerChatEvent event = PlayerChatEvent.HandleDeathMessage(player.username, deathMessage);
+			PlayerChatEvent event = PlayerChatEvent.HandleDeathMessage(player.username, deathMessage.replace(player.getTranslatedEntityName(), player.username));
         	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 			
 			if (event.isHandled())
