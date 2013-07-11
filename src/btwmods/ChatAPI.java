@@ -18,6 +18,7 @@ import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.ICommandSender;
 import net.minecraft.src.Packet201PlayerInfo;
 import net.minecraft.src.Packet3Chat;
+import net.minecraft.src.ServerConfigurationManager;
 
 public class ChatAPI {
 	
@@ -138,6 +139,19 @@ public class ChatAPI {
 	public static void sendChatToAllPlayers(Packet3Chat packet) {
 		for (EntityPlayerMP player : (List<EntityPlayerMP>)MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
 			player.playerNetServerHandler.sendPacket(packet);
+		}
+	}
+	
+	public static void sendChatToAllAdmins(String message) {
+		sendChatToAllAdmins(new Packet3Chat(message, false));
+	}
+	
+	public static void sendChatToAllAdmins(Packet3Chat packet) {
+		ServerConfigurationManager configManager = MinecraftServer.getServer().getConfigurationManager();
+		for (EntityPlayerMP player : (List<EntityPlayerMP>)MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+			if (configManager.areCommandsAllowed(player.username)) {
+				player.playerNetServerHandler.sendPacket(packet);
+			}
 		}
 	}
 
