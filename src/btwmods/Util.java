@@ -33,6 +33,12 @@ public class Util {
 	public static final String COLOR_PINK   = "\u00a7d";
 	public static final String COLOR_YELLOW = "\u00a7e";
 	public static final String COLOR_WHITE  = "\u00a7f";
+	public static final String COLOR_ITALIC  = "\u00a7o";
+	public static final String COLOR_OBFUSCATED  = "\u00a7l";
+	public static final String COLOR_UNDERLINE  = "\u00a7n";
+	public static final String COLOR_BOLD  = "\u00a7l";
+	public static final String COLOR_STRIKETHROUGH  = "\u00a7m";
+	public static final String COLOR_RESET  = "\u00a7r";
 	public static final DecimalFormat DECIMAL_FORMAT_3 = new DecimalFormat("0.000");
 	public static final DecimalFormat DECIMAL_FORMAT_2 = new DecimalFormat("0.00");
 	public static final DecimalFormat DECIMAL_FORMAT_1 = new DecimalFormat("0.0");
