@@ -127,7 +127,7 @@ public class ChatAPI {
 	}
 	
 	public static void sendChatToPlayer(String senderUsername, EntityPlayerMP target, Packet3Chat packet) {
-		if (onSendChatToPlayerAttempt(senderUsername, target, packet.message)) {
+		if (onSendChatToPlayerAttempt(senderUsername, target.username, packet.message)) {
     		target.playerNetServerHandler.sendPacket(packet);
     	}
 	}
@@ -234,8 +234,8 @@ public class ChatAPI {
 		return true;
 	}
 	
-	public static boolean onSendChatToPlayerAttempt(String senderUsername, EntityPlayer target, String message) {
-		PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(senderUsername, target, message);
+	public static boolean onSendChatToPlayerAttempt(String senderUsername, String targetUsername, String message) {
+		PlayerChatEvent event = PlayerChatEvent.SendChatToPlayerAttempt(senderUsername, targetUsername, message);
        	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 		return event.isAllowed();
 	}

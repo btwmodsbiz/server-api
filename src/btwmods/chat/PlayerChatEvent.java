@@ -6,7 +6,6 @@ import btwmods.ChatAPI;
 import btwmods.events.APIEvent;
 import btwmods.events.IEventInterrupter;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.EntityPlayer;
 
 public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	
@@ -20,7 +19,7 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	private String message = null;
 	private boolean isHandled = false;
 	private boolean isAllowed = true;
-	private EntityPlayer targetPlayer = null;
+	private String targetUsername = null;
 	private List completions = null;
 	
 	public boolean isHandled() {
@@ -57,8 +56,8 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 			this.message = message;
 	}
 	
-	public EntityPlayer getTargetPlayer() {
-		return targetPlayer;
+	public String getTargetUsername() {
+		return targetUsername;
 	}
 
 	public boolean isAllowed() {
@@ -131,9 +130,9 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 		return new PlayerChatEvent(username, TYPE.HANDLE_DEATH_MESSAGE, message);
 	}
 
-	public static PlayerChatEvent SendChatToPlayerAttempt(String username, EntityPlayer target, String message) {
+	public static PlayerChatEvent SendChatToPlayerAttempt(String username, String targetUsername, String message) {
 		PlayerChatEvent event = new PlayerChatEvent(username, TYPE.SEND_TO_PLAYER_ATTEMPT, message);
-		event.targetPlayer = target;
+		event.targetUsername = targetUsername;
 		return event;
 	}
 
