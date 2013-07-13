@@ -1,5 +1,6 @@
 package btwmods;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -198,6 +199,25 @@ public class ChatAPI {
 		return true;
 	}
 
+	public static boolean onHandleWhisper(String[] arguments) {
+		if (arguments.length < 2)
+			return true;
+		
+		String senderUsername = arguments[0];
+		String targetUsername = arguments[1];
+		String[] messageArray = Arrays.copyOfRange(arguments, 2, arguments.length);
+		StringBuilder message = new StringBuilder();
+		for (String part : messageArray) {
+			if (message.length() > 0)
+				message.append(" ");
+			message.append(part);
+		}
+		
+		PlayerChatEvent event = PlayerChatEvent.HandleWhisper(senderUsername, targetUsername, message.toString());
+    	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+		return !event.isHandled();
+	}
+
 	public static boolean onHandleLoginMessage(EntityPlayer player) {
 		if (!listeners.isEmpty(IPlayerChatListener.class)) {
 			PlayerChatEvent event = PlayerChatEvent.HandleLoginMessage(player.username);
@@ -243,6 +263,16 @@ public class ChatAPI {
 	public static boolean onAutoComplete(ICommandSender sender, String text, List completions) {
 		if (sender instanceof EntityPlayerMP) {
 			PlayerChatEvent event = PlayerChatEvent.HandleAutoComplete(((EntityPlayer)sender).username, text, completions);
+	    	((IPlayerChatListener)listeners).onPlayerChatAction(event);
+			return event.isHandled();
+		}
+		
+		return false;
+	}
+
+	public static boolean onDeferredAutoComplete(ICommandSender sender, String text) {
+		if (sender instanceof EntityPlayerMP) {
+			PlayerChatEvent event = PlayerChatEvent.HandleDeferredAutoComplete(((EntityPlayer)sender).username, text);
 	    	((IPlayerChatListener)listeners).onPlayerChatAction(event);
 			return event.isHandled();
 		}

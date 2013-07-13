@@ -10,7 +10,7 @@ import net.minecraft.server.MinecraftServer;
 public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	
 	public enum TYPE { HANDLE_CHAT, HANDLE_GLOBAL, GLOBAL, HANDLE_EMOTE, SEND_TO_PLAYER_ATTEMPT, AUTO_COMPLETE,
-		HANDLE_LOGIN_MESSAGE, HANDLE_LOGOUT_MESSAGE, HANDLE_DEATH_MESSAGE };
+		HANDLE_LOGIN_MESSAGE, HANDLE_LOGOUT_MESSAGE, HANDLE_DEATH_MESSAGE, HANDLE_WHISPER, HANDLE_DEFERRED_AUTO_COMPLETE };
 	
 	public final TYPE type;
 	public final String username;
@@ -33,8 +33,10 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 			case HANDLE_DEATH_MESSAGE:
 			case HANDLE_EMOTE:
 			case HANDLE_GLOBAL:
+			case HANDLE_WHISPER:
 			case HANDLE_LOGIN_MESSAGE:
 			case HANDLE_LOGOUT_MESSAGE:
+			case HANDLE_DEFERRED_AUTO_COMPLETE:
 				isHandled = true;
 				break;
 			case SEND_TO_PLAYER_ATTEMPT:
@@ -89,10 +91,12 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 			case HANDLE_DEATH_MESSAGE:
 			case HANDLE_EMOTE:
 			case HANDLE_GLOBAL:
+			case HANDLE_WHISPER:
 				return true;
 
 			case HANDLE_LOGIN_MESSAGE:
 			case HANDLE_LOGOUT_MESSAGE:
+			case HANDLE_DEFERRED_AUTO_COMPLETE:
 			case SEND_TO_PLAYER_ATTEMPT:
 			case AUTO_COMPLETE:
 			case GLOBAL:
@@ -139,6 +143,16 @@ public class PlayerChatEvent extends APIEvent implements IEventInterrupter {
 	public static PlayerChatEvent HandleAutoComplete(String username, String text, List completions) {
 		PlayerChatEvent event = new PlayerChatEvent(username, TYPE.AUTO_COMPLETE, text);
 		event.completions = completions;
+		return event;
+	}
+
+	public static PlayerChatEvent HandleDeferredAutoComplete(String username, String message) {
+		return new PlayerChatEvent(username, TYPE.HANDLE_DEFERRED_AUTO_COMPLETE, message);
+	}
+	
+	public static PlayerChatEvent HandleWhisper(String username, String targetUsername, String message) {
+		PlayerChatEvent event = new PlayerChatEvent(username, TYPE.HANDLE_WHISPER, message);
+		event.targetUsername = targetUsername;
 		return event;
 	}
 	
