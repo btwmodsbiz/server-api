@@ -68,6 +68,9 @@ public class ChatAPI {
 	}
 	
 	public static void setAlias(String username, String alias) {
+		if (alias == null || username == null)
+			throw new NullPointerException();
+		
 		ModLoader.outputInfo("Set alias " + username + " to " + alias);
    		String oldAlias = usernameToAlias.put(username.toLowerCase(), alias);
    		aliasToUsername.put(alias.toLowerCase(), username);
@@ -78,34 +81,22 @@ public class ChatAPI {
    		}
 	}
 	
-	public static void removeAlias(String username) {
+	public static void removeAlias(String username, boolean updateClients) {
    		String oldAlias = usernameToAlias.remove(username.toLowerCase());
-   		if (oldAlias != null) {
-   	   		aliasToUsername.remove(oldAlias.toLowerCase());
-   		}
-	}
-	
-	public static void refreshAlias(String username) {
-   		String oldAlias = usernameToAlias.remove(username.toLowerCase());
-   		
    		if (oldAlias != null) {
    	   		aliasToUsername.remove(oldAlias.toLowerCase());
    	   		
-   	   		EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerEntity(username);
-   	   		resetPlayerInfo(oldAlias, getUsernameAliased(username), player == null ? 1000 : player.ping);
+   	   		if (updateClients) {
+   	   			EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerEntity(username);
+   	   			resetPlayerInfo(oldAlias, getUsernameAliased(username), player == null ? 1000 : player.ping);
+   	   		}
    		}
 	}
 	
-	public static void removeAllAliases() {
+	public static void removeAllAliases(boolean updateClients) {
 		String[] usernames = usernameToAlias.keySet().toArray(new String[0]);
 		for (String username : usernames)
-			removeAlias(username);
-	}
-	
-	public static void refreshAllAliases() {
-		String[] usernames = usernameToAlias.keySet().toArray(new String[0]);
-		for (String username : usernames)
-			refreshAlias(username);
+			removeAlias(username, updateClients);
 	}
 	
 	private static void resetPlayerInfo(String fromUsername, String toUsername, int ping) {
