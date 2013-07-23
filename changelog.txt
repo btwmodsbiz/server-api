@@ -1,3 +1,20 @@
+Version 4.87.1 (vMC 1.5.2 BTW 4.87)
+
+  - Added sendChatToAllAdmins methods to ChatAPI.
+  
+  - Added additional formatting constants to Util.
+  
+  - Added event handling to PlayerChatEvent and ChatAPI for handling
+    whispers and deferred tab completion.
+    
+  - Changed PlayerChatEvent's targetPlayer type to String and renamed it
+    targetUsername.
+    
+  - Changed alias methods in ChatAPI to make more sense.
+  
+  - Moved ChatAPI.getUsernameAliased calls to EntityPlayer's
+    getTranslatedEntityName.
+
 Version 4.87.0 (vMC 1.5.2 BTW 4.87)
 
   - Updated to BTW 4.87
