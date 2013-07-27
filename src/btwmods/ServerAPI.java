@@ -18,6 +18,7 @@ public class ServerAPI {
 	
 	private static MinecraftServer server = null;
 	
+	public static boolean hardcoreSpawn = true;
 	public static long animalSpawnTick = 0L;
 	public static boolean softcoreEnderChests = false;
 	private static boolean allowUnloadSpawnChunks = false;
@@ -39,6 +40,7 @@ public class ServerAPI {
 	
 	static void init(Settings settings) {
 		animalSpawnTick = settings.getLong("ServerAPI", "animalSpawnTick", 0L);
+		hardcoreSpawn = settings.getBoolean("ServerAPI", "hardcoreSpawn", hardcoreSpawn);
 		allowUnloadSpawnChunks = settings.getBoolean("ServerAPI", "allowUnloadSpawnChunks", allowUnloadSpawnChunks);
 		preloadSpawnChunks = settings.getBoolean("ServerAPI", "preloadSpawnChunks", preloadSpawnChunks);
 		softcoreEnderChests = settings.getBoolean("ServerAPI", "softcoreEnderChests", softcoreEnderChests);
