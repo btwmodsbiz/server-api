@@ -124,6 +124,13 @@ public class ChatAPI {
     	}
 	}
 	
+	public static void sendChatToPlayer(String targetUsername, String message) {
+		ServerConfigurationManager configManager = MinecraftServer.getServer().getConfigurationManager();
+		EntityPlayerMP player = configManager.getPlayerEntity(targetUsername);
+		if (player != null)
+			player.sendChatToPlayer(message);
+	}
+	
 	public static void sendChatToAllPlayers(String message) {
 		sendChatToAllPlayers(new Packet3Chat(message, false));
 	}
