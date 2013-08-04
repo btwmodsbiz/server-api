@@ -19,7 +19,7 @@ public class ServerAPI {
 	private static MinecraftServer server = null;
 	
 	public static boolean hardcoreSpawn = true;
-	public static long animalSpawnTick = 0L;
+	public static long animalSpawnTick = 0L; // 400L in vanilla MC
 	public static boolean softcoreEnderChests = false;
 	private static boolean allowUnloadSpawnChunks = false;
 	private static boolean preloadSpawnChunks = true;
